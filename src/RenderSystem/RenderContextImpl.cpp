@@ -1,0 +1,122 @@
+//
+// Created by matherno on 17/11/17.
+//
+
+#include "RenderContextImpl.h"
+#include "RenderableSetImpl.h"
+
+using namespace mathernogl;
+
+bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
+  {
+  window.reset(initGL(initConfig->windowName, initConfig->windowWidth, initConfig->windowHeight, initConfig->fullscreen, initConfig->antiAliasing));
+  if (window)
+    {
+    window->setClearColour(0, 0, 0);
+    renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
+    return true;
+    }
+  return false;
+  }
+
+bool RenderContextImpl::cleanUp()
+  {
+  //todo: cleanup all opengl objects
+  return true;
+  }
+
+uint RenderContextImpl::getNextRenderableID()
+  {
+  return nextRenderableID++;
+  }
+
+void RenderContextImpl::setWorldToCamera(const mathernogl::Matrix4& transform)
+  {
+  worldToCameraTransform = transform;
+  }
+
+void RenderContextImpl::setCameraToClip(const mathernogl::Matrix4& transform)
+  {
+  cameraToClipTransform = transform;
+  }
+
+void RenderContextImpl::render()
+  {
+  if (!isRendering)
+    {
+    isRendering = true;
+    transformStack.clear();
+    window->clear();
+    pushTransform(renderableSet->getTransform());
+    renderableSet->render(this);
+    popTransform();
+    window->update();
+    isRendering = false;
+    }
+  }
+
+bool RenderContextImpl::isWindowOpen() const
+  {
+  return window->isOpen();
+  }
+
+void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
+  {
+  //todo: keep track of enabled shader and don't enable this if already enabled
+  shaderProgram->enable();
+
+  if (shaderProgram->hasUniformVariable(SHADER_VAR_WORLD_TO_CAMERA))
+    shaderProgram->setVarMat4(SHADER_VAR_WORLD_TO_CAMERA, worldToCameraTransform);
+  if (shaderProgram->hasUniformVariable(SHADER_VAR_CAMERA_TO_CLIP))
+    shaderProgram->setVarMat4(SHADER_VAR_CAMERA_TO_CLIP, cameraToClipTransform);
+  if (shaderProgram->hasUniformVariable(SHADER_VAR_VERT_TO_WORLD))
+    {
+    if (getStackedTransform())
+      shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, *getStackedTransform()->getTransformMatrix());
+    else
+      shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, Matrix4(1));
+    }
+
+  //todo: put vert to world shader variable set in a more appropriate place
+
+  }
+
+ShaderProgramPtr RenderContextImpl::createShaderProgram(const std::vector<Shader>* shaders)
+  {
+  //todo: cache all created shader programs, and ensure that duplicates aren't created
+  ShaderProgram* shaderProgram = new ShaderProgram();
+  shaderProgram->init(*shaders);
+  return ShaderProgramPtr(shaderProgram);
+  }
+
+MeshStoragePtr RenderContextImpl::createMeshStorage(const std::string& objFilePath)
+  {
+  //todo: cache the mesh storages, ensuring no duplicates are loaded into memory
+  MeshStoragePtr meshStorage(new MeshStorage(nextMeshStorageID++));
+  loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords);
+  if(meshStorage->initialiseVAO())
+    return meshStorage;
+  else
+    return nullptr;
+  }
+
+void RenderContextImpl::pushTransform(const mathernogl::Transform* transform)
+  {
+  transformStack.push(transform);
+  }
+
+void RenderContextImpl::popTransform()
+  {
+  transformStack.pop();
+  }
+
+const Transform* RenderContextImpl::getStackedTransform()
+  {
+  return transformStack.getTop();
+  }
+
+Window* RenderContextImpl::getWindow()
+  {
+  return window.get();
+  }
+
