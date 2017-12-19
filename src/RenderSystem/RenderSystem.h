@@ -25,7 +25,8 @@ private:
 public:
   Renderable(uint id) : id(id) {}
   virtual ~Renderable() {}
-  uint getID() const { return id; }
+
+  virtual uint getID() const { return id; }
   virtual void initialise(RenderContext* renderContext) = 0;
   virtual void cleanUp(RenderContext* renderContext) = 0;
   virtual void render(RenderContext* renderContext) = 0;

@@ -7,17 +7,32 @@
 #include "InputManagerImpl.h"
 #include "Camera.h"
 #include <src/RenderSystem/RenderContextImpl.h>
+#include <set>
 
 class GameContextImpl : public GameContext
   {
+enum ProcessStage
+  {
+  stageNone,
+  stageInit,
+  stageInput,
+  stageUpdate,
+  stageRender,
+  stageCleanUp,
+  };
+
 private:
   InputManagerImpl inputManager;
   RenderContextImpl renderContext;
   uint nextActorID = 1;
   mathernogl::MappedList<GameActorPtr> actors;
   Camera camera;
+  long startTime;
   long startFrameTime;
+  long gameTime = 0;
   long deltaTime = 0;
+  ProcessStage stage = stageNone;
+  std::set<uint> actorsToRemove;
 
 public:
   GameContextImpl() {}
@@ -35,6 +50,7 @@ public:
   virtual void addInputHandler(InputHandlerPtr handler) override;
   virtual void removeInputHandler(InputHandlerPtr handler) override;
 
+  virtual long getGameTime() override { return gameTime; }
   virtual long getDeltaTime() override { return deltaTime; }
   virtual void startFrame() override;
   virtual void processInputStage() override;
@@ -45,4 +61,7 @@ public:
   virtual Camera* getCamera() override { return &camera; }
   virtual InputManager* getInputManager() override { return &inputManager; }
   virtual RenderContext* getRenderContext() override { return &renderContext; }
+
+protected:
+  void removePendingActors();
   };

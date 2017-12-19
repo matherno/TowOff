@@ -42,9 +42,6 @@ void TestActor::onAttached(GameContext* gameContext)
     tree.reset(renderable);
     context->getRenderableSet()->addRenderable(tree);
     }
-
-  context->getRenderableSet()->getTransform()->rotate(1, 0, 0, 10);
-  context->getRenderableSet()->getTransform()->translate(0, -2, 0);
   }
 
 void TestActor::onUpdate(GameContext* gameContext)

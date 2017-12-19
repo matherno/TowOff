@@ -16,7 +16,7 @@ private:
 public:
   GameActor(uint id) : id(id) {}
   virtual ~GameActor() {}
-  uint getID(){ return id; }
+  uint getID() const { return id; }
   virtual void onAttached(GameContext* gameContext) = 0;
   virtual void onUpdate(GameContext* gameContext) = 0;
   virtual void onDetached(GameContext* gameContext) = 0;
@@ -84,6 +84,7 @@ public:
   virtual bool gotActor(uint id) = 0;
   virtual void addInputHandler(InputHandlerPtr handler) = 0;
   virtual void removeInputHandler(InputHandlerPtr handler) = 0;
+  virtual long getGameTime() = 0;
   virtual long getDeltaTime() = 0;
   virtual void startFrame() = 0;
   virtual void processInputStage() = 0;

@@ -13,6 +13,7 @@ class RenderableMesh : public Renderable
 private:
   MeshStoragePtr meshStorage;
   ShaderProgramPtr shaderProgram;
+  bool lightShaded = true;
 
 public:
   RenderableMesh(uint id);
@@ -23,4 +24,6 @@ public:
 
   void setMeshStorage(MeshStoragePtr meshStorage) { this->meshStorage = meshStorage; }
   MeshStoragePtr getMeshStorage(MeshStoragePtr meshStorage) const { return meshStorage; }
+
+  void setLightShaded(bool lightShaded){ this->lightShaded = lightShaded; }
   };

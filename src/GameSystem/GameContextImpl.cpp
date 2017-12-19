@@ -6,8 +6,11 @@
 
 bool GameContextImpl::initialise()
   {
+  stage = stageInit;
   RenderInitConfig config;
   config.windowName = "Testing";
+  config.windowWidth = 1280;
+  config.windowHeight = 768;
   if (!renderContext.initialise(&config))
     {
     mathernogl::logError("Failed to initialise render system!");
@@ -16,12 +19,18 @@ bool GameContextImpl::initialise()
 
   inputManager.initialise(renderContext.getWindow());
 
+  startTime = mathernogl::getTimeMS();
+  gameTime = 0;
+
+  stage = stageNone;
   return true;
   }
 
 void GameContextImpl::cleanUp()
   {
+  stage = stageCleanUp;
   renderContext.cleanUp();
+  stage = stageNone;
   }
 
 void GameContextImpl::addActor(GameActorPtr actor)
@@ -32,11 +41,18 @@ void GameContextImpl::addActor(GameActorPtr actor)
 
 void GameContextImpl::removeActor(uint id)
   {
-  if (actors.contains(id))
+  if (stage != stageUpdate)
     {
-    GameActorPtr actor = actors.get(id);
-    actors.remove(id);
-    actor->onDetached(this);
+    if (actors.contains(id))
+      {
+      GameActorPtr actor = actors.get(id);
+      actors.remove(id);
+      actor->onDetached(this);
+      }
+    }
+  else
+    {
+    actorsToRemove.emplace(id);
     }
   }
 
@@ -57,17 +73,23 @@ uint GameContextImpl::getNextActorID()
 
 void GameContextImpl::processInputStage()
   {
+  stage = stageInput;
   inputManager.processInput(this);
+  stage = stageNone;
   }
 
 void GameContextImpl::processUpdateStage()
   {
+  stage = stageUpdate;
   for (GameActorPtr actor : *actors.getList())
     actor->onUpdate(this);
+  stage = stageNone;
+  removePendingActors();
   }
 
 void GameContextImpl::processDrawStage()
   {
+  stage = stageRender;
   if (!camera.isValid())
     {
     renderContext.setWorldToCamera(*camera.getWorldToCamera()->getTransformMatrix());
@@ -76,6 +98,7 @@ void GameContextImpl::processDrawStage()
     }
 
   renderContext.render();
+  stage = stageNone;
   }
 
 void GameContextImpl::addInputHandler(InputHandlerPtr handler)
@@ -92,6 +115,7 @@ void GameContextImpl::removeInputHandler(InputHandlerPtr handler)
 
 void GameContextImpl::startFrame()
   {
+  gameTime = mathernogl::getTimeMS() - startTime;
   startFrameTime = mathernogl::getTimeMS();
   }
 
@@ -102,5 +126,14 @@ void GameContextImpl::endFrame(float maxFPS)
     {
     }
   deltaTime = mathernogl::getTimeMS() - startFrameTime;
+  }
+
+void GameContextImpl::removePendingActors()
+  {
+  std::for_each(actorsToRemove.begin(), actorsToRemove.end(), [this](uint id)
+    {
+    removeActor(id);
+    });
+  actorsToRemove.clear();
   }
 

@@ -6,17 +6,23 @@
 #include "TestActor.h"
 #include "TestInputHandler.h"
 #include "PanCameraInputHandler.h"
+#include "TOGameContext.h"
 
 int main()
   {
-  GameContextImpl context;
+  TOGameContext context;
   context.initialise();
 
   PanCameraInputHandler* handler = new PanCameraInputHandler(context.getInputManager()->getNextHandlerID(), Vector3D(0, 20, 30), 0, 0, -20);
   context.addInputHandler(InputHandlerPtr(handler));
 
-  TestInputHandler* handler2 = new TestInputHandler(context.getInputManager()->getNextHandlerID());
-  context.addInputHandler(InputHandlerPtr(handler2));
+  for (int num = 0; num < 20; ++num)
+    {
+    context.createBasicTower(Vector3D(mathernogl::RandomGenerator::randomFloat(-40, 40), 0, mathernogl::RandomGenerator::randomFloat(-40, 40)));
+    }
+//  context.createBasicTower(Vector3D(0, 0, 0));
+//  context.createBasicTower(Vector3D(20, 0, 0));
+//  context.createBasicTower(Vector3D(20, 0, 10));
 
   while(context.getRenderContext()->isWindowOpen())
     {
