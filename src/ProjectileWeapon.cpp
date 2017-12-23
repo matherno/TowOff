@@ -35,3 +35,8 @@ void ProjectileWeapon::endShooting(GameContext* context, const Vector3D& shootPo
   {
 
   }
+
+bool ProjectileWeapon::isCoolingDown(long currentTime)
+  {
+  return currentTime - lastShootTime <= cooldownTime;;
+  }

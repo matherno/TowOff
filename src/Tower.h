@@ -80,4 +80,5 @@ public:
   virtual void initShooting(GameContext* context) = 0;
   virtual void updateShooting(GameContext* context, const Vector3D& shootPos) = 0;
   virtual void endShooting(GameContext* context, const Vector3D& shootPos) = 0;
+  virtual bool isCoolingDown(long currentTime) = 0;
   };

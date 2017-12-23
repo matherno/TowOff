@@ -12,7 +12,7 @@ typedef std::function<ProjectilePtr(uint id)> CreateProjectileFunc;
 class ProjectileWeapon : public TowerWeapon
   {
 private:
-  long lastShootTime = 0;
+  long lastShootTime = -9999;
 
   CreateProjectileFunc createProjectileFunc;
   long cooldownTime = 1000;
@@ -28,4 +28,6 @@ public:
   void setCooldownTime(long cooldownTime) { this->cooldownTime = cooldownTime; }
   void setShootForce(double shootForce) { this->shootForce = shootForce; }
   void setGravityForce(double gravityForce) { this->gravityForce = gravityForce; }
+
+  virtual bool isCoolingDown(long currentTime) override;
   };

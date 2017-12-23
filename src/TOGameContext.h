@@ -28,6 +28,7 @@ public:
   Player* getPlayer(uint num);
   Player* createPlayer();
   int numPlayers() const { return (int)players.size(); }
+  Vector3D getPlayerColour(uint num);
 
   TowerPtr getTower(uint id);
   TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);
@@ -35,6 +36,7 @@ public:
   void removeTower(uint id);
 
   TowerPtr createBasicTower(const Vector3D& position = Vector3D(0));
+  TowerPtr createBasicTowerProj(const Vector3D& position = Vector3D(0));
 
   ProjectilePtr createFootballProjectile(uint id);
 

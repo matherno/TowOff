@@ -6,7 +6,7 @@
 #include "Projectile.h"
 #include "Resources.h"
 
-Projectile::Projectile(uint id) : GameActor(id)
+Projectile::Projectile(uint id) : TimeToLiveActor(id)
   {}
 
 void Projectile::onAttached(GameContext* gameContext)
@@ -27,6 +27,7 @@ void Projectile::onAttached(GameContext* gameContext)
 
 void Projectile::onUpdate(GameContext* gameContext)
   {
+  TimeToLiveActor::onUpdate(gameContext);
   float deltaTimeSeconds = (float)gameContext->getDeltaTime() / 1000.0f;
   velocity += acceleration * deltaTimeSeconds;
   velocity -= velocity * dragEffect * deltaTimeSeconds;
@@ -35,10 +36,6 @@ void Projectile::onUpdate(GameContext* gameContext)
   renderable->getTransform()->scale(scale);
   renderable->getTransform()->rotateBetween(Vector3D(0, 0, -1), velocity.getUniform());
   renderable->getTransform()->translate(position);
-
-  timeToLive -= gameContext->getDeltaTime();
-  if (timeToLive <= 0)
-    gameContext->removeActor(getID());
   }
 
 void Projectile::onDetached(GameContext* gameContext)

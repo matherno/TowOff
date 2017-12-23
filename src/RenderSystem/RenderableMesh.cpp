@@ -28,6 +28,7 @@ void RenderableMesh::render(RenderContext* renderContext)
     meshStorage->getVAO().bind();
     renderContext->activateShaderProgram(shaderProgram);
     shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0);
+    shaderProgram->setVarVec3("inColour", colour);
     glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
     }
   }

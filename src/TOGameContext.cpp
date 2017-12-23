@@ -65,8 +65,11 @@ TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower, bool onlyEnemies)
       {
       if (targetTower->getID() != tower->getID())
         {
-        closestTower = targetTower;
-        closestTowerDist = distance;
+        if (!onlyEnemies || tower->getPlayerNum() != targetTower->getPlayerNum())
+          {
+          closestTower = targetTower;
+          closestTowerDist = distance;
+          }
         }
       }
     }
@@ -81,14 +84,29 @@ void TOGameContext::removeTower(uint id)
 
 TowerPtr TOGameContext::createBasicTower(const Vector3D& position)
   {
+  std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
+  weapon->setCooldownTime(1000);
+
+  TowerPtr tower(new Tower(getNextActorID(), MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
+  tower->setPosition(position);
+  tower->setTargetOffset(Vector3D(0, 1, 0));
+  tower->setShootOffset(Vector3D(0, 2, -2));
+  tower->setWeapon(std::move(weapon));
+  towers.add(tower, tower->getID());
+  addActor(tower);
+  return tower;
+  }
+
+TowerPtr TOGameContext::createBasicTowerProj(const Vector3D& position)
+  {
   std::unique_ptr<ProjectileWeapon> weapon(new ProjectileWeapon());
   weapon->setCooldownTime(1000);
   weapon->setShootForce(100);
-  weapon->setGravityForce(2);
+  weapon->setGravityForce(0);
   weapon->setCreateProjectileFunc([this](uint id)->ProjectilePtr
-    {
-    return createFootballProjectile(id);
-    });
+                                    {
+                                    return createFootballProjectile(id);
+                                    });
 
   TowerPtr tower(new Tower(getNextActorID(), MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
   tower->setPosition(position);
@@ -108,4 +126,17 @@ ProjectilePtr TOGameContext::createFootballProjectile(uint id)
   projectile->setDragEffect(0.5);
   projectile->setTimeToLive(1000);
   return projectile;
+  }
+
+Vector3D TOGameContext::getPlayerColour(uint num)
+  {
+  switch (num)
+    {
+    case 1:
+      return Vector3D(0, 0, 0.5);
+    case 2:
+      return Vector3D(0, 0.5, 0);
+    default:
+      return Vector3D(0.5, 0.5, 0.5);
+    }
   }

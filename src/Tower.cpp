@@ -57,8 +57,13 @@ void Tower::onUpdate(GameContext* gameContext)
     return;
     }
 
+  ((RenderableMesh*)towerBase.get())->setColour(toGameContext->getPlayerColour(getPlayerNum()));
+
   if (state == idle)
     {
+    if (weapon && weapon->isCoolingDown(gameContext->getGameTime()))
+      return;
+
     TowerPtr target = toGameContext->getClosestTowerTo(this, true);
     if (target && weapon)
       {

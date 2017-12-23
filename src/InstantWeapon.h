@@ -10,7 +10,7 @@ class InstantWeapon : public TowerWeapon
   {
 private:
   long cooldownTime = 1000;
-  long lastShootTime = 0;
+  long lastShootTime = -9999;
   int damagePerShot = 10;
 
 public:
@@ -20,4 +20,9 @@ public:
 
   void setCooldownTime(long time) { cooldownTime = time; }
   void setDamagePerShot(int damagePerShot) { this->damagePerShot = damagePerShot; }
+
+  virtual bool isCoolingDown(long currentTime) override;
+
+protected:
+  void createBeamShot(GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos);
   };
