@@ -14,6 +14,7 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
     {
     window->setClearColour(0, 0, 0);
     renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
+    setDepthTest(true);
     return true;
     }
   return false;
@@ -98,6 +99,11 @@ MeshStoragePtr RenderContextImpl::createMeshStorage(const std::string& objFilePa
     return meshStorage;
   else
     return nullptr;
+  }
+
+MeshStoragePtr RenderContextImpl::createEmptyMeshStorage()
+  {
+  return std::make_shared<MeshStorage>(nextMeshStorageID++);
   }
 
 void RenderContextImpl::pushTransform(const mathernogl::Transform* transform)

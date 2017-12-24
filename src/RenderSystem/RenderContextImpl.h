@@ -38,6 +38,7 @@ public:
   virtual void activateShaderProgram(ShaderProgramPtr shaderProgram) override;
   virtual ShaderProgramPtr createShaderProgram(const std::vector<mathernogl::Shader>* shaders) override;
   virtual MeshStoragePtr createMeshStorage(const std::string& objFilePath) override;
+  virtual MeshStoragePtr createEmptyMeshStorage() override;
 
   virtual void pushTransform(const mathernogl::Transform* transform) override;
   virtual void popTransform() override;

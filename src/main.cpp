@@ -23,6 +23,8 @@ int main()
     tower->setPlayerNum((uint)mathernogl::RandomGenerator::randomInt(1, 2));
     }
 
+//  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
   while(context.getRenderContext()->isWindowOpen())
     {
     context.startFrame();

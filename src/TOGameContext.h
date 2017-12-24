@@ -17,6 +17,7 @@ class TOGameContext : public GameContextImpl
 private:
   std::vector<PlayerPtr> players;
   TowerList towers;
+  RenderablePtr surfaceMesh;
 
 public:
   virtual bool initialise() override;
@@ -47,4 +48,6 @@ public:
     return toContext;
     }
 
+protected:
+  void initSurface(uint numCells, float cellSize);
   };

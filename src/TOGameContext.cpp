@@ -2,6 +2,8 @@
 // Created by matt on 3/12/17.
 //
 
+#include <src/RenderSystem/RenderableMesh.h>
+#include <src/RenderSystem/RenderableTerrain.h>
 #include "TOGameContext.h"
 #include "Resources.h"
 #include "ProjectileWeapon.h"
@@ -9,11 +11,14 @@
 
 bool TOGameContext::initialise()
   {
-  return GameContextImpl::initialise();
+  bool success = GameContextImpl::initialise();
+  initSurface(10, 15);
+  return success;
   }
 
 void TOGameContext::cleanUp()
   {
+  surfaceMesh->cleanUp(getRenderContext());
   GameContextImpl::cleanUp();
   }
 
@@ -139,4 +144,15 @@ Vector3D TOGameContext::getPlayerColour(uint num)
     default:
       return Vector3D(0.5, 0.5, 0.5);
     }
+  }
+
+void TOGameContext::initSurface(uint numCells, float cellSize)
+  {
+  RenderContext* renderContext = getRenderContext();
+  RenderableTerrain* terrain = new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize);
+  terrain->setMultiColour(Vector3D(0.2, 0.4, 0.2), Vector3D(0.1, 0.3, 0.0));
+  surfaceMesh.reset(terrain);
+  surfaceMesh->getTransform()->translate(Vector3D(numCells*cellSize*-0.5f, 0, numCells*cellSize*-0.5f));
+  surfaceMesh->initialise(renderContext);
+  renderContext->getRenderableSet()->addRenderable(surfaceMesh);
   }

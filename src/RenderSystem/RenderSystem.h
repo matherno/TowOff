@@ -83,6 +83,7 @@ public:
   virtual void activateShaderProgram(ShaderProgramPtr shaderProgram) = 0;
   virtual ShaderProgramPtr createShaderProgram(const std::vector<mathernogl::Shader>* shaders) = 0;
   virtual MeshStoragePtr createMeshStorage(const string& objFilePath) = 0;
+  virtual MeshStoragePtr createEmptyMeshStorage() = 0;
   virtual void pushTransform(const Transform* transform) = 0;
   virtual void popTransform() = 0;
   virtual const Transform* getStackedTransform() = 0;

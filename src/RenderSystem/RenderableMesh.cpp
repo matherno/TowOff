@@ -13,7 +13,6 @@ void RenderableMesh::initialise(RenderContext* renderContext)
   {
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/MeshVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/MeshFS.glsl") };
   shaderProgram = renderContext->createShaderProgram(&shaders);
-  setDepthTest(true);
   }
 
 void RenderableMesh::cleanUp(RenderContext* renderContext)
@@ -28,6 +27,7 @@ void RenderableMesh::render(RenderContext* renderContext)
     meshStorage->getVAO().bind();
     renderContext->activateShaderProgram(shaderProgram);
     shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0);
+    shaderProgram->setVarInt("inUseSingleColour", 1);
     shaderProgram->setVarVec3("inColour", colour);
     glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
     }
