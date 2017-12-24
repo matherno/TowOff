@@ -91,6 +91,8 @@ public:
   virtual void processUpdateStage() = 0;
   virtual void processDrawStage() = 0;
   virtual void endFrame(float maxFPS) = 0;
+  virtual void setPaused(bool pause) = 0;
+  virtual bool isPaused() const = 0;
   virtual Camera* getCamera() = 0;
   virtual InputManager* getInputManager() = 0;
   virtual RenderContext* getRenderContext() = 0;

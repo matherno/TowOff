@@ -14,8 +14,9 @@ void TimeToLiveActor::onAttached(GameContext* gameContext)
 void TimeToLiveActor::onUpdate(GameContext* gameContext)
   {
   timeToLive -= gameContext->getDeltaTime();
-  if (timeToLive <= 0)
+  if (!firstUpdate && timeToLive <= 0)
     gameContext->removeActor(getID());
+  firstUpdate = false;
   }
 
 void TimeToLiveActor::onDetached(GameContext* gameContext)

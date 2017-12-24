@@ -26,6 +26,7 @@ private:
   TowerState state = idle;
   int maxHealthPoints = 100;
   int healthPoints = maxHealthPoints;
+  bool showDamageEffect = false;
 
 protected:
   float hitRadius = 5;

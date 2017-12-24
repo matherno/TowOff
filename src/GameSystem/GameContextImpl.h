@@ -33,6 +33,7 @@ private:
   long deltaTime = 0;
   ProcessStage stage = stageNone;
   std::set<uint> actorsToRemove;
+  bool paused = false;
 
 public:
   GameContextImpl() {}
@@ -57,6 +58,8 @@ public:
   virtual void processUpdateStage() override;
   virtual void processDrawStage() override;
   virtual void endFrame(float maxFPS) override;
+  virtual void setPaused(bool pause) override;
+  virtual bool isPaused() const override;
 
   virtual Camera* getCamera() override { return &camera; }
   virtual InputManager* getInputManager() override { return &inputManager; }

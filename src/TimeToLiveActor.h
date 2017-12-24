@@ -12,6 +12,7 @@ class TimeToLiveActor : public GameActor
 protected:
   long timeToLive = 2000;
   std::list<RenderablePtr> renderables;
+  bool firstUpdate = true;
 
 public:
   TimeToLiveActor(uint id, long timeToLive = 200);

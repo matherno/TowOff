@@ -29,6 +29,10 @@ bool GameContextImpl::initialise()
 void GameContextImpl::cleanUp()
   {
   stage = stageCleanUp;
+  for (GameActorPtr actor : *actors.getList())
+    actor->onDetached(this);
+  actors.clear();
+  actorsToRemove.clear();
   renderContext.cleanUp();
   stage = stageNone;
   }
@@ -41,7 +45,7 @@ void GameContextImpl::addActor(GameActorPtr actor)
 
 void GameContextImpl::removeActor(uint id)
   {
-  if (stage != stageUpdate)
+  if (stage != stageUpdate && stage != stageCleanUp)
     {
     if (actors.contains(id))
       {
@@ -80,11 +84,14 @@ void GameContextImpl::processInputStage()
 
 void GameContextImpl::processUpdateStage()
   {
-  stage = stageUpdate;
-  for (GameActorPtr actor : *actors.getList())
-    actor->onUpdate(this);
-  stage = stageNone;
-  removePendingActors();
+  if (!paused)
+    {
+    stage = stageUpdate;
+    for (GameActorPtr actor : *actors.getList())
+      actor->onUpdate(this);
+    stage = stageNone;
+    removePendingActors();
+    }
   }
 
 void GameContextImpl::processDrawStage()
@@ -115,7 +122,8 @@ void GameContextImpl::removeInputHandler(InputHandlerPtr handler)
 
 void GameContextImpl::startFrame()
   {
-  gameTime = mathernogl::getTimeMS() - startTime;
+  if (!paused)
+    gameTime += deltaTime;
   startFrameTime = mathernogl::getTimeMS();
   }
 
@@ -135,5 +143,15 @@ void GameContextImpl::removePendingActors()
     removeActor(id);
     });
   actorsToRemove.clear();
+  }
+
+void GameContextImpl::setPaused(bool pause)
+  {
+  paused = pause;
+  }
+
+bool GameContextImpl::isPaused() const
+  {
+  return paused;
   }
 

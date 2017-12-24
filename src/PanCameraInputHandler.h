@@ -16,6 +16,7 @@ private:
   float pitch;
   Matrix4 rotationMatrix;
   float zoomOffset;
+  bool paused = false;
 
 public:
   PanCameraInputHandler(uint id, const Vector3D& position, float zoomOffset = 0, float yaw = 0, float pitch = -45);
@@ -29,6 +30,9 @@ public:
   void refreshCamera(Camera* camera) const;
 
   virtual void onAttached(GameContext* gameContext) override;
+
+  virtual bool onKeyPressed(GameContext* gameContext, uint key) override;
+
   virtual void onDetached(GameContext* gameContext) override;
   virtual bool onKeyHeld(GameContext* gameContext, uint key) override;
 

@@ -13,12 +13,17 @@ bool TOGameContext::initialise()
   {
   bool success = GameContextImpl::initialise();
   initSurface(10, 15);
+  initDamageParticleSystem();
   return success;
   }
 
 void TOGameContext::cleanUp()
   {
-  surfaceMesh->cleanUp(getRenderContext());
+  if (surfaceMesh)
+    {
+    getRenderContext()->getRenderableSet()->removeRenderable(surfaceMesh->getID());
+    surfaceMesh->cleanUp(getRenderContext());
+    }
   GameContextImpl::cleanUp();
   }
 
@@ -155,4 +160,21 @@ void TOGameContext::initSurface(uint numCells, float cellSize)
   surfaceMesh->getTransform()->translate(Vector3D(numCells*cellSize*-0.5f, 0, numCells*cellSize*-0.5f));
   surfaceMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(surfaceMesh);
+  }
+
+void TOGameContext::initDamageParticleSystem()
+  {
+  ParticleSystem* system = new ParticleSystem(getNextActorID());
+  system->setGravityAccel(0.00001);
+  system->setTimeBetweenSpawns(7);
+  system->setInitVelocity(0.007);
+  system->setTimeAlive(300);
+  system->setParticleSize(4);
+  towerDamageParticles.reset(system);
+  addActor(towerDamageParticles);
+  }
+
+void TOGameContext::doTowerDamageEffect(const Tower* tower)
+  {
+  towerDamageParticles->addEmitter(tower->getTargetPosition(), 50, Vector3D(0.9, 0, 0));
   }

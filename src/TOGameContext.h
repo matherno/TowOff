@@ -4,6 +4,7 @@ class TOGameContext;
 
 #include <src/GameSystem/GameSystem.h>
 #include <src/GameSystem/GameContextImpl.h>
+#include <src/ParticleSystem/ParticleSystem.h>
 #include "Tower.h"
 #include "Player.h"
 #include "Projectile.h"
@@ -18,6 +19,7 @@ private:
   std::vector<PlayerPtr> players;
   TowerList towers;
   RenderablePtr surfaceMesh;
+  ParticleSystemPtr towerDamageParticles;
 
 public:
   virtual bool initialise() override;
@@ -41,6 +43,8 @@ public:
 
   ProjectilePtr createFootballProjectile(uint id);
 
+  void doTowerDamageEffect(const Tower* tower);
+
   inline static TOGameContext* cast(GameContext* context)
     {
     TOGameContext* toContext = dynamic_cast<TOGameContext*>(context);
@@ -50,4 +54,5 @@ public:
 
 protected:
   void initSurface(uint numCells, float cellSize);
+  void initDamageParticleSystem();
   };

@@ -15,6 +15,7 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
     window->setClearColour(0, 0, 0);
     renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
     setDepthTest(true);
+    setAlphaBlending(true);
     return true;
     }
   return false;

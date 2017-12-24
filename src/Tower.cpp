@@ -51,6 +51,12 @@ void Tower::onAttached(GameContext* gameContext)
 void Tower::onUpdate(GameContext* gameContext)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  if (showDamageEffect)
+    {
+    toGameContext->doTowerDamageEffect(this);
+    showDamageEffect = false;
+    }
+
   if (!isAlive())
     {
     toGameContext->removeTower(getID());
@@ -110,6 +116,7 @@ void Tower::onDetached(GameContext* gameContext)
 
 bool Tower::inflictDamage(int damagePoints)
   {
+  showDamageEffect = true;
   healthPoints -= damagePoints;
   return healthPoints <= 0;
   }

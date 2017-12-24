@@ -3,10 +3,15 @@
 #include <src/RenderSystem/RenderContextImpl.h>
 #include <src/RenderSystem/RenderableMesh.h>
 #include <src/GameSystem/GameContextImpl.h>
+#include <src/ParticleSystem/ParticleEmitter.h>
+#include <src/ParticleSystem/RenderableParticles.h>
+#include <src/ParticleSystem/ParticleSystem.h>
 #include "TestActor.h"
 #include "TestInputHandler.h"
 #include "PanCameraInputHandler.h"
 #include "TOGameContext.h"
+
+using namespace mathernogl;
 
 int main()
   {

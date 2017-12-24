@@ -80,3 +80,14 @@ void PanCameraInputHandler::refreshRotationMatrix()
   rotationMatrix = mathernogl::matrixYaw(-yaw) * mathernogl::matrixPitch(-pitch);
   }
 
+bool PanCameraInputHandler::onKeyPressed(GameContext* gameContext, uint key)
+  {
+  switch(getCharFromKeyCode(key))
+    {
+    case 'P':
+      paused = !paused;
+      gameContext->setPaused(paused);
+      break;
+    }
+  }
+
