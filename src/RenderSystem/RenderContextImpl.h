@@ -32,6 +32,8 @@ public:
 
   virtual void setWorldToCamera(const mathernogl::Matrix4& transform) override;
   virtual void setCameraToClip(const mathernogl::Matrix4& transform) override;
+  virtual const Matrix4* getWorldToCamera() const override;
+  virtual const Matrix4* getCameraToClip() const override;
   virtual void render() override;
   virtual bool isWindowOpen() const override;
 

@@ -44,6 +44,7 @@ public:
   ProjectilePtr createFootballProjectile(uint id);
 
   void doTowerDamageEffect(const Tower* tower);
+  Vector3D terrainHitTest(uint cursorX, uint cursorY);
 
   inline static TOGameContext* cast(GameContext* context)
     {

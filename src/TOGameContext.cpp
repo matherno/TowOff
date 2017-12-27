@@ -178,3 +178,12 @@ void TOGameContext::doTowerDamageEffect(const Tower* tower)
   {
   towerDamageParticles->addEmitter(tower->getTargetPosition(), 50, Vector3D(0.9, 0, 0));
   }
+
+Vector3D TOGameContext::terrainHitTest(uint cursorX, uint cursorY)
+  {
+  Vector3D cursorWorldPos = getCursorWorldPos(cursorX, cursorY);
+  Vector3D cursorViewDir = getViewDirectionAtCursor(cursorX, cursorY);
+  ASSERT (cursorViewDir.y != 0, "View is parallel to terrain, can't hit!");
+  float tValue = -1.0f * cursorWorldPos.y / cursorViewDir.y;
+  return cursorWorldPos + (cursorViewDir * tValue);
+  }

@@ -65,6 +65,11 @@ public:
   virtual InputManager* getInputManager() override { return &inputManager; }
   virtual RenderContext* getRenderContext() override { return &renderContext; }
 
+  Vector3D getCursorWorldPos(uint cursorX, uint cursorY);
+  Vector3D clipToWorldTransform(const Vector3D& clipSpacePos);
+  Vector3D getViewDirection();
+  Vector3D getViewDirectionAtCursor(uint cursorX, uint cursorY);
+
 protected:
   void removePendingActors();
   };

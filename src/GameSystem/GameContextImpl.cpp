@@ -155,3 +155,30 @@ bool GameContextImpl::isPaused() const
   return paused;
   }
 
+Vector3D GameContextImpl::getCursorWorldPos(uint cursorX, uint cursorY)
+  {
+  uint screenWidth = getRenderContext()->getWindow()->getWidth();
+  uint screenHeight = getRenderContext()->getWindow()->getHeight();
+  Vector3D clipSpacePos = Vector3D((float)cursorX / (float)screenWidth * 2.0f - 1.0f, (1.0f - (float)cursorY / (float)screenHeight) * 2.0f - 1.0f, 0);
+  return clipToWorldTransform(clipSpacePos);
+  }
+
+Vector3D GameContextImpl::getViewDirection()
+  {
+  return (clipToWorldTransform(Vector3D(0, 0, 1)) - clipToWorldTransform(Vector3D(0, 0, 0))).getUniform();
+  }
+
+Vector3D GameContextImpl::getViewDirectionAtCursor(uint cursorX, uint cursorY)
+  {
+  uint screenWidth = getRenderContext()->getWindow()->getWidth();
+  uint screenHeight = getRenderContext()->getWindow()->getHeight();
+  Vector3D clipSpacePos = Vector3D((float)cursorX / (float)screenWidth * 2.0f - 1.0f, (1.0f - (float)cursorY / (float)screenHeight) * 2.0f - 1.0f, 0);
+  return (clipToWorldTransform(clipSpacePos + Vector3D(0, 0, 1)) - clipToWorldTransform(clipSpacePos)).getUniform();
+  }
+
+Vector3D GameContextImpl::clipToWorldTransform(const Vector3D& clipSpacePos)
+  {
+  using namespace mathernogl;
+  return clipSpacePos * matrixInverse(*getRenderContext()->getCameraToClip()) * matrixInverse(*getRenderContext()->getWorldToCamera());
+  }
+

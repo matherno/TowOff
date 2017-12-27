@@ -78,6 +78,8 @@ public:
   virtual RenderableSetPtr getRenderableSet() = 0;
   virtual void setWorldToCamera(const Matrix4& transform) = 0;
   virtual void setCameraToClip(const Matrix4& transform) = 0;
+  virtual const Matrix4* getWorldToCamera() const = 0;
+  virtual const Matrix4* getCameraToClip() const = 0;
   virtual void render() = 0;
   virtual bool isWindowOpen() const = 0;
   virtual void activateShaderProgram(ShaderProgramPtr shaderProgram) = 0;

@@ -45,7 +45,7 @@ void InstantWeapon::createBeamShot(GameContext* context, const Vector3D& shootPo
   mesh->getTransform()->rotate(Vector3D(0, 1, 0), angle);
   mesh->getTransform()->translate(shootPos + shootToTarget * 0.5f);
   mesh->setLightShaded(false);
-  mesh->setColour(Vector3D(0.7, 0.15, 0.1));
+  mesh->setColour(Vector3D(0.5, 0.15, 0.1));
 
   RenderablePtr meshPtr(mesh);
   renderContext->getRenderableSet()->addRenderable(meshPtr);

@@ -31,6 +31,8 @@ public:
 
   virtual void onAttached(GameContext* gameContext) override;
 
+  virtual bool onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY) override;
+
   virtual bool onKeyPressed(GameContext* gameContext, uint key) override;
 
   virtual void onDetached(GameContext* gameContext) override;

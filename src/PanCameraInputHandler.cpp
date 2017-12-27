@@ -4,6 +4,7 @@
 
 #include <src/GameSystem/InputCodes.h>
 #include "PanCameraInputHandler.h"
+#include "TOGameContext.h"
 
 PanCameraInputHandler::PanCameraInputHandler(uint id, const Vector3D& position, float zoomOffset, float yaw, float pitch)
   : InputHandler(id), position(position), zoomOffset(zoomOffset), yaw(yaw), pitch(pitch)
@@ -89,5 +90,14 @@ bool PanCameraInputHandler::onKeyPressed(GameContext* gameContext, uint key)
       gameContext->setPaused(paused);
       break;
     }
+  }
+
+bool PanCameraInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+  {
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY);
+  TowerPtr tower = toGameContext->createBasicTower(terrainPos);
+  tower->setPlayerNum((uint)button + 1);
+  return true;
   }
 

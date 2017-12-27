@@ -127,3 +127,13 @@ Window* RenderContextImpl::getWindow()
   return window.get();
   }
 
+const Matrix4* RenderContextImpl::getWorldToCamera() const
+  {
+  return &worldToCameraTransform;
+  }
+
+const Matrix4* RenderContextImpl::getCameraToClip() const
+  {
+  return &cameraToClipTransform;
+  }
+

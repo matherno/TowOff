@@ -21,12 +21,12 @@ int main()
   PanCameraInputHandler* handler = new PanCameraInputHandler(context.getInputManager()->getNextHandlerID(), Vector3D(0, 60, 30), 0, 0, -45);
   context.addInputHandler(InputHandlerPtr(handler));
 
-  mathernogl::RandomGenerator::setSeed();
-  for (int num = 0; num < 50; ++num)
-    {
-    TowerPtr tower = context.createBasicTower(Vector3D(mathernogl::RandomGenerator::randomFloat(-40, 40), 0, mathernogl::RandomGenerator::randomFloat(-40, 40)));
-    tower->setPlayerNum((uint)mathernogl::RandomGenerator::randomInt(1, 2));
-    }
+//  mathernogl::RandomGenerator::setSeed();
+//  for (int num = 0; num < 50; ++num)
+//    {
+//    TowerPtr tower = context.createBasicTower(Vector3D(mathernogl::RandomGenerator::randomFloat(-40, 40), 0, mathernogl::RandomGenerator::randomFloat(-40, 40)));
+//    tower->setPlayerNum((uint)mathernogl::RandomGenerator::randomInt(1, 2));
+//    }
 
 //  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
