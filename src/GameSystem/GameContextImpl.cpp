@@ -18,6 +18,7 @@ bool GameContextImpl::initialise()
     }
 
   inputManager.initialise(renderContext.getWindow());
+  uiManager.initialise(this);
 
   startTime = mathernogl::getTimeMS();
   gameTime = 0;
@@ -34,6 +35,7 @@ void GameContextImpl::cleanUp()
   actors.clear();
   actorsToRemove.clear();
   renderContext.cleanUp();
+  uiManager.cleanUp(this);
   stage = stageNone;
   }
 
@@ -89,6 +91,7 @@ void GameContextImpl::processUpdateStage()
     stage = stageUpdate;
     for (GameActorPtr actor : *actors.getList())
       actor->onUpdate(this);
+    uiManager.update(this);
     stage = stageNone;
     removePendingActors();
     }
@@ -181,4 +184,3 @@ Vector3D GameContextImpl::clipToWorldTransform(const Vector3D& clipSpacePos)
   using namespace mathernogl;
   return clipSpacePos * matrixInverse(*getRenderContext()->getCameraToClip()) * matrixInverse(*getRenderContext()->getWorldToCamera());
   }
-

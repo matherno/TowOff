@@ -2,9 +2,11 @@
 
 #include <memory>
 #include <src/RenderSystem/RenderSystem.h>
+#include <src/UISystem/UISystem.h>
 #include "Camera.h"
 
 class GameContext;
+class UIManager;
 
 /*
 *   GameActor, an actor in the game representing an object with some behaviour and/or visual presence in the scene
@@ -96,6 +98,7 @@ public:
   virtual Camera* getCamera() = 0;
   virtual InputManager* getInputManager() = 0;
   virtual RenderContext* getRenderContext() = 0;
+  virtual UIManager* getUIManager() = 0;
   };
 
 

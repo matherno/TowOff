@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include <src/RenderSystem/RenderContextImpl.h>
 #include <set>
+#include <src/UISystem/UIManagerImpl.h>
 
 class GameContextImpl : public GameContext
   {
@@ -24,6 +25,7 @@ enum ProcessStage
 private:
   InputManagerImpl inputManager;
   RenderContextImpl renderContext;
+  UIManagerImpl uiManager;
   uint nextActorID = 1;
   mathernogl::MappedList<GameActorPtr> actors;
   Camera camera;
@@ -59,11 +61,13 @@ public:
   virtual void processDrawStage() override;
   virtual void endFrame(float maxFPS) override;
   virtual void setPaused(bool pause) override;
+
   virtual bool isPaused() const override;
 
   virtual Camera* getCamera() override { return &camera; }
   virtual InputManager* getInputManager() override { return &inputManager; }
   virtual RenderContext* getRenderContext() override { return &renderContext; }
+  virtual UIManager* getUIManager() override { return &uiManager; }
 
   Vector3D getCursorWorldPos(uint cursorX, uint cursorY);
   Vector3D clipToWorldTransform(const Vector3D& clipSpacePos);

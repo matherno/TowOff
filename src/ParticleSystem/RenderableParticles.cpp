@@ -48,6 +48,9 @@ void RenderableParticles::render(RenderContext* renderContext)
   particlesBuffer.copyDataFloat(posData);
   shaderProgram->setVarFloat("inSize", emitter->getParticleSize());
   shaderProgram->setVarVec3("inColour", colour);
+  setFaceCulling(false);
+  setDepthTest(true);
+  setAlphaBlending(true);
   glDrawArrays(GL_POINTS, 0, particleCount);
   }
 

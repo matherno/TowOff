@@ -29,6 +29,9 @@ void RenderableMesh::render(RenderContext* renderContext)
     shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0);
     shaderProgram->setVarInt("inUseSingleColour", 1);
     shaderProgram->setVarVec3("inColour", colour);
+    setDepthTest(true);
+    setAlphaBlending(true);
+    setFaceCulling(true);
     glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
     }
   }

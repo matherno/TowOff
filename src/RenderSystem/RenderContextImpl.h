@@ -9,6 +9,7 @@
 #define SHADER_VAR_VERT_TO_WORLD "inVertToWorld"
 #define SHADER_VAR_WORLD_TO_CAMERA "inWorldToCamera"
 #define SHADER_VAR_CAMERA_TO_CLIP "inCameraToClip"
+#define SHADER_VAR_SCREEN_SIZE "inScreenSize"
 
 class RenderContextImpl : public RenderContext
   {

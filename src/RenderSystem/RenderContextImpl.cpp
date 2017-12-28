@@ -14,8 +14,6 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
     {
     window->setClearColour(0, 0, 0);
     renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
-    setDepthTest(true);
-    setAlphaBlending(true);
     return true;
     }
   return false;
@@ -78,6 +76,8 @@ void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
     else
       shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, Matrix4(1));
     }
+  if (shaderProgram->hasUniformVariable(SHADER_VAR_SCREEN_SIZE))
+    shaderProgram->setVarVec2(SHADER_VAR_SCREEN_SIZE, getWindow()->getSize());
 
   //todo: put vert to world shader variable set in a more appropriate place
 
