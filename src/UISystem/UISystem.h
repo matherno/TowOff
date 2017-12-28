@@ -18,6 +18,7 @@ enum Alignment
 
 class UIComponent;
 typedef std::shared_ptr<UIComponent> UIComponentPtr;
+typedef std::function<bool(uint mouseX, uint mouseY)> OnMouseClickCallback;
 
 class UIComponent
   {
@@ -41,6 +42,9 @@ public:
   virtual void addChild(UIComponentPtr component) = 0;
   virtual void removeChild(uint id) = 0;
   virtual void setVisible(bool visible) = 0;
+  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
+  virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) = 0;
+  virtual void setMouseClickCallback(OnMouseClickCallback func) = 0;
   };
 
 class UIManager
@@ -52,4 +56,6 @@ public:
   virtual bool initialise(GameContext* context) = 0;
   virtual void update(GameContext* context) = 0;
   virtual void cleanUp(GameContext* context) = 0;
+  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
+  virtual bool hitTest(uint mouseX, uint mouseY) = 0;
   };

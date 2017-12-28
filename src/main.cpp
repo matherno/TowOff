@@ -33,6 +33,8 @@ int main()
   panel->setWidthMatchParent(true);
   uiManager->addComponent(UIComponentPtr(panel));
 
+  bool hit = false;
+
   {
     UIPanel* button = new UIPanel(uiManager->getNextComponentID());
     button->setOffset(Vector2D(0, 0));
@@ -40,6 +42,13 @@ int main()
     button->setBackgroundColour(Vector3D(0, 0.5, 0));
     button->setVerticalAlignment(alignmentCentre);
     button->setHorizontalAlignment(alignmentCentre);
+    button->setMouseClickCallback([&hit, button](uint x, uint y)->bool
+                                    {
+                                    hit = !hit;
+                                    button->setBackgroundColour(hit ? Vector3D(0, 0.2, 0.3) : Vector3D(0, 0.5, 0));
+                                    button->invalidate();
+                                    return true;
+                                    });
     panel->addChild(UIComponentPtr(button));
   }
   {

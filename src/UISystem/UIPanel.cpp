@@ -146,3 +146,37 @@ void UIPanel::setVisible(bool visible)
   if(renderable)
     renderable->setVisible(visible);
   }
+
+bool UIPanel::mouseClick(GameContext* context, uint mouseX, uint mouseY)
+  {
+  for (UIComponentPtr comp : *children.getList())
+    {
+    if (comp->mouseClick(context, mouseX, mouseY))
+      return true;
+    }
+  if (mouseClickCallback && hitTest(mouseX, mouseY, false))
+    {
+    if (mouseClickCallback(mouseX, mouseY))
+      return true;
+    }
+  return false;
+  }
+
+bool UIPanel::hitTest(uint mouseX, uint mouseY, bool testChildren)
+  {
+  if (visible && mouseX >= currentScreenPos.x && mouseX <= currentScreenPos.x + currentScreenSize.x)
+    {
+    if (mouseY >= currentScreenPos.y && mouseY <= currentScreenPos.y + currentScreenSize.y)
+      return true;
+    }
+
+  if (testChildren)
+    {
+    for (UIComponentPtr comp : *children.getList())
+      {
+      if (comp->hitTest(mouseX, mouseY, true))
+        return true;
+      }
+    }
+  return false;
+  }
