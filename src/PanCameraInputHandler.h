@@ -17,6 +17,7 @@ private:
   Matrix4 rotationMatrix;
   float zoomOffset;
   bool paused = false;
+  uint activePlayer = 0;
 
 public:
   PanCameraInputHandler(uint id, const Vector3D& position, float zoomOffset = 0, float yaw = 0, float pitch = -45);
@@ -28,6 +29,8 @@ public:
   void setPanSpeed(float speed) { panSpeed = speed; }
   void setYawSpeed(float speed) { yawSpeed = speed; }
   void refreshCamera(Camera* camera) const;
+  void setActivePlayer(uint player) { activePlayer = player; }
+  uint getActivePlayer() const { return activePlayer; }
 
   virtual void onAttached(GameContext* gameContext) override;
 

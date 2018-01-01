@@ -31,7 +31,7 @@ public:
   Player* getPlayer(uint num);
   Player* createPlayer();
   int numPlayers() const { return (int)players.size(); }
-  Vector3D getPlayerColour(uint num);
+  Vector3D getPlayerColour(uint num) const;
 
   TowerPtr getTower(uint id);
   TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);

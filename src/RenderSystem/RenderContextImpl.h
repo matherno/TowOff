@@ -39,9 +39,11 @@ public:
   virtual bool isWindowOpen() const override;
 
   virtual void activateShaderProgram(ShaderProgramPtr shaderProgram) override;
+  virtual uint bindTexture(TexturePtr texture) override;
   virtual ShaderProgramPtr createShaderProgram(const std::vector<mathernogl::Shader>* shaders) override;
   virtual MeshStoragePtr createMeshStorage(const std::string& objFilePath) override;
   virtual MeshStoragePtr createEmptyMeshStorage() override;
+  virtual TexturePtr createTexture(const string& imageFilePath) override;
 
   virtual void pushTransform(const mathernogl::Transform* transform) override;
   virtual void popTransform() override;

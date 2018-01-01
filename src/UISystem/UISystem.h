@@ -45,6 +45,7 @@ public:
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) = 0;
   virtual void setMouseClickCallback(OnMouseClickCallback func) = 0;
+  virtual void setPadding(float horizPadding, float vertPadding) = 0;     // padding only used when matching parent size
   };
 
 class UIManager

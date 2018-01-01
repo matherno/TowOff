@@ -32,6 +32,8 @@ void RenderableMesh::render(RenderContext* renderContext)
     setDepthTest(true);
     setAlphaBlending(true);
     setFaceCulling(true);
+    clearGLErrors();
     glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
+    ASSERT_NO_GL_ERROR();
     }
   }

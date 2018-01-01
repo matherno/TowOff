@@ -60,6 +60,7 @@ bool MeshStorage::initVAOWithTexCoords(std::vector<int>* indicesPtr)
     ++numVertices;
     }
 
+  mathernogl::clearGLErrors();
   GPUBufferStatic buffer;
   buffer.init();
   buffer.copyDataFloat(bufferData);
@@ -70,6 +71,9 @@ bool MeshStorage::initVAOWithTexCoords(std::vector<int>* indicesPtr)
   vao.linkBufferAsFloats(buffer, 6 * sizeof(float), 6 * sizeof(float), 2, 2, false);
   vao.unbind();
   buffer.cleanUp();
+  ASSERT_NO_GL_ERROR();
+
+  return glGetError() == GL_NO_ERROR;
   }
 
 bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
@@ -94,6 +98,7 @@ bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
     ++numVertices;
     }
 
+  mathernogl::clearGLErrors();
   GPUBufferStatic buffer;
   buffer.init();
   buffer.copyDataFloat(bufferData);
@@ -104,4 +109,7 @@ bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
   vao.linkBufferAsFloats(buffer, 6 * sizeof(float), 6 * sizeof(float), 3, 2, false);
   vao.unbind();
   buffer.cleanUp();
+  ASSERT_NO_GL_ERROR();
+
+  return glGetError() == GL_NO_ERROR;
   }

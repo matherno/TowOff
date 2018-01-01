@@ -16,9 +16,12 @@ private:
   Vector2D size;
   bool widthMatchParent = false;
   bool heightMatchParent = false;
+  float horizPadding = 0;
+  float vertPadding = 0;
   Alignment horizAlignment = alignmentStart;
   Alignment vertAlignment = alignmentStart;
   Vector3D colour;
+  TexturePtr texture;
   mathernogl::MappedList<UIComponentPtr> children;
   std::list<UIComponentPtr> childrenToAdd;
   std::list<uint> childrenToRemove;
@@ -43,7 +46,8 @@ public:
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) override;
 
-  virtual void setBackgroundColour(const Vector3D& colour) { this->colour = colour; } ;
+  virtual void setBackgroundColour(const Vector3D& colour) { this->colour = colour; }
+  virtual void setBackgroundTexture(TexturePtr texture) { this->texture = texture; }
   virtual void setOffset(const Vector2D& offset) override { this->offset = offset; }
   virtual void setSize(const Vector2D& size) override { this->size = size; }
   virtual void setWidthMatchParent(bool match) override { widthMatchParent = match; }
@@ -52,6 +56,7 @@ public:
   virtual void setVerticalAlignment(Alignment alignment) override { vertAlignment = alignment; }
   virtual void setVisible(bool visible) override;
   virtual void setMouseClickCallback(OnMouseClickCallback func) override { mouseClickCallback = func; }
+  virtual void setPadding(float horizPadding, float vertPadding) override;
 
 private:
   void addPendingComponents(GameContext* context);

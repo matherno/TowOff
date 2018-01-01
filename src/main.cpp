@@ -19,47 +19,64 @@ int main()
   TOGameContext context;
   context.initialise();
 
-  PanCameraInputHandler* handler = new PanCameraInputHandler(context.getInputManager()->getNextHandlerID(), Vector3D(0, 60, 30), 0, 0, -45);
+  PanCameraInputHandler* handler = new PanCameraInputHandler(context.getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), 0, 0, -45);
   context.addInputHandler(InputHandlerPtr(handler));
 
   UIManager* uiManager = context.getUIManager();
   UIPanel* panel = new UIPanel(uiManager->getNextComponentID());
   panel->setOffset(Vector2D(0, 0));
   panel->setSize(Vector2D(300, 170));
-  panel->setBackgroundColour(Vector3D(0, 0, 0.5));
+  panel->setBackgroundColour(Vector3D(0.4, 0.3, 0.1));
   panel->setHorizontalAlignment(alignmentEnd);
   panel->setVerticalAlignment(alignmentEnd);
 //  panel->setHeightMatchParent(true);
   panel->setWidthMatchParent(true);
   uiManager->addComponent(UIComponentPtr(panel));
 
-  bool hit = false;
+  UIPanel* subPanel = new UIPanel(uiManager->getNextComponentID());
+  subPanel->setOffset(Vector2D(0, 0));
+  subPanel->setSize(Vector2D(100, 100));
+  subPanel->setBackgroundColour(Vector3D(0.35, 0.35, 0.3));
+  subPanel->setVerticalAlignment(alignmentCentre);
+  subPanel->setHorizontalAlignment(alignmentCentre);
+  subPanel->setHeightMatchParent(true);
+  subPanel->setWidthMatchParent(true);
+  subPanel->setPadding(15, 10);
+  panel->addChild(UIComponentPtr(subPanel));
+
 
   {
     UIPanel* button = new UIPanel(uiManager->getNextComponentID());
-    button->setOffset(Vector2D(0, 0));
-    button->setSize(Vector2D(100, 100));
-    button->setBackgroundColour(Vector3D(0, 0.5, 0));
-    button->setVerticalAlignment(alignmentCentre);
-    button->setHorizontalAlignment(alignmentCentre);
-    button->setMouseClickCallback([&hit, button](uint x, uint y)->bool
+    button->setOffset(Vector2D(50, 20));
+    button->setSize(Vector2D(70, 70));
+    button->setBackgroundColour(context.getPlayerColour(1));
+    button->setVerticalAlignment(alignmentStart);
+    button->setHorizontalAlignment(alignmentStart);
+    button->setMouseClickCallback([&handler, &panel, &context](uint x, uint y)->bool
                                     {
-                                    hit = !hit;
-                                    button->setBackgroundColour(hit ? Vector3D(0, 0.2, 0.3) : Vector3D(0, 0.5, 0));
-                                    button->invalidate();
+                                    handler->setActivePlayer(1);
+                                    panel->setBackgroundColour(context.getPlayerColour(1));
                                     return true;
                                     });
-    panel->addChild(UIComponentPtr(button));
+    subPanel->addChild(UIComponentPtr(button));
   }
+
   {
     UIPanel* button = new UIPanel(uiManager->getNextComponentID());
-    button->setOffset(Vector2D(0, 0));
-    button->setSize(Vector2D(100, 100));
-    button->setBackgroundColour(Vector3D(0.3, 0, 0));
-    button->setVerticalAlignment(alignmentEnd);
-    button->setHorizontalAlignment(alignmentEnd);
-    panel->addChild(UIComponentPtr(button));
+    button->setOffset(Vector2D(150, 20));
+    button->setSize(Vector2D(70, 70));
+    button->setBackgroundColour(context.getPlayerColour(2));
+    button->setVerticalAlignment(alignmentStart);
+    button->setHorizontalAlignment(alignmentStart);
+    button->setMouseClickCallback([&handler, &panel, &context](uint x, uint y)->bool
+                                    {
+                                    handler->setActivePlayer(2);
+                                    panel->setBackgroundColour(context.getPlayerColour(2));
+                                    return true;
+                                    });
+    subPanel->addChild(UIComponentPtr(button));
   }
+
 //  mathernogl::RandomGenerator::setSeed();
 //  for (int num = 0; num < 50; ++num)
 //    {
@@ -76,6 +93,13 @@ int main()
     context.processUpdateStage();
     context.processDrawStage();
     context.endFrame(60);
+
+    if (handler->getActivePlayer() != 0)
+      panel->setBackgroundColour(context.getPlayerColour(handler->getActivePlayer()));
+    else
+      panel->setBackgroundColour(Vector3D(0.4, 0.3, 0.1));
+    panel->invalidate();
+
     }
 
   context.cleanUp();

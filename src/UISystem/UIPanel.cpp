@@ -42,13 +42,15 @@ void UIPanel::refresh(GameContext* context, const Vector2D& parentPos, const Vec
   if (renderable)
     {
     Vector2D adjustedSize = size;
-    if (widthMatchParent)
-      adjustedSize.x = parentSize.x;
-    if (heightMatchParent)
-      adjustedSize.y = parentSize.y;
-
     Vector2D position = parentPos;
-    if (!widthMatchParent)
+
+    if (widthMatchParent)
+      {
+      float padding = std::min(horizPadding, (parentSize.x * 0.5f) - 1.0f);
+      adjustedSize.x = parentSize.x - (padding * 2);
+      position.x += padding;
+      }
+    else
       {
       switch (horizAlignment)
         {
@@ -62,7 +64,13 @@ void UIPanel::refresh(GameContext* context, const Vector2D& parentPos, const Vec
       position.x += offset.x;
       }
 
-    if (!heightMatchParent)
+    if (heightMatchParent)
+      {
+      float padding = std::min(vertPadding, (parentSize.y * 0.5f) - 1.0f);
+      adjustedSize.y = parentSize.y - (padding * 2);
+      position.y += padding;
+      }
+    else
       {
       switch (vertAlignment)
         {
@@ -76,7 +84,11 @@ void UIPanel::refresh(GameContext* context, const Vector2D& parentPos, const Vec
       position.y += offset.y;
       }
 
+    adjustedSize.x = std::max(adjustedSize.x, 1.0f);
+    adjustedSize.y = std::max(adjustedSize.y, 1.0f);
+
     renderable->setColour(colour);
+    renderable->setTexture(texture);
     renderable->setVisible(visible);
     renderable->refresh(position, adjustedSize);
     for (UIComponentPtr& child : *children.getList())
@@ -179,4 +191,10 @@ bool UIPanel::hitTest(uint mouseX, uint mouseY, bool testChildren)
       }
     }
   return false;
+  }
+
+void UIPanel::setPadding(float horizPadding, float vertPadding)
+  {
+  this->horizPadding = horizPadding;
+  this->vertPadding = vertPadding;
   }

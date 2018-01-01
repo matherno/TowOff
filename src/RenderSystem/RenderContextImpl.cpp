@@ -9,11 +9,13 @@ using namespace mathernogl;
 
 bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
   {
+  clearGLErrors();
   window.reset(initGL(initConfig->windowName, initConfig->windowWidth, initConfig->windowHeight, initConfig->fullscreen, initConfig->antiAliasing));
   if (window)
     {
     window->setClearColour(0, 0, 0);
     renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
+    ASSERT_NO_GL_ERROR();
     return true;
     }
   return false;
@@ -135,5 +137,20 @@ const Matrix4* RenderContextImpl::getWorldToCamera() const
 const Matrix4* RenderContextImpl::getCameraToClip() const
   {
   return &cameraToClipTransform;
+  }
+
+TexturePtr RenderContextImpl::createTexture(const string& imageFilePath)
+  {
+  //todo: cache these
+  return TexturePtr(createTextureFromFile(imageFilePath, false));
+  }
+
+uint RenderContextImpl::bindTexture(TexturePtr texture)
+  {
+  //todo: allow multiple texture bindings by caching what is bound, and not binding if already bound to a location
+  uint glBindLocation = 0;
+  glActiveTexture(glBindLocation);
+  glBindTexture(texture->glTexType, texture->glTexID);
+  return glBindLocation;
   }
 

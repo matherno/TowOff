@@ -138,7 +138,7 @@ ProjectilePtr TOGameContext::createFootballProjectile(uint id)
   return projectile;
   }
 
-Vector3D TOGameContext::getPlayerColour(uint num)
+Vector3D TOGameContext::getPlayerColour(uint num) const
   {
   switch (num)
     {

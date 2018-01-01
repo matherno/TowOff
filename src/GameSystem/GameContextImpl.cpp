@@ -9,8 +9,8 @@ bool GameContextImpl::initialise()
   stage = stageInit;
   RenderInitConfig config;
   config.windowName = "Testing";
-  config.windowWidth = 1280;
-  config.windowHeight = 768;
+  config.windowWidth = 1800;
+  config.windowHeight = 900;
   if (!renderContext.initialise(&config))
     {
     mathernogl::logError("Failed to initialise render system!");

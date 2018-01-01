@@ -67,6 +67,7 @@ struct RenderInitConfig
 *   RenderContext, main rendering manager
 */
 typedef std::shared_ptr<mathernogl::ShaderProgram> ShaderProgramPtr;
+typedef std::shared_ptr<mathernogl::Texture> TexturePtr;
 class RenderContext
   {
 public:
@@ -83,9 +84,11 @@ public:
   virtual void render() = 0;
   virtual bool isWindowOpen() const = 0;
   virtual void activateShaderProgram(ShaderProgramPtr shaderProgram) = 0;
+  virtual uint bindTexture(TexturePtr texture) = 0;
   virtual ShaderProgramPtr createShaderProgram(const std::vector<mathernogl::Shader>* shaders) = 0;
   virtual MeshStoragePtr createMeshStorage(const string& objFilePath) = 0;
   virtual MeshStoragePtr createEmptyMeshStorage() = 0;
+  virtual TexturePtr createTexture(const string& imageFilePath) = 0;
   virtual void pushTransform(const Transform* transform) = 0;
   virtual void popTransform() = 0;
   virtual const Transform* getStackedTransform() = 0;

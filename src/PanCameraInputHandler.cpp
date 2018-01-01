@@ -94,10 +94,19 @@ bool PanCameraInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 
 bool PanCameraInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
-  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
-  Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY);
-  TowerPtr tower = toGameContext->createBasicTower(terrainPos);
-  tower->setPlayerNum((uint)button + 1);
-  return true;
+  if (activePlayer != 0 && button == MOUSE_LEFT)
+    {
+    TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+    Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY);
+    TowerPtr tower = toGameContext->createBasicTower(terrainPos);
+    tower->setPlayerNum(activePlayer);
+    return true;
+    }
+  else if (button == MOUSE_RIGHT)
+    {
+    activePlayer = 0;
+    return true;
+    }
+  return false;
   }
 

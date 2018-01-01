@@ -18,7 +18,13 @@ void UIRenderable::initialise(RenderContext* renderContext)
   vao.init();
   vao.bind();
   vao.linkBufferAsFloats(vertBuffer, 2, 0, false);
+
+  mathernogl::GPUBufferStatic texCoordBuffer;
+  texCoordBuffer.init();
+  texCoordBuffer.copyDataFloat({ 0,1, 1,1, 1,0, 0,1, 0,0, 1,0});
+  vao.linkBufferAsFloats(texCoordBuffer, 2, 1, false);
   vao.unbind();
+  texCoordBuffer.cleanUp();
   }
 
 void UIRenderable::cleanUp(RenderContext* renderContext)
@@ -38,8 +44,19 @@ void UIRenderable::render(RenderContext* renderContext)
   setFaceCulling(false);
   setDepthTest(true);
   setAlphaBlending(true);
-  shaderProgram->setVarVec3("inColour", colour);
+  if (texture)
+    {
+    shaderProgram->setVarInt("inUseSolidColour", 0);
+    shaderProgram->setVarInt("inTexture", renderContext->bindTexture(texture));
+    }
+  else
+    {
+    shaderProgram->setVarInt("inUseSolidColour", 1);
+    shaderProgram->setVarVec3("inColour", colour);
+    }
+  clearGLErrors();
   glDrawArrays(GL_TRIANGLES, 0, 6);
+  ASSERT_NO_GL_ERROR();
   }
 
 void UIRenderable::refresh(const Vector2D& position, const Vector2D& size)
