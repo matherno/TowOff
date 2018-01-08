@@ -12,7 +12,7 @@
 bool TOGameContext::initialise()
   {
   bool success = GameContextImpl::initialise();
-  initSurface(10, 15);
+  initSurface(20, 5);
   initDamageParticleSystem();
   return success;
   }
@@ -154,7 +154,12 @@ Vector3D TOGameContext::getPlayerColour(uint num) const
 void TOGameContext::initSurface(uint numCells, float cellSize)
   {
   RenderContext* renderContext = getRenderContext();
-  RenderableTerrain* terrain = new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize);
+  std::shared_ptr<HeightMap> heightMap(new HeightMap());
+//  HeightMapFactory::createDiamondSquareMap(heightMap.get(), 5, 20, 0.6);
+//  HeightMapFactory::createNoiseMap(heightMap.get(), numCells+1, 10, 1);
+  HeightMapFactory::createFlatMap(heightMap.get(), numCells+1, 0);
+
+  RenderableTerrain* terrain = new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize);
   terrain->setMultiColour(Vector3D(0.2, 0.4, 0.2), Vector3D(0.1, 0.3, 0.0));
   surfaceMesh.reset(terrain);
   surfaceMesh->getTransform()->translate(Vector3D(numCells*cellSize*-0.5f, 0, numCells*cellSize*-0.5f));

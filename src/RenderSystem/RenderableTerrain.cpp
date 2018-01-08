@@ -12,6 +12,12 @@ RenderableTerrain::RenderableTerrain(uint id, uint numCells, float cellSize)
 
   }
 
+RenderableTerrain::RenderableTerrain(uint id, std::shared_ptr<HeightMap>& heightMap, float cellSize)
+    : Renderable(id), heightMap(heightMap), cellSize(cellSize)
+  {
+  numCells = (heightMap->width - 1);
+  }
+
 void RenderableTerrain::initialise(RenderContext* renderContext)
   {
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/MeshVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/MeshFS.glsl") };
@@ -19,7 +25,11 @@ void RenderableTerrain::initialise(RenderContext* renderContext)
   setDepthTest(true);
 
   meshStorage = renderContext->createEmptyMeshStorage();
-  mathernogl::createGrid(numCells, numCells, cellSize, &meshStorage->vertices);
+  if (heightMap)
+    mathernogl::createGridHeightMapped(numCells, numCells, cellSize, &heightMap->heights, &meshStorage->vertices);
+  else
+    mathernogl::createGrid(numCells, numCells, cellSize, &meshStorage->vertices);
+
   Vector3D colour;
   for (int vertNum = 0; vertNum < meshStorage->vertices.size(); ++vertNum)
     {

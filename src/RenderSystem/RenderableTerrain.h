@@ -1,5 +1,6 @@
 #pragma once
 
+#include <src/HeightMapFactory.h>
 #include "RenderSystem.h"
 
 /*
@@ -15,9 +16,11 @@ private:
   ShaderProgramPtr shaderProgram;
   Vector3D baseColour1;
   Vector3D baseColour2;
+  std::shared_ptr<HeightMap> heightMap;
 
 public:
   RenderableTerrain(uint id, uint numCells, float cellSize);
+  RenderableTerrain(uint id, std::shared_ptr<HeightMap>& heightMap, float cellSize);
 
   virtual void initialise(RenderContext* renderContext) override;
   virtual void cleanUp(RenderContext* renderContext) override;
