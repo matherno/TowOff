@@ -12,7 +12,6 @@
 #include "PanCameraInputHandler.h"
 #include "TOGameContext.h"
 
-using namespace mathernogl;
 
 int main()
   {

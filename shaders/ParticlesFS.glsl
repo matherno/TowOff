@@ -7,5 +7,5 @@ in float fade;
 out vec4 outputColour;
 
 void main(){
-	outputColour = vec4(inColour, fade);
+	outputColour = vec4(inColour, 1.0 - (fade * fade));
 }

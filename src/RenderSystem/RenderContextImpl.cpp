@@ -32,12 +32,12 @@ uint RenderContextImpl::getNextRenderableID()
   return nextRenderableID++;
   }
 
-void RenderContextImpl::setWorldToCamera(const mathernogl::Matrix4& transform)
+void RenderContextImpl::setWorldToCamera(const Matrix4& transform)
   {
   worldToCameraTransform = transform;
   }
 
-void RenderContextImpl::setCameraToClip(const mathernogl::Matrix4& transform)
+void RenderContextImpl::setCameraToClip(const Matrix4& transform)
   {
   cameraToClipTransform = transform;
   }
@@ -147,10 +147,19 @@ TexturePtr RenderContextImpl::createTexture(const string& imageFilePath)
 
 uint RenderContextImpl::bindTexture(TexturePtr texture)
   {
-  //todo: allow multiple texture bindings by caching what is bound, and not binding if already bound to a location
+  //todo: cache what is bound, and not binding if already bound to a location
   uint glBindLocation = 0;
-  glActiveTexture(glBindLocation);
-  glBindTexture(texture->glTexType, texture->glTexID);
+  if (texIDsToBoundLocals.find(texture->glTexID) != texIDsToBoundLocals.end())
+    {
+    glBindLocation = texIDsToBoundLocals[texture->glTexID];
+    }
+  else
+    {
+    glBindLocation = nextTexBoundLocal++;
+    glActiveTexture(GL_TEXTURE0 + glBindLocation);
+    glBindTexture(texture->glTexType, texture->glTexID);
+    texIDsToBoundLocals[texture->glTexID] = glBindLocation;
+    }
   return glBindLocation;
   }
 

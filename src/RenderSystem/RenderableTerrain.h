@@ -1,6 +1,6 @@
 #pragma once
 
-#include <src/HeightMapFactory.h>
+#include <src/RenderSystem/HeightMapFactory.h>
 #include "RenderSystem.h"
 
 /*

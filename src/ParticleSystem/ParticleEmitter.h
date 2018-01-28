@@ -7,47 +7,62 @@
 #include <list>
 
 #include <mathernogl/MathernoGL.h>
+#include <src/RenderSystem/RenderSystem.h>
+
 
 struct Particle
   {
-  mathernogl::Vector3D position;
-  mathernogl::Vector3D velocity;
+  Vector3D position;
+  Vector3D velocity;
   long timeToLive;
+  int texIndex;
   };
+typedef std::unique_ptr<Particle> ParticlePtr;
+
+typedef std::function<Vector3D()> ParticleInitFunction;
 
 class ParticleEmitter
   {
 private:
-  std::vector<Particle*> particles;
+  std::list<ParticlePtr> particles;
   mathernogl::RandomGenerator randomGenerator;
+  Vector3D position;
   long timeSinceStart = 0;
   long lastSpawnTime = 0;
-  float gravityAccel = 0.001;
+  double gravityAccel = 0.001;
   long timeBetweenSpawns = 1000;
   long timeAlive = 10000;
-  float size = 3.0f;
-  float initVelocity = 0.05f;
+  double initVelocity = 0.05;
   bool isSpawning = true;
+  ParticleInitFunction particleOffsetFunc;
+  ParticleInitFunction particleDirectionFunc;
+  int numTextureIndices = 0;
 
 public:
   ParticleEmitter();
 
-  float getGravityAccel() const;
-  void setGravityAccel(float gravityAccel);
+  void setPosition(const Vector3D& position){ this->position = position; }
+  void translate(const Vector3D& translate){ this->position += translate; }
+  double getGravityAccel() const;
+  void setGravityAccel(double gravityAccel);
   long getTimeBetweenSpawns() const;
   void setTimeBetweenSpawns(long timeBetweenSpawns);
   long getTimeAlive() const;
   void setTimeAlive(long timeAlive);
-  void createParticle(const mathernogl::Vector3D& initPosOffset, const mathernogl::Vector3D& velocity, long timeAlive);
+  void createParticle(const Vector3D& initPosOffset, const Vector3D& velocity, long timeAlive);
   void updateParticles(long deltaTime);
-  void setParticleSize(float size){ this->size = size; }
-  float getParticleSize() const { return size; }
-  void setInitVelocity(float velocity){ initVelocity = velocity; }
+  void setInitVelocity(double velocity){ initVelocity = velocity; }
   int count() { return (int)particles.size(); }
   void setSpawningState(bool isSpawning){ this->isSpawning = isSpawning; }
+  void setNumTexturesIndices(int numTextures){ numTextureIndices = numTextures; }
 
-  const std::vector<Particle*>::const_iterator begin() const { return particles.cbegin(); }
-  const std::vector<Particle*>::const_iterator end() const { return particles.cend(); }
+  void setParticleOffsetFunc(ParticleInitFunction func){ particleOffsetFunc = func; }
+  void setParticleDirectionFunc(ParticleInitFunction func){ particleDirectionFunc = func; }
+
+  void sortParticles(const Matrix4* worldToCamera);
+
+  const std::list<ParticlePtr>::const_iterator begin() const { return particles.cbegin(); }
+  const std::list<ParticlePtr>::const_iterator end() const { return particles.cend(); }
   };
 
 typedef std::shared_ptr<ParticleEmitter> ParticleEmitterPtr;

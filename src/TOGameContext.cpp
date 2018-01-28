@@ -169,7 +169,7 @@ void TOGameContext::initSurface(uint numCells, float cellSize)
 
 void TOGameContext::initDamageParticleSystem()
   {
-  ParticleSystem* system = new ParticleSystem(getNextActorID());
+  ParticleSystem* system = new ParticleSystem(getNextActorID(), true);
   system->setGravityAccel(0.00001);
   system->setTimeBetweenSpawns(7);
   system->setInitVelocity(0.007);

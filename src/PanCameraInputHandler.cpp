@@ -22,7 +22,7 @@ void PanCameraInputHandler::onAttached(GameContext* gameContext)
   Camera* camera = gameContext->getCamera();
   refreshRotationMatrix();
   refreshCamera(camera);
-  *camera->getCameraToClip() = mathernogl::matrixPerspective(1, (float)gameContext->getRenderContext()->getWindow()->getAspectRatio(), -1, -1000);
+  *camera->getCameraToClip() = mathernogl::matrixPerspective(1, gameContext->getRenderContext()->getWindow()->getAspectRatio(), -1, -1000);
   camera->setValid(false);
   }
 

@@ -19,9 +19,11 @@ private:
   uint nextMeshStorageID = 1;
   bool isRendering = false;
   RenderableSetPtr renderableSet;
-  mathernogl::Matrix4 worldToCameraTransform;
-  mathernogl::Matrix4 cameraToClipTransform;
+  Matrix4 worldToCameraTransform;
+  Matrix4 cameraToClipTransform;
   TransformStack transformStack;
+  std::map<uint, uint> texIDsToBoundLocals;
+  uint nextTexBoundLocal = 0;
 
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;
@@ -31,8 +33,8 @@ public:
   virtual uint getNextRenderableID() override;
   virtual RenderableSetPtr getRenderableSet() override { return renderableSet; }
 
-  virtual void setWorldToCamera(const mathernogl::Matrix4& transform) override;
-  virtual void setCameraToClip(const mathernogl::Matrix4& transform) override;
+  virtual void setWorldToCamera(const Matrix4& transform) override;
+  virtual void setCameraToClip(const Matrix4& transform) override;
   virtual const Matrix4* getWorldToCamera() const override;
   virtual const Matrix4* getCameraToClip() const override;
   virtual void render() override;

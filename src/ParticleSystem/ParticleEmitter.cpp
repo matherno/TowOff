@@ -10,13 +10,14 @@ ParticleEmitter::ParticleEmitter()
 
   }
 
-void ParticleEmitter::createParticle(const mathernogl::Vector3D& initPosOffset, const mathernogl::Vector3D& velocity, long timeAlive)
+void ParticleEmitter::createParticle(const Vector3D& initPosOffset, const Vector3D& velocity, long timeAlive)
   {
   Particle* particle = new Particle();
-  particle->position = initPosOffset;
+  particle->position = position + initPosOffset;
   particle->velocity = velocity;
   particle->timeToLive = timeAlive;
-  particles.push_back(particle);
+  particle->texIndex = numTextureIndices > 0 ? mathernogl::RandomGenerator::randomInt(0, numTextureIndices - 1) : 0;
+  particles.emplace_back(particle);
   }
 
 void ParticleEmitter::updateParticles(long deltaTime)
@@ -25,14 +26,24 @@ void ParticleEmitter::updateParticles(long deltaTime)
   while (timeSinceStart - lastSpawnTime > timeBetweenSpawns)
     {
     if (isSpawning)
-      createParticle({0, 0, 0}, randomGenerator.getNormal() * initVelocity, timeAlive);
+      {
+      Vector3D offset(0);
+      if (particleOffsetFunc)
+        offset = particleOffsetFunc();
+      Vector3D direction;
+      if (particleDirectionFunc)
+        direction = particleDirectionFunc();
+      else
+        direction = randomGenerator.getNormal();
+      createParticle(offset, direction * initVelocity, timeAlive);
+      }
     lastSpawnTime += timeBetweenSpawns;
     }
 
-  std::vector<Particle*>::iterator iter = particles.begin();
+  auto iter = particles.begin();
   while (iter != particles.end())
     {
-    Particle* particle = *iter;
+    Particle* particle = iter->get();
     particle->timeToLive -= deltaTime;
     particle->velocity.y -= gravityAccel * deltaTime;
     particle->position += particle->velocity * (int) deltaTime;
@@ -43,12 +54,12 @@ void ParticleEmitter::updateParticles(long deltaTime)
     }
   }
 
-float ParticleEmitter::getGravityAccel() const
+double ParticleEmitter::getGravityAccel() const
   {
   return gravityAccel;
   }
 
-void ParticleEmitter::setGravityAccel(float gravityAccel)
+void ParticleEmitter::setGravityAccel(double gravityAccel)
   {
   ParticleEmitter::gravityAccel = gravityAccel;
   }
@@ -71,4 +82,15 @@ long ParticleEmitter::getTimeAlive() const
 void ParticleEmitter::setTimeAlive(long timeAlive)
   {
   ParticleEmitter::timeAlive = timeAlive;
+  }
+
+void ParticleEmitter::sortParticles(const Matrix4* worldToCamera)
+  {
+  //todo could try different algorithm if (when...) need performance -> insertion sort
+  particles.sort([worldToCamera](const ParticlePtr& lhs, const ParticlePtr& rhs)->bool
+                   {
+                   Vector3D lhCamPos = lhs->position * *worldToCamera;
+                   Vector3D rhCamPos = rhs->position * *worldToCamera;
+                   return lhCamPos.z < rhCamPos.z;
+                   });
   }
