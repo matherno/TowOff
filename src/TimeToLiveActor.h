@@ -1,6 +1,6 @@
 #pragma once
 
-#include <src/GameSystem/GameSystem.h>
+#include <GameSystem/GameSystem.h>
 
 /*
 *   Actor that removes itself after the given number of milliseconds

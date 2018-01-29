@@ -29,6 +29,7 @@ public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;
   virtual bool cleanUp() override;
   virtual mathernogl::Window* getWindow() override;
+  virtual const mathernogl::Window* getWindow() const override;
 
   virtual uint getNextRenderableID() override;
   virtual RenderableSetPtr getRenderableSet() override { return renderableSet; }

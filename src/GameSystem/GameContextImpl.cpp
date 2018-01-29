@@ -4,14 +4,17 @@
 
 #include "GameContextImpl.h"
 
+GameContextImpl::GameContextImpl()
+  {
+  renderConfig.windowName = "Testing";
+  renderConfig.windowWidth = 1800;
+  renderConfig.windowHeight = 900;
+  }
+
 bool GameContextImpl::initialise()
   {
   stage = stageInit;
-  RenderInitConfig config;
-  config.windowName = "Testing";
-  config.windowWidth = 1800;
-  config.windowHeight = 900;
-  if (!renderContext.initialise(&config))
+  if (!renderContext.initialise(&renderConfig))
     {
     mathernogl::logError("Failed to initialise render system!");
     return false;
@@ -20,7 +23,6 @@ bool GameContextImpl::initialise()
   inputManager.initialise(renderContext.getWindow());
   uiManager.initialise(this);
 
-  startTime = mathernogl::getTimeMS();
   gameTime = 0;
 
   stage = stageNone;
@@ -158,7 +160,7 @@ bool GameContextImpl::isPaused() const
   return paused;
   }
 
-Vector3D GameContextImpl::getCursorWorldPos(uint cursorX, uint cursorY)
+Vector3D GameContextImpl::getCursorWorldPos(uint cursorX, uint cursorY) const
   {
   uint screenWidth = getRenderContext()->getWindow()->getWidth();
   uint screenHeight = getRenderContext()->getWindow()->getHeight();
@@ -166,12 +168,12 @@ Vector3D GameContextImpl::getCursorWorldPos(uint cursorX, uint cursorY)
   return clipToWorldTransform(clipSpacePos);
   }
 
-Vector3D GameContextImpl::getViewDirection()
+Vector3D GameContextImpl::getViewDirection() const
   {
   return (clipToWorldTransform(Vector3D(0, 0, 1)) - clipToWorldTransform(Vector3D(0, 0, 0))).getUniform();
   }
 
-Vector3D GameContextImpl::getViewDirectionAtCursor(uint cursorX, uint cursorY)
+Vector3D GameContextImpl::getViewDirectionAtCursor(uint cursorX, uint cursorY) const
   {
   uint screenWidth = getRenderContext()->getWindow()->getWidth();
   uint screenHeight = getRenderContext()->getWindow()->getHeight();
@@ -179,7 +181,7 @@ Vector3D GameContextImpl::getViewDirectionAtCursor(uint cursorX, uint cursorY)
   return (clipToWorldTransform(clipSpacePos + Vector3D(0, 0, 1)) - clipToWorldTransform(clipSpacePos)).getUniform();
   }
 
-Vector3D GameContextImpl::clipToWorldTransform(const Vector3D& clipSpacePos)
+Vector3D GameContextImpl::clipToWorldTransform(const Vector3D& clipSpacePos) const
   {
   using namespace mathernogl;
   return clipSpacePos * matrixInverse(*getRenderContext()->getCameraToClip()) * matrixInverse(*getRenderContext()->getWorldToCamera());

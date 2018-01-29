@@ -167,10 +167,7 @@ bool UIPanel::mouseClick(GameContext* context, uint mouseX, uint mouseY)
       return true;
     }
   if (mouseClickCallback && hitTest(mouseX, mouseY, false))
-    {
-    if (mouseClickCallback(mouseX, mouseY))
-      return true;
-    }
+    return mouseClickCallback(mouseX, mouseY);
   return false;
   }
 

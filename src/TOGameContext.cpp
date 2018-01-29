@@ -2,18 +2,28 @@
 // Created by matt on 3/12/17.
 //
 
-#include <src/RenderSystem/RenderableMesh.h>
-#include <src/RenderSystem/RenderableTerrain.h>
+#include <RenderSystem/RenderableMesh.h>
+
 #include "TOGameContext.h"
 #include "Resources.h"
 #include "ProjectileWeapon.h"
 #include "InstantWeapon.h"
+#include "TOInputHandler.h"
+#include "TowerFactory.h"
+
+#define LAND_HEIGHT 0
+#define WATER_HEIGHT -1
+#define WATER_FLOOR_HEIGHT -5
 
 bool TOGameContext::initialise()
   {
+  renderConfig.windowName = "TowOff";
   bool success = GameContextImpl::initialise();
-  initSurface(20, 5);
+  inputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), 50, 0, -45));
+  addInputHandler(inputHandler);
+  initSurface(6);
   initDamageParticleSystem();
+  initUI();
   return success;
   }
 
@@ -92,16 +102,17 @@ void TOGameContext::removeTower(uint id)
   removeActor(id);
   }
 
+TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
+  {
+  TowerPtr tower = TowerFactory::createTower(towerType, getNextActorID(), position);
+  towers.add(tower, tower->getID());
+  addActor(tower);
+  return tower;
+  }
+
 TowerPtr TOGameContext::createBasicTower(const Vector3D& position)
   {
-  std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
-  weapon->setCooldownTime(1000);
-
-  TowerPtr tower(new Tower(getNextActorID(), MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
-  tower->setPosition(position);
-  tower->setTargetOffset(Vector3D(0, 1, 0));
-  tower->setShootOffset(Vector3D(0, 2, -2));
-  tower->setWeapon(std::move(weapon));
+  TowerPtr tower = TowerFactory::createBasicTowerA(getNextActorID(), position);
   towers.add(tower, tower->getID());
   addActor(tower);
   return tower;
@@ -109,33 +120,10 @@ TowerPtr TOGameContext::createBasicTower(const Vector3D& position)
 
 TowerPtr TOGameContext::createBasicTowerProj(const Vector3D& position)
   {
-  std::unique_ptr<ProjectileWeapon> weapon(new ProjectileWeapon());
-  weapon->setCooldownTime(1000);
-  weapon->setShootForce(100);
-  weapon->setGravityForce(0);
-  weapon->setCreateProjectileFunc([this](uint id)->ProjectilePtr
-                                    {
-                                    return createFootballProjectile(id);
-                                    });
-
-  TowerPtr tower(new Tower(getNextActorID(), MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
-  tower->setPosition(position);
-  tower->setTargetOffset(Vector3D(0, 1, 0));
-  tower->setShootOffset(Vector3D(0, 2, -1));
-  tower->setWeapon(std::move(weapon));
+  TowerPtr tower = TowerFactory::createBasicTowerProj(getNextActorID(), position);
   towers.add(tower, tower->getID());
   addActor(tower);
   return tower;
-  }
-
-ProjectilePtr TOGameContext::createFootballProjectile(uint id)
-  {
-  ProjectilePtr projectile(new Projectile(id));
-  projectile->setScale(2);
-  projectile->setMeshFilePath(MESH_FOOTBALL_PROJECTILE);
-  projectile->setDragEffect(0.5);
-  projectile->setTimeToLive(1000);
-  return projectile;
   }
 
 Vector3D TOGameContext::getPlayerColour(uint num) const
@@ -151,20 +139,35 @@ Vector3D TOGameContext::getPlayerColour(uint num) const
     }
   }
 
-void TOGameContext::initSurface(uint numCells, float cellSize)
+void TOGameContext::initSurface(uint size)
   {
   RenderContext* renderContext = getRenderContext();
   std::shared_ptr<HeightMap> heightMap(new HeightMap());
-//  HeightMapFactory::createDiamondSquareMap(heightMap.get(), 5, 20, 0.6);
-//  HeightMapFactory::createNoiseMap(heightMap.get(), numCells+1, 10, 1);
-  HeightMapFactory::createFlatMap(heightMap.get(), numCells+1, 0);
+  HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.6);
 
-  RenderableTerrain* terrain = new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize);
-  terrain->setMultiColour(Vector3D(0.2, 0.4, 0.2), Vector3D(0.1, 0.3, 0.0));
-  surfaceMesh.reset(terrain);
-  surfaceMesh->getTransform()->translate(Vector3D(numCells*cellSize*-0.5f, 0, numCells*cellSize*-0.5f));
+  for (float& height : heightMap->heights)
+    {
+    if (height > -5)
+      height = LAND_HEIGHT;
+    else
+      height = WATER_FLOOR_HEIGHT;
+    }
+
+  const float cellSize = 4;
+  const uint numCells = (uint)pow(2, (int)size);
+  const float translation = (float)numCells*cellSize*-0.5f;
+  surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize));
+  surfaceMesh->setMultiColour(Vector3D(0.2, 0.4, 0.2), Vector3D(0.1, 0.3, 0.0));
+  surfaceMesh->getTransform()->translate(Vector3D(translation, 0, translation));
   surfaceMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(surfaceMesh);
+
+  std::shared_ptr<RenderableTerrain> waterMesh;
+  waterMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize));
+  waterMesh->setSingleColour(Vector3D(0.2, 0.2, 0.5));
+  waterMesh->getTransform()->translate(Vector3D(translation, WATER_HEIGHT, translation));
+  waterMesh->initialise(renderContext);
+  renderContext->getRenderableSet()->addRenderable(waterMesh);
   }
 
 void TOGameContext::initDamageParticleSystem()
@@ -184,11 +187,37 @@ void TOGameContext::doTowerDamageEffect(const Tower* tower)
   towerDamageParticles->addEmitter(tower->getTargetPosition(), 50, Vector3D(0.9, 0, 0));
   }
 
-Vector3D TOGameContext::terrainHitTest(uint cursorX, uint cursorY)
+Vector3D TOGameContext::terrainHitTest(uint cursorX, uint cursorY, bool* isLand /*= nullptr*/) const
   {
   Vector3D cursorWorldPos = getCursorWorldPos(cursorX, cursorY);
   Vector3D cursorViewDir = getViewDirectionAtCursor(cursorX, cursorY);
   ASSERT (cursorViewDir.y != 0, "View is parallel to terrain, can't hit!");
-  float tValue = -1.0f * cursorWorldPos.y / cursorViewDir.y;
-  return cursorWorldPos + (cursorViewDir * tValue);
+  double tValue = -1.0 * cursorWorldPos.y / cursorViewDir.y;
+  Vector3D position = cursorWorldPos + (cursorViewDir * tValue);
+  if (isLand)
+    *isLand = isPositionLand(position);
+  return position;
+  }
+
+bool TOGameContext::isPositionLand(const Vector3D& worldPos) const
+  {
+  float height = surfaceMesh->getHeightAt(worldPos);
+  if (height != TERRAIN_OUT_OF_BOUNDS)
+    return height >= LAND_HEIGHT;
+  return false;
+  }
+
+void TOGameContext::initUI()
+  {
+  hudHandler.initialiseUI(this);
+  }
+
+uint TOGameContext::getActivePlayer() const
+  {
+  return inputHandler->getActivePlayer();
+  }
+
+void TOGameContext::setActivePlayer(uint player)
+  {
+  inputHandler->setActivePlayer(player);
   }

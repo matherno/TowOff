@@ -2,7 +2,7 @@
 // Created by matherno on 22/11/17.
 //
 
-#include <src/RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableMesh.h>
 #include "TestActor.h"
 
 TestActor::TestActor(uint id) : GameActor(id)

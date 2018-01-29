@@ -129,6 +129,11 @@ Window* RenderContextImpl::getWindow()
   return window.get();
   }
 
+const Window* RenderContextImpl::getWindow() const
+  {
+  return window.get();
+  }
+
 const Matrix4* RenderContextImpl::getWorldToCamera() const
   {
   return &worldToCameraTransform;

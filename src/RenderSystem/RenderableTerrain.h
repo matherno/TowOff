@@ -1,7 +1,9 @@
 #pragma once
 
-#include <src/RenderSystem/HeightMapFactory.h>
+#include <RenderSystem/HeightMapFactory.h>
 #include "RenderSystem.h"
+
+#define TERRAIN_OUT_OF_BOUNDS std::numeric_limits<float>::max()
 
 /*
 *   
@@ -28,4 +30,6 @@ public:
 
   void setSingleColour(const Vector3D& colour);
   void setMultiColour(const Vector3D& baseColour1, const Vector3D& baseColour2);
+
+  float getHeightAt(const Vector3D& worldPos) const;
   };

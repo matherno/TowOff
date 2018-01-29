@@ -2,7 +2,7 @@
 // Created by matt on 10/12/17.
 //
 
-#include <src/RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableMesh.h>
 #include "InstantWeapon.h"
 #include "TimeToLiveActor.h"
 #include "Resources.h"

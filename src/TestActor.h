@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <src/GameSystem/GameSystem.h>
+#include <GameSystem/GameSystem.h>
 
 class TestActor : public GameActor
   {

@@ -7,7 +7,7 @@
 #include <list>
 
 #include <mathernogl/MathernoGL.h>
-#include <src/RenderSystem/RenderSystem.h>
+#include <RenderSystem/RenderSystem.h>
 
 
 struct Particle

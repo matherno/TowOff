@@ -2,7 +2,7 @@
 // Created by matt on 13/12/17.
 //
 
-#include <src/RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableMesh.h>
 #include "Projectile.h"
 #include "Resources.h"
 

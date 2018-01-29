@@ -2,22 +2,22 @@
 // Created by matt on 3/12/17.
 //
 
-#include <src/GameSystem/InputCodes.h>
-#include "PanCameraInputHandler.h"
+#include <GameSystem/InputCodes.h>
+#include "TOInputHandler.h"
 #include "TOGameContext.h"
 
-PanCameraInputHandler::PanCameraInputHandler(uint id, const Vector3D& position, float zoomOffset, float yaw, float pitch)
+TOInputHandler::TOInputHandler(uint id, const Vector3D& position, float zoomOffset, float yaw, float pitch)
   : InputHandler(id), position(position), zoomOffset(zoomOffset), yaw(yaw), pitch(pitch)
   {
   }
 
-void PanCameraInputHandler::refreshCamera(Camera* camera) const
+void TOInputHandler::refreshCamera(Camera* camera) const
   {
   *camera->getWorldToCamera() = mathernogl::matrixTranslate(position * -1) * rotationMatrix * mathernogl::matrixTranslate(0, 0, -zoomOffset);
   camera->setValid(false);
   }
 
-void PanCameraInputHandler::onAttached(GameContext* gameContext)
+void TOInputHandler::onAttached(GameContext* gameContext)
   {
   Camera* camera = gameContext->getCamera();
   refreshRotationMatrix();
@@ -26,12 +26,12 @@ void PanCameraInputHandler::onAttached(GameContext* gameContext)
   camera->setValid(false);
   }
 
-void PanCameraInputHandler::onDetached(GameContext* gameContext)
+void TOInputHandler::onDetached(GameContext* gameContext)
   {
 
   }
 
-bool PanCameraInputHandler::onKeyHeld(GameContext* gameContext, uint key)
+bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
   {
   char character = getCharFromKeyCode(key);
   Vector3D translation(0);
@@ -76,31 +76,36 @@ bool PanCameraInputHandler::onKeyHeld(GameContext* gameContext, uint key)
   return false;
   }
 
-void PanCameraInputHandler::refreshRotationMatrix()
+void TOInputHandler::refreshRotationMatrix()
   {
   rotationMatrix = mathernogl::matrixYaw(-yaw) * mathernogl::matrixPitch(-pitch);
   }
 
-bool PanCameraInputHandler::onKeyPressed(GameContext* gameContext, uint key)
+bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
   {
   switch(getCharFromKeyCode(key))
     {
     case 'P':
       paused = !paused;
       gameContext->setPaused(paused);
-      break;
+      return true;
     }
+  return false;
   }
 
-bool PanCameraInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
-  if (activePlayer != 0 && button == MOUSE_LEFT)
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  HUDHandler* hudHandler = toGameContext->getHUDHandler();
+  if (hudHandler->isTowerTypeSelected() && button == MOUSE_LEFT)
     {
-    TOGameContext* toGameContext = TOGameContext::cast(gameContext);
-    Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY);
-    TowerPtr tower = toGameContext->createBasicTower(terrainPos);
-    tower->setPlayerNum(activePlayer);
-    return true;
+    bool isOnLand = false;
+    Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY, &isOnLand);
+    if (isOnLand)
+      {
+      TowerPtr tower = toGameContext->createTower(hudHandler->getTowerTypeSelected(), terrainPos);
+      return true;
+      }
     }
   else if (button == MOUSE_RIGHT)
     {
@@ -108,5 +113,13 @@ bool PanCameraInputHandler::onMousePressed(GameContext* gameContext, uint button
     return true;
     }
   return false;
+  }
+
+bool TOInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset, uint mouseX, uint mouseY)
+  {
+  zoomOffset -= scrollOffset * zoomSpeed;
+  zoomOffset = mathernogl::clampf(zoomOffset, minZoom, maxZoom);
+  refreshCamera(gameContext->getCamera());
+  return true;
   }
 

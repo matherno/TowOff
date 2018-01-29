@@ -6,9 +6,9 @@
 #include "GameSystem.h"
 #include "InputManagerImpl.h"
 #include "Camera.h"
-#include <src/RenderSystem/RenderContextImpl.h>
+#include <RenderSystem/RenderContextImpl.h>
 #include <set>
-#include <src/UISystem/UIManagerImpl.h>
+#include <UISystem/UIManagerImpl.h>
 
 class GameContextImpl : public GameContext
   {
@@ -29,7 +29,6 @@ private:
   uint nextActorID = 1;
   mathernogl::MappedList<GameActorPtr> actors;
   Camera camera;
-  long startTime;
   long startFrameTime;
   long gameTime = 0;
   long deltaTime = 0;
@@ -37,8 +36,11 @@ private:
   std::set<uint> actorsToRemove;
   bool paused = false;
 
+protected:
+  RenderInitConfig renderConfig;
+
 public:
-  GameContextImpl() {}
+  GameContextImpl();
   virtual ~GameContextImpl() override {}
 
   virtual bool initialise() override;
@@ -68,11 +70,15 @@ public:
   virtual InputManager* getInputManager() override { return &inputManager; }
   virtual RenderContext* getRenderContext() override { return &renderContext; }
   virtual UIManager* getUIManager() override { return &uiManager; }
+  virtual const Camera* getCamera() const override { return &camera; }
+  virtual const InputManager* getInputManager() const override { return &inputManager; }
+  virtual const RenderContext* getRenderContext() const override { return &renderContext; }
+  virtual const UIManager* getUIManager() const override { return &uiManager; }
 
-  Vector3D getCursorWorldPos(uint cursorX, uint cursorY);
-  Vector3D clipToWorldTransform(const Vector3D& clipSpacePos);
-  Vector3D getViewDirection();
-  Vector3D getViewDirectionAtCursor(uint cursorX, uint cursorY);
+  Vector3D getCursorWorldPos(uint cursorX, uint cursorY) const;
+  Vector3D clipToWorldTransform(const Vector3D& clipSpacePos) const;
+  Vector3D getViewDirection() const;
+  Vector3D getViewDirectionAtCursor(uint cursorX, uint cursorY) const;
 
 protected:
   void removePendingActors();

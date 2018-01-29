@@ -5,7 +5,7 @@
 
 
 #include <mathernogl/MathernoGL.h>
-#include <src/GameSystem/GameSystem.h>
+#include <GameSystem/GameSystem.h>
 
 class GameContext;
 

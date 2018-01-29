@@ -1,7 +1,7 @@
 #pragma once
 
-#include <src/RenderSystem/RenderSystem.h>
-#include <src/GameSystem/GameSystem.h>
+#include <RenderSystem/RenderSystem.h>
+#include <GameSystem/GameSystem.h>
 #include "TimeToLiveActor.h"
 
 /*

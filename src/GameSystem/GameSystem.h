@@ -1,8 +1,8 @@
 #pragma once
 
 #include <memory>
-#include <src/RenderSystem/RenderSystem.h>
-#include <src/UISystem/UISystem.h>
+#include <RenderSystem/RenderSystem.h>
+#include <UISystem/UISystem.h>
 #include "Camera.h"
 
 class GameContext;
@@ -99,6 +99,10 @@ public:
   virtual InputManager* getInputManager() = 0;
   virtual RenderContext* getRenderContext() = 0;
   virtual UIManager* getUIManager() = 0;
+  virtual const Camera* getCamera() const = 0;
+  virtual const InputManager* getInputManager() const = 0;
+  virtual const RenderContext* getRenderContext() const = 0;
+  virtual const UIManager* getUIManager() const = 0;
   };
 
 

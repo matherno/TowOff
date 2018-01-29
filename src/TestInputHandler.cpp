@@ -2,7 +2,7 @@
 // Created by matherno on 23/11/17.
 //
 
-#include <src/GameSystem/InputCodes.h>
+#include <GameSystem/InputCodes.h>
 #include "TestInputHandler.h"
 #include "TestActor.h"
 

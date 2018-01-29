@@ -31,6 +31,7 @@ public:
   virtual void cleanUp(RenderContext* renderContext) = 0;
   virtual void render(RenderContext* renderContext) = 0;
   virtual Transform* getTransform() { return &transform; }
+  virtual const Transform* getTransform() const { return &transform; }
   virtual void setTransform(const Transform& transform) { this->transform = transform; }
   };
 typedef std::shared_ptr<Renderable> RenderablePtr;
@@ -93,5 +94,6 @@ public:
   virtual void popTransform() = 0;
   virtual const Transform* getStackedTransform() = 0;
   virtual mathernogl::Window* getWindow() = 0;
+  virtual const mathernogl::Window* getWindow() const = 0;
   };
 typedef std::shared_ptr<RenderContext> RenderContextPtr;

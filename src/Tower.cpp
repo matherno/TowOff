@@ -2,7 +2,7 @@
 // Created by matt on 3/12/17.
 //
 
-#include <src/RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableMesh.h>
 #include "Tower.h"
 #include "TOGameContext.h"
 #include "InstantWeapon.h"

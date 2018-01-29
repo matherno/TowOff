@@ -2,7 +2,7 @@
 // Created by matt on 28/12/17.
 //
 
-#include <src/GameSystem/InputCodes.h>
+#include <GameSystem/InputCodes.h>
 #include "UIInputHandler.h"
 
 UIInputHandler::UIInputHandler(uint id) : InputHandler(id)
