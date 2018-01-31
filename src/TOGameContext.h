@@ -47,10 +47,6 @@ public:
   void removeTower(uint id);
 
   TowerPtr createTower(uint towerType, const Vector3D& position = Vector3D(0));
-  TowerPtr createBasicTower(const Vector3D& position = Vector3D(0));
-  TowerPtr createBasicTowerProj(const Vector3D& position = Vector3D(0));
-
-  ProjectilePtr createFootballProjectile(uint id);
 
   void doTowerDamageEffect(const Tower* tower);
   Vector3D terrainHitTest(uint cursorX, uint cursorY, bool* isLand = nullptr) const;

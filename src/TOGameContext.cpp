@@ -19,7 +19,7 @@ bool TOGameContext::initialise()
   {
   renderConfig.windowName = "TowOff";
   bool success = GameContextImpl::initialise();
-  inputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), 50, 0, -45));
+  inputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), -20, 0, -45));
   addInputHandler(inputHandler);
   initSurface(6);
   initDamageParticleSystem();
@@ -110,22 +110,6 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
   return tower;
   }
 
-TowerPtr TOGameContext::createBasicTower(const Vector3D& position)
-  {
-  TowerPtr tower = TowerFactory::createBasicTowerA(getNextActorID(), position);
-  towers.add(tower, tower->getID());
-  addActor(tower);
-  return tower;
-  }
-
-TowerPtr TOGameContext::createBasicTowerProj(const Vector3D& position)
-  {
-  TowerPtr tower = TowerFactory::createBasicTowerProj(getNextActorID(), position);
-  towers.add(tower, tower->getID());
-  addActor(tower);
-  return tower;
-  }
-
 Vector3D TOGameContext::getPlayerColour(uint num) const
   {
   switch (num)
@@ -143,17 +127,17 @@ void TOGameContext::initSurface(uint size)
   {
   RenderContext* renderContext = getRenderContext();
   std::shared_ptr<HeightMap> heightMap(new HeightMap());
-  HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.6);
+  HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.7);
 
   for (float& height : heightMap->heights)
     {
-    if (height > -5)
+    if (height > -1)
       height = LAND_HEIGHT;
     else
       height = WATER_FLOOR_HEIGHT;
     }
 
-  const float cellSize = 4;
+  const float cellSize = 2;
   const uint numCells = (uint)pow(2, (int)size);
   const float translation = (float)numCells*cellSize*-0.5f;
   surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize));

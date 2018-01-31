@@ -10,15 +10,18 @@
 
 const std::vector<TowerType> towerTypes =
   {
-    TowerType{"Basic Tower A", IMAGE_ICON_BASIC_TOWER, TowerFactory::createBasicTowerA},
-    TowerType{"Basic Tower B", IMAGE_ICON_BASIC_TOWER_DUP, TowerFactory::createBasicTowerB},
-    TowerType{"Basic Tower B", IMAGE_ICON_BASIC_TOWER_DUP, TowerFactory::createBasicTowerB},
-    TowerType{"Basic Tower B", IMAGE_ICON_BASIC_TOWER_DUP, TowerFactory::createBasicTowerB},
-    TowerType{"Basic Tower B", IMAGE_ICON_BASIC_TOWER_DUP, TowerFactory::createBasicTowerB},
-    TowerType{"Basic Tower B", IMAGE_ICON_BASIC_TOWER_DUP, TowerFactory::createBasicTowerB},
-    TowerType{"Basic Tower B", IMAGE_ICON_BASIC_TOWER_DUP, TowerFactory::createBasicTowerB},
+    TowerType{"Home Base",       IMAGE_ICON_HOME_BASE,    TowerFactory::createHomeBase},
+    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  TowerFactory::createBasicTower},
+    TowerType{"Pylon",           IMAGE_ICON_PYLON,        TowerFactory::createPylon},
+    TowerType{"Miner",           IMAGE_ICON_MINER,        TowerFactory::createMiner},
+    TowerType{"Enemy Tower",     IMAGE_ICON_ENEMY_TOWER,  TowerFactory::createBasicTower},
   };
 
+
+const std::vector<TowerType>* TowerFactory::getTowerTypeList()
+  {
+  return &towerTypes;
+  }
 
 ProjectilePtr createFootballProjectile(uint id)
   {
@@ -55,35 +58,40 @@ TowerPtr TowerFactory::createBasicTowerProj(uint id, const Vector3D& position)
   return tower;
   }
 
-TowerPtr TowerFactory::createBasicTowerA(uint id, const Vector3D& position)
+TowerPtr TowerFactory::createBasicTower(uint id, const Vector3D& position)
   {
   std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
   weapon->setCooldownTime(1000);
+  weapon->setBeamRadius(0.2);
 
   TowerPtr tower(new Tower(id, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
   tower->setPosition(position);
-  tower->setTargetOffset(Vector3D(0, 1, 0));
-  tower->setShootOffset(Vector3D(0, 2, -2));
+  tower->setTargetOffset(Vector3D(0, 0.5, 0));
+  tower->setShootOffset(Vector3D(0, 1.45, -1));
   tower->setWeapon(std::move(weapon));
-  tower->setPlayerNum(1);
   return tower;
   }
 
-TowerPtr TowerFactory::createBasicTowerB(uint id, const Vector3D& position)
+TowerPtr TowerFactory::createHomeBase(uint id, const Vector3D& position)
   {
-  std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
-  weapon->setCooldownTime(1000);
-
-  TowerPtr tower(new Tower(id, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
+  TowerPtr tower(new Tower(id, MESH_HOME_BASE));
+  tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setPosition(position);
-  tower->setTargetOffset(Vector3D(0, 1, 0));
-  tower->setShootOffset(Vector3D(0, 2, -2));
-  tower->setWeapon(std::move(weapon));
-  tower->setPlayerNum(2);
   return tower;
   }
 
-const std::vector<TowerType>* TowerFactory::getTowerTypeList()
+TowerPtr TowerFactory::createPylon(uint id, const Vector3D& position)
   {
-  return &towerTypes;
+  TowerPtr tower(new Tower(id, MESH_PYLON));
+  tower->setTargetOffset(Vector3D(0, 0.5, 0));
+  tower->setPosition(position);
+  return tower;
+  }
+
+TowerPtr TowerFactory::createMiner(uint id, const Vector3D& position)
+  {
+  TowerPtr tower(new Tower(id, MESH_MINER_BASE, MESH_MINER_TURRET));
+  tower->setTargetOffset(Vector3D(0, 0.5, 0));
+  tower->setPosition(position);
+  return tower;
   }

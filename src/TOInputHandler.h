@@ -13,8 +13,8 @@ private:
   float panSpeed = 50;
   float yawSpeed = 90;
   float zoomSpeed = 8;
-  float minZoom = -50;
-  float maxZoom = 150;
+  float minZoom = -60;
+  float maxZoom = 50;
   float yaw;
   float pitch;
   Matrix4 rotationMatrix;

@@ -12,6 +12,7 @@ private:
   long cooldownTime = 1000;
   long lastShootTime = -9999;
   int damagePerShot = 10;
+  float beamRadius = 0.3;
 
 public:
   virtual void initShooting(GameContext* context) override;
@@ -20,6 +21,7 @@ public:
 
   void setCooldownTime(long time) { cooldownTime = time; }
   void setDamagePerShot(int damagePerShot) { this->damagePerShot = damagePerShot; }
+  void setBeamRadius(float beamRadius) { this->beamRadius = beamRadius; }
 
   virtual bool isCoolingDown(long currentTime) override;
 

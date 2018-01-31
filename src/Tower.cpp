@@ -63,7 +63,7 @@ void Tower::onUpdate(GameContext* gameContext)
     return;
     }
 
-  ((RenderableMesh*)towerBase.get())->setColour(toGameContext->getPlayerColour(getPlayerNum()));
+//  ((RenderableMesh*)towerBase.get())->setColour(toGameContext->getPlayerColour(getPlayerNum()));
 
   if (state == idle)
     {

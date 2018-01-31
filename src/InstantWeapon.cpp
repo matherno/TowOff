@@ -40,7 +40,7 @@ void InstantWeapon::createBeamShot(GameContext* context, const Vector3D& shootPo
   shootToTarget.y = 0;
   Vector3D shootDir = shootToTarget;
   shootDir.makeUniform();
-  mesh->getTransform()->scale(0.3, 0.3, shootToTarget.magnitude());
+  mesh->getTransform()->scale(beamRadius, beamRadius, shootToTarget.magnitude());
   float angle = mathernogl::ccwAngleBetween(Vector2D(0, -1), Vector2D(shootToTarget.x, shootToTarget.z));
   mesh->getTransform()->rotate(Vector3D(0, 1, 0), angle);
   mesh->getTransform()->translate(shootPos + shootToTarget * 0.5f);

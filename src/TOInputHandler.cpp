@@ -5,6 +5,7 @@
 #include <GameSystem/InputCodes.h>
 #include "TOInputHandler.h"
 #include "TOGameContext.h"
+#include "TowerFactory.h"
 
 TOInputHandler::TOInputHandler(uint id, const Vector3D& position, float zoomOffset, float yaw, float pitch)
   : InputHandler(id), position(position), zoomOffset(zoomOffset), yaw(yaw), pitch(pitch)
@@ -103,7 +104,12 @@ bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
     Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY, &isOnLand);
     if (isOnLand)
       {
-      TowerPtr tower = toGameContext->createTower(hudHandler->getTowerTypeSelected(), terrainPos);
+      uint towerType = hudHandler->getTowerTypeSelected();
+      TowerPtr tower = toGameContext->createTower(towerType, terrainPos);
+      if ((*TowerFactory::getTowerTypeList())[towerType].name == "Enemy Tower")
+        tower->setPlayerNum(2);
+      else
+        tower->setPlayerNum(1);
       return true;
       }
     }

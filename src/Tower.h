@@ -36,7 +36,7 @@ protected:
   Vector3D targetOffset;
 
 public:
-  Tower(uint id, string baseModelFile, string turretModelFile);
+  Tower(uint id, string baseModelFile, string turretModelFile = "");
   virtual ~Tower() {};
   void setPlayerNum(uint playerNum);
   uint getPlayerNum() const { return playerNum; }
