@@ -17,11 +17,21 @@ public:
     shooting,
     };
 
+  enum TowerFunction
+    {
+    combat,
+    storage,
+    relay,
+    miner,
+    };
+
 private:
+  TowerFunction towerFunction;
   RenderablePtr towerBase;
   RenderablePtr towerTurret;
   Vector3D position;
   Vector3D targetPosition;
+  Vector3D connectPosition;
   uint playerNum = 0;
   TowerState state = idle;
   int maxHealthPoints = 100;
@@ -30,17 +40,21 @@ private:
 
 protected:
   float hitRadius = 5;
+  float connectRadius = 10;
   std::unique_ptr<TowerWeapon> weapon;
   string baseModelFile, turretModelFile;
   Vector3D shootOffset;
   Vector3D targetOffset;
+  Vector3D connectOffset;
 
 public:
-  Tower(uint id, string baseModelFile, string turretModelFile = "");
+  Tower(uint id, TowerFunction function, string baseModelFile, string turretModelFile = "");
   virtual ~Tower() {};
   void setPlayerNum(uint playerNum);
   uint getPlayerNum() const { return playerNum; }
-  TowerState getState(){ return state; }
+  TowerState getState() const { return state; }
+  TowerFunction getFunction() const { return towerFunction; }
+  bool isPowerSrc() const { return towerFunction == miner || towerFunction == storage; }
 
   virtual void onAttached(GameContext* gameContext) override;
   virtual void onUpdate(GameContext* gameContext) override;
@@ -51,14 +65,18 @@ public:
 
   Vector3D getPosition() const { return position; }
   Vector3D getTargetPosition() const { return targetPosition; }
+  Vector3D getConnectPosition() const { return connectPosition; }
   Vector3D getHitRadius() const { return hitRadius; }
   int getHealthPoints() const { return healthPoints; }
   void setPosition(const Vector3D& pos);
   void setShootOffset(const Vector3D& offset) { shootOffset = offset; }
   void setTargetOffset(const Vector3D& offset);
+  void setConnectOffset(const Vector3D& offset);
   void setWeapon(std::unique_ptr<TowerWeapon> weapon) { this->weapon = std::move(weapon); }
   void setMaxHealthPoints(int max);
   bool isAlive() { return healthPoints > 0; }
+  void setConnectRadius(float radius) { connectRadius = radius; }
+  float getConnectRadius() const { return connectRadius; }
 
 protected:
   void setTurretRotation(const Vector3D& targetPos);

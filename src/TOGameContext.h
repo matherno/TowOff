@@ -11,6 +11,7 @@ class TOGameContext;
 #include "Projectile.h"
 #include "TOInputHandler.h"
 #include "HUDHandler.h"
+#include "ConnectionManager.h"
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
@@ -25,6 +26,7 @@ private:
   ParticleSystemPtr towerDamageParticles;
   std::shared_ptr<TOInputHandler> inputHandler;
   HUDHandler hudHandler;
+  std::shared_ptr<ConnectionManager> connectionManager;
 
 public:
   virtual bool initialise() override;
@@ -45,6 +47,7 @@ public:
   TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);
+  bool isConnectedToPowerSrc(uint towerID) const;
 
   TowerPtr createTower(uint towerType, const Vector3D& position = Vector3D(0));
 

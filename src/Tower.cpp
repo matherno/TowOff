@@ -8,8 +8,8 @@
 #include "InstantWeapon.h"
 #include "ProjectileWeapon.h"
 
-Tower::Tower(uint id, string baseModelFile, string turretModelFile)
-  : GameActor(id), baseModelFile(baseModelFile), turretModelFile(turretModelFile)
+Tower::Tower(uint id, TowerFunction function, string baseModelFile, string turretModelFile)
+  : GameActor(id), towerFunction(function), baseModelFile(baseModelFile), turretModelFile(turretModelFile)
   {
   }
 
@@ -67,7 +67,10 @@ void Tower::onUpdate(GameContext* gameContext)
 
   if (state == idle)
     {
-    if (weapon && weapon->isCoolingDown(gameContext->getGameTime()))
+    if (!weapon || weapon->isCoolingDown(gameContext->getGameTime()))
+      return;
+
+    if (!toGameContext->isConnectedToPowerSrc(getID()))
       return;
 
     TowerPtr target = toGameContext->getClosestTowerTo(this, true);
@@ -84,7 +87,8 @@ void Tower::onUpdate(GameContext* gameContext)
     Vector3D shootPos = position + shootOffset;
     if (towerTurret)
       towerTurret->getTransform()->transform(shootOffset, &shootPos);
-    if (weapon->getTarget() && weapon->getTarget()->isAlive())
+    bool connectedToSrc = toGameContext->isConnectedToPowerSrc(getID());
+    if (weapon->getTarget() && weapon->getTarget()->isAlive() && connectedToSrc)
       {
       weapon->updateShooting(toGameContext, shootPos);
       }
@@ -134,12 +138,19 @@ void Tower::setPosition(const Vector3D& pos)
   if (towerTurret)
     towerTurret->getTransform()->setTransformMatrix(mathernogl::matrixTranslate(pos));
   setTargetOffset(targetOffset);
+  setConnectOffset(connectOffset);
   }
 
 void Tower::setTargetOffset(const Vector3D& offset)
   {
   targetOffset = offset;
   targetPosition = position + targetOffset;
+  }
+
+void Tower::setConnectOffset(const Vector3D& offset)
+  {
+  connectOffset = offset;
+  connectPosition = position + offset;
   }
 
 void Tower::setMaxHealthPoints(int max)
@@ -163,3 +174,4 @@ void Tower::setTurretRotation(const Vector3D& targetPos)
     towerTurret->getTransform()->translate(position);
     }
   }
+

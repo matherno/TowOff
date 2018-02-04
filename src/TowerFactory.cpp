@@ -50,8 +50,9 @@ TowerPtr TowerFactory::createBasicTowerProj(uint id, const Vector3D& position)
                                     return createFootballProjectile(id);
                                     });
 
-  TowerPtr tower(new Tower(id, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
+  TowerPtr tower(new Tower(id, Tower::combat, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
   tower->setPosition(position);
+  tower->setConnectOffset(Vector3D(0, 1, 0));
   tower->setTargetOffset(Vector3D(0, 1, 0));
   tower->setShootOffset(Vector3D(0, 2, -1));
   tower->setWeapon(std::move(weapon));
@@ -64,8 +65,9 @@ TowerPtr TowerFactory::createBasicTower(uint id, const Vector3D& position)
   weapon->setCooldownTime(1000);
   weapon->setBeamRadius(0.2);
 
-  TowerPtr tower(new Tower(id, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
+  TowerPtr tower(new Tower(id, Tower::combat, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
   tower->setPosition(position);
+  tower->setConnectOffset(Vector3D(0, 1, 0));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setShootOffset(Vector3D(0, 1.45, -1));
   tower->setWeapon(std::move(weapon));
@@ -74,7 +76,8 @@ TowerPtr TowerFactory::createBasicTower(uint id, const Vector3D& position)
 
 TowerPtr TowerFactory::createHomeBase(uint id, const Vector3D& position)
   {
-  TowerPtr tower(new Tower(id, MESH_HOME_BASE));
+  TowerPtr tower(new Tower(id, Tower::storage, MESH_HOME_BASE));
+  tower->setConnectOffset(Vector3D(-0.61, 5.12, 0.61));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setPosition(position);
   return tower;
@@ -82,15 +85,18 @@ TowerPtr TowerFactory::createHomeBase(uint id, const Vector3D& position)
 
 TowerPtr TowerFactory::createPylon(uint id, const Vector3D& position)
   {
-  TowerPtr tower(new Tower(id, MESH_PYLON));
+  TowerPtr tower(new Tower(id, Tower::relay, MESH_PYLON));
+  tower->setConnectOffset(Vector3D(0, 4.02, 0));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setPosition(position);
+  tower->setConnectRadius(20);
   return tower;
   }
 
 TowerPtr TowerFactory::createMiner(uint id, const Vector3D& position)
   {
-  TowerPtr tower(new Tower(id, MESH_MINER_BASE, MESH_MINER_TURRET));
+  TowerPtr tower(new Tower(id, Tower::miner, MESH_MINER_BASE, MESH_MINER_TURRET));
+  tower->setConnectOffset(Vector3D(0, 2.61, 0));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setPosition(position);
   return tower;

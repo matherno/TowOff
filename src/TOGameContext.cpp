@@ -24,6 +24,8 @@ bool TOGameContext::initialise()
   initSurface(6);
   initDamageParticleSystem();
   initUI();
+  connectionManager.reset(new ConnectionManager(getNextActorID()));
+  addActor(connectionManager);
   return success;
   }
 
@@ -33,6 +35,7 @@ void TOGameContext::cleanUp()
     {
     getRenderContext()->getRenderableSet()->removeRenderable(surfaceMesh->getID());
     surfaceMesh->cleanUp(getRenderContext());
+    removeActor(connectionManager->getID());
     }
   GameContextImpl::cleanUp();
   }
@@ -100,6 +103,7 @@ void TOGameContext::removeTower(uint id)
   {
   towers.remove(id);
   removeActor(id);
+  connectionManager->removeTower(id);
   }
 
 TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
@@ -107,6 +111,8 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
   TowerPtr tower = TowerFactory::createTower(towerType, getNextActorID(), position);
   towers.add(tower, tower->getID());
   addActor(tower);
+  if (tower->getFunction() != Tower::combat)
+    connectionManager->addTower(tower);
   return tower;
   }
 
@@ -131,7 +137,7 @@ void TOGameContext::initSurface(uint size)
 
   for (float& height : heightMap->heights)
     {
-    if (height > -1)
+    if (height > 0)
       height = LAND_HEIGHT;
     else
       height = WATER_FLOOR_HEIGHT;
@@ -204,4 +210,9 @@ uint TOGameContext::getActivePlayer() const
 void TOGameContext::setActivePlayer(uint player)
   {
   inputHandler->setActivePlayer(player);
+  }
+
+bool TOGameContext::isConnectedToPowerSrc(uint towerID) const
+  {
+  return connectionManager->isTowerConnectedToPowerSrc(towerID);
   }
