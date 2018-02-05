@@ -158,7 +158,7 @@ void ConnectionManager::addPendingRenderables(RenderContext* renderContext)
     Vector3D colour(0.2, 0.2, 0.7);
     if (firstTower->getFunction() == Tower::relay && secondTower->getFunction() == Tower::relay)
       colour.set(0, 0.1, 0.6);
-    connectionBeamIDs[nodePair] = beamsRenderable->addLine(start, end, colour, 0.8waawda);
+    connectionBeamIDs[nodePair] = beamsRenderable->addLine(start, end, colour, 0.8);
     }
   beamsToCreate.clear();
   }

@@ -18,16 +18,6 @@ int main()
   TOGameContext context;
   context.initialise();
 
-
-//  mathernogl::RandomGenerator::setSeed();
-//  for (int num = 0; num < 50; ++num)
-//    {
-//    TowerPtr tower = context.createBasicTower(Vector3D(mathernogl::RandomGenerator::randomFloat(-40, 40), 0, mathernogl::RandomGenerator::randomFloat(-40, 40)));
-//    tower->setPlayerNum((uint)mathernogl::RandomGenerator::randomInt(1, 2));
-//    }
-
-//  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
   while(context.getRenderContext()->isWindowOpen())
     {
     context.startFrame();

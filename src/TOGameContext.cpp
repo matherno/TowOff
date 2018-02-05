@@ -101,9 +101,12 @@ TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower, bool onlyEnemies)
 
 void TOGameContext::removeTower(uint id)
   {
+  TowerPtr tower = getTower(id);
   towers.remove(id);
   removeActor(id);
   connectionManager->removeTower(id);
+  if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
+    rebuildRelayInfluenceMap();
   }
 
 TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
@@ -113,6 +116,8 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
   addActor(tower);
   if (tower->getFunction() != Tower::combat)
     connectionManager->addTower(tower);
+  if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
+    rebuildRelayInfluenceMap();
   return tower;
   }
 
@@ -214,5 +219,40 @@ void TOGameContext::setActivePlayer(uint player)
 
 bool TOGameContext::isConnectedToPowerSrc(uint towerID) const
   {
-  return connectionManager->isTowerConnectedToPowerSrc(towerID);
+  const TowerPtr tower = towers.get(towerID);
+  if (tower)
+    {
+    if (tower->getFunction() == Tower::combat)
+      return relayInfluenceMap.count(towerID) > 0 && !relayInfluenceMap.at(towerID).empty();
+    else
+      return connectionManager->isTowerConnectedToPowerSrc(towerID);
+    }
+  return false;
+  }
+
+bool isCombatTowerInRange(const TowerPtr& combatTower, const TowerPtr& relayTower)
+  {
+  float range = TowerFactory::getRelayPowerRange(relayTower->getTowerType());
+  if (range <= 0)
+    return false;
+  return combatTower->getPosition().distanceToPoint(relayTower->getPosition()) <= range;
+  }
+
+void TOGameContext::rebuildRelayInfluenceMap()
+  {
+  relayInfluenceMap.clear();
+  for (const TowerPtr& combatTower : *towers.getList())
+    {
+    if (combatTower->getFunction() != Tower::combat)
+      continue;
+
+    for (const TowerPtr& relayTower : *towers.getList())
+      {
+      if (relayTower->getFunction() != Tower::relay)
+        continue;
+
+      if(isCombatTowerInRange(combatTower, relayTower))
+        relayInfluenceMap[combatTower->getID()].push_back(relayTower->getID());
+      }
+    }
   }

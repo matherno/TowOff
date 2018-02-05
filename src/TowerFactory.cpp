@@ -7,20 +7,33 @@
 #include "ProjectileWeapon.h"
 #include "Resources.h"
 #include "InstantWeapon.h"
+#include "TowerFunctionalities.h"
 
-const std::vector<TowerType> towerTypes =
+#define TOWER_HOMEBASE  0
+#define TOWER_BASIC     1
+#define TOWER_PYLON     2
+#define TOWER_MINER     3
+#define TOWER_ENEMY     4
+
+const std::map<uint, TowerType> towerTypes =
   {
-    TowerType{"Home Base",       IMAGE_ICON_HOME_BASE,    TowerFactory::createHomeBase},
-    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  TowerFactory::createBasicTower},
-    TowerType{"Pylon",           IMAGE_ICON_PYLON,        TowerFactory::createPylon},
-    TowerType{"Miner",           IMAGE_ICON_MINER,        TowerFactory::createMiner},
-    TowerType{"Enemy Tower",     IMAGE_ICON_ENEMY_TOWER,  TowerFactory::createBasicTower},
+  {TOWER_HOMEBASE, TowerType{"Home Base",       IMAGE_ICON_HOME_BASE,    TowerFactory::createHomeBase}},
+  {TOWER_BASIC,    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  TowerFactory::createBasicTower}},
+  {TOWER_PYLON,    TowerType{"Pylon",           IMAGE_ICON_PYLON,        TowerFactory::createPylon}},
+  {TOWER_MINER,    TowerType{"Miner",           IMAGE_ICON_MINER,        TowerFactory::createMiner}},
+  {TOWER_ENEMY,    TowerType{"Enemy Tower",     IMAGE_ICON_ENEMY_TOWER,  TowerFactory::createBasicTower}},
   };
 
 
-const std::vector<TowerType>* TowerFactory::getTowerTypeList()
+const std::map<uint, TowerType>* TowerFactory::getTowerTypeMap()
   {
   return &towerTypes;
+  }
+
+const TowerType* TowerFactory::getTowerType(uint towerType)
+  {
+  ASSERT(towerTypes.count(towerType) > 0, "Invalid tower type number");
+  return &towerTypes.at(towerType);
   }
 
 ProjectilePtr createFootballProjectile(uint id)
@@ -35,11 +48,11 @@ ProjectilePtr createFootballProjectile(uint id)
 
 TowerPtr TowerFactory::createTower(uint towerType, uint id, const Vector3D& position)
   {
-  ASSERT(towerType < towerTypes.size(), "Invalid tower type number");
-  return towerTypes[towerType].createFunction(id, position);
+
+  return getTowerType(towerType)->createFunction(id, towerType, position);
   }
 
-TowerPtr TowerFactory::createBasicTowerProj(uint id, const Vector3D& position)
+TowerPtr TowerFactory::createBasicTowerProj(uint id, uint towerType, const Vector3D& position)
   {
   std::unique_ptr<ProjectileWeapon> weapon(new ProjectileWeapon());
   weapon->setCooldownTime(1000);
@@ -50,54 +63,83 @@ TowerPtr TowerFactory::createBasicTowerProj(uint id, const Vector3D& position)
                                     return createFootballProjectile(id);
                                     });
 
-  TowerPtr tower(new Tower(id, Tower::combat, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
+  TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
+  function->setShootOffset(Vector3D(0, 2, -1));
+  function->setWeapon(std::move(weapon));
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
   tower->setConnectOffset(Vector3D(0, 1, 0));
   tower->setTargetOffset(Vector3D(0, 1, 0));
-  tower->setShootOffset(Vector3D(0, 2, -1));
-  tower->setWeapon(std::move(weapon));
+  tower->setBaseModelFilePath(MESH_BASIC_TOWER_BASE);
+  tower->setTurretModelFilePath(MESH_BASIC_TOWER_TURRET);
   return tower;
   }
 
-TowerPtr TowerFactory::createBasicTower(uint id, const Vector3D& position)
+TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D& position)
   {
   std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
   weapon->setCooldownTime(1000);
   weapon->setBeamRadius(0.2);
 
-  TowerPtr tower(new Tower(id, Tower::combat, MESH_BASIC_TOWER_BASE, MESH_BASIC_TOWER_TURRET));
+  TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
+  function->setShootOffset(Vector3D(0, 1.45, -1));
+  function->setWeapon(std::move(weapon));
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
   tower->setConnectOffset(Vector3D(0, 1, 0));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
-  tower->setShootOffset(Vector3D(0, 1.45, -1));
-  tower->setWeapon(std::move(weapon));
+  tower->setBaseModelFilePath(MESH_BASIC_TOWER_BASE);
+  tower->setTurretModelFilePath(MESH_BASIC_TOWER_TURRET);
   return tower;
   }
 
-TowerPtr TowerFactory::createHomeBase(uint id, const Vector3D& position)
+TowerPtr TowerFactory::createHomeBase(uint id, uint towerType, const Vector3D& position)
   {
-  TowerPtr tower(new Tower(id, Tower::storage, MESH_HOME_BASE));
+  TowerFunctionalityStorage* function = new TowerFunctionalityStorage();
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setConnectOffset(Vector3D(-0.61, 5.12, 0.61));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setPosition(position);
+  tower->setBaseModelFilePath(MESH_HOME_BASE);
   return tower;
   }
 
-TowerPtr TowerFactory::createPylon(uint id, const Vector3D& position)
+TowerPtr TowerFactory::createPylon(uint id, uint towerType, const Vector3D& position)
   {
-  TowerPtr tower(new Tower(id, Tower::relay, MESH_PYLON));
+  TowerFunctionalityRelay* function = new TowerFunctionalityRelay();
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setConnectOffset(Vector3D(0, 4.02, 0));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setPosition(position);
   tower->setConnectRadius(20);
+  tower->setBaseModelFilePath(MESH_PYLON);
   return tower;
   }
 
-TowerPtr TowerFactory::createMiner(uint id, const Vector3D& position)
+TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& position)
   {
-  TowerPtr tower(new Tower(id, Tower::miner, MESH_MINER_BASE, MESH_MINER_TURRET));
+  TowerFunctionalityMiner* function = new TowerFunctionalityMiner();
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setConnectOffset(Vector3D(0, 2.61, 0));
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   tower->setPosition(position);
+  tower->setBaseModelFilePath(MESH_MINER_BASE);
+  tower->setTurretModelFilePath(MESH_MINER_TURRET);
   return tower;
   }
+
+float TowerFactory::getRelayPowerRange(uint towerType)
+  {
+  switch (towerType)
+    {
+    case TOWER_PYLON:
+      return 20;
+    }
+  return 0;
+  }
+

@@ -106,7 +106,7 @@ bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
       {
       uint towerType = hudHandler->getTowerTypeSelected();
       TowerPtr tower = toGameContext->createTower(towerType, terrainPos);
-      if ((*TowerFactory::getTowerTypeList())[towerType].name == "Enemy Tower")
+      if (TowerFactory::getTowerType(towerType)->name == "Enemy Tower")
         tower->setPlayerNum(2);
       else
         tower->setPlayerNum(1);

@@ -28,6 +28,9 @@ private:
   HUDHandler hudHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
 
+  //  maps combat towers to the relay towers that they are within range of
+  std::map<uint, std::list<uint>> relayInfluenceMap;
+
 public:
   virtual bool initialise() override;
   virtual void cleanUp() override;
@@ -66,4 +69,5 @@ protected:
   void initSurface(uint size);
   void initDamageParticleSystem();
   void initUI();
+  void rebuildRelayInfluenceMap();
   };

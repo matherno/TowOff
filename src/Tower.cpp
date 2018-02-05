@@ -7,9 +7,10 @@
 #include "TOGameContext.h"
 #include "InstantWeapon.h"
 #include "ProjectileWeapon.h"
+#include "TowerFactory.h"
 
-Tower::Tower(uint id, TowerFunction function, string baseModelFile, string turretModelFile)
-  : GameActor(id), towerFunction(function), baseModelFile(baseModelFile), turretModelFile(turretModelFile)
+Tower::Tower(uint id, uint towerType, TowerFunctionalityPtr functionality)
+  : GameActor(id), towerType(towerType), functionality(std::move(functionality))
   {
   }
 
@@ -46,6 +47,8 @@ void Tower::onAttached(GameContext* gameContext)
       context->getRenderableSet()->addRenderable(towerTurret);
       }
     }
+
+  functionality->onAttached(this, gameContext);
   }
 
 void Tower::onUpdate(GameContext* gameContext)
@@ -63,47 +66,13 @@ void Tower::onUpdate(GameContext* gameContext)
     return;
     }
 
-//  ((RenderableMesh*)towerBase.get())->setColour(toGameContext->getPlayerColour(getPlayerNum()));
+  functionality->onUpdate(this, gameContext);
 
-  if (state == idle)
-    {
-    if (!weapon || weapon->isCoolingDown(gameContext->getGameTime()))
-      return;
-
-    if (!toGameContext->isConnectedToPowerSrc(getID()))
-      return;
-
-    TowerPtr target = toGameContext->getClosestTowerTo(this, true);
-    if (target && weapon)
-      {
-      weapon->setTarget(target);
-      weapon->initShooting(toGameContext);
-      setTurretRotation(target->getTargetPosition());
-      state = shooting;
-      }
-    }
-  else if (state == shooting)
-    {
-    Vector3D shootPos = position + shootOffset;
-    if (towerTurret)
-      towerTurret->getTransform()->transform(shootOffset, &shootPos);
-    bool connectedToSrc = toGameContext->isConnectedToPowerSrc(getID());
-    if (weapon->getTarget() && weapon->getTarget()->isAlive() && connectedToSrc)
-      {
-      weapon->updateShooting(toGameContext, shootPos);
-      }
-    else
-      {
-      weapon->endShooting(toGameContext, shootPos);
-      state = idle;
-      }
-    }
   }
 
 void Tower::onDetached(GameContext* gameContext)
   {
-  if (state == shooting && weapon)
-    weapon->endShooting(TOGameContext::cast(gameContext), position + shootOffset);
+  functionality->onDetached(this, gameContext);
   if (towerBase)
     {
     gameContext->getRenderContext()->getRenderableSet()->removeRenderable(towerBase->getID());
@@ -168,10 +137,22 @@ void Tower::setTurretRotation(const Vector3D& targetPos)
     targetDirection.y = 0;
     targetDirection.makeUniform();
 
-    float angleBetween = mathernogl::ccwAngleBetween(Vector2D(0, -1), Vector2D(targetDirection.x, targetDirection.z));
+    double angleBetween = mathernogl::ccwAngleBetween(Vector2D(0, -1), Vector2D(targetDirection.x, targetDirection.z));
     towerTurret->getTransform()->setIdentityMatrix();
     towerTurret->getTransform()->rotate(0, 1, 0, angleBetween);
     towerTurret->getTransform()->translate(position);
     }
+  }
+
+Tower::TowerFunction Tower::getFunction() const
+  {
+  return functionality->function;
+  }
+
+const Transform* Tower::getTurretRotation() const
+  {
+  if (towerTurret)
+    return towerTurret->getTransform();
+  return nullptr;
   }
 

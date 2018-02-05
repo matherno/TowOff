@@ -36,9 +36,12 @@ void HUDHandler::initialiseUI(GameContext* context)
 
   UIToggleButtonGroupPtr toggleButtonGroup(new UIToggleButtonGroup());
 
-  const std::vector<TowerType>* towerTypes = TowerFactory::getTowerTypeList();
-  for (uint towerNum = 0; towerNum < towerTypes->size(); ++towerNum){
-    const TowerType& towerType = (*towerTypes)[towerNum];
+  int towerNum = 0;
+  const std::map<uint, TowerType>* towerTypes = TowerFactory::getTowerTypeMap();
+  for (const std::pair<uint, TowerType> pair : *towerTypes){
+    const uint towerTypeID = pair.first;
+    const TowerType& towerType = pair.second;
+
     UIButton* button = new UIButton(uiManager->getNextComponentID(), true);
     button->setOffset(Vector2D(50 + towerNum * 70, 20));
     button->setSize(Vector2D(50, 50));
@@ -48,15 +51,16 @@ void HUDHandler::initialiseUI(GameContext* context)
     button->setHorizontalAlignment(alignmentStart);
     button->setHighlightWidth(3);
     button->setGroup(toggleButtonGroup);
-    button->setMouseClickCallback([this, towerNum, button](uint x, uint y) -> bool
+    button->setMouseClickCallback([this, towerTypeID, button](uint x, uint y) -> bool
                                     {
                                     if (button->isToggledDown())
-                                      onSelectedTowerType(towerNum);
+                                      onSelectedTowerType(towerTypeID);
                                     else
                                       onDeselectedTowerType();
                                     return true;
                                     });
     subPanel->addChild(UIComponentPtr(button));
+    ++towerNum;
   }
   }
 
