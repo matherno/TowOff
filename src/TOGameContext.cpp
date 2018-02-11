@@ -106,7 +106,7 @@ void TOGameContext::removeTower(uint id)
   removeActor(id);
   connectionManager->removeTower(id);
   if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
-    rebuildRelayInfluenceMap();
+    rebuildCombatTowerNetworksMap();
   }
 
 TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
@@ -117,7 +117,7 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
   if (tower->getFunction() != Tower::combat)
     connectionManager->addTower(tower);
   if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
-    rebuildRelayInfluenceMap();
+    rebuildCombatTowerNetworksMap();
   return tower;
   }
 
@@ -217,19 +217,6 @@ void TOGameContext::setActivePlayer(uint player)
   inputHandler->setActivePlayer(player);
   }
 
-bool TOGameContext::isConnectedToPowerSrc(uint towerID) const
-  {
-  const TowerPtr tower = towers.get(towerID);
-  if (tower)
-    {
-    if (tower->getFunction() == Tower::combat)
-      return relayInfluenceMap.count(towerID) > 0 && !relayInfluenceMap.at(towerID).empty();
-    else
-      return connectionManager->isTowerConnectedToPowerSrc(towerID);
-    }
-  return false;
-  }
-
 bool isCombatTowerInRange(const TowerPtr& combatTower, const TowerPtr& relayTower)
   {
   float range = TowerFactory::getRelayPowerRange(relayTower->getTowerType());
@@ -238,11 +225,12 @@ bool isCombatTowerInRange(const TowerPtr& combatTower, const TowerPtr& relayTowe
   return combatTower->getPosition().distanceToPoint(relayTower->getPosition()) <= range;
   }
 
-void TOGameContext::rebuildRelayInfluenceMap()
+void TOGameContext::rebuildCombatTowerNetworksMap()
   {
-  relayInfluenceMap.clear();
+  combatTowerNetworks.clear();
   for (const TowerPtr& combatTower : *towers.getList())
     {
+
     if (combatTower->getFunction() != Tower::combat)
       continue;
 
@@ -252,7 +240,100 @@ void TOGameContext::rebuildRelayInfluenceMap()
         continue;
 
       if(isCombatTowerInRange(combatTower, relayTower))
-        relayInfluenceMap[combatTower->getID()].push_back(relayTower->getID());
+        {
+        const Network* network = connectionManager->getTowersNetwork(relayTower->getID());
+        if (network)
+          combatTowerNetworks[combatTower->getID()].insert(network->id);
+        }
+      }
+
+    }
+  }
+
+TowerPtr TOGameContext::findConnectedTower(uint towerID, bool findClosest, TOGameContext::TowerQualifyingFunc qualifyingFunc) const
+  {
+  const TowerPtr tower = towers.get(towerID);
+  if (!tower)
+    return nullptr;
+
+  bool isCombatTower = tower->getFunction() == Tower::combat;
+  const std::set<uint>* combatTowerNetworks;
+  if (isCombatTower)
+    {
+    combatTowerNetworks = combatTowerGetNetworksInRange(towerID);
+    if (!combatTowerNetworks || combatTowerNetworks->empty())
+      return nullptr;
+    }
+
+  TowerPtr resultTower = nullptr;
+  double closestTowerDist;
+  const Vector3D srcTowerPos = tower->getPosition();
+  for (const TowerPtr& targetTower : *towers.getList())
+    {
+    bool connected = false;
+    if (isCombatTower)
+      {
+      const Network* network = connectionManager->getTowersNetwork(targetTower->getID());
+      if (network)
+        connected = combatTowerNetworks->count(network->id) > 0;
+      }
+    else
+      connected = connectionManager->areTowersConnected(towerID, targetTower->getID());
+
+    if (!connected)
+      continue;
+
+    double distance = srcTowerPos.distanceToPoint(targetTower->getPosition());
+    if (!findClosest || !resultTower || distance < closestTowerDist)
+      {
+      if (targetTower->getID() != towerID && qualifyingFunc(targetTower))
+        {
+        resultTower = targetTower;
+        closestTowerDist = distance;
+        if (!findClosest)
+          return resultTower;
+        }
       }
     }
+
+  return resultTower;
+  }
+
+TowerPtr TOGameContext::findClosestConnectedPowerSrc(uint towerID, bool mustHaveEnergy) const
+  {
+  return findConnectedTower(towerID, true, [mustHaveEnergy](TowerPtr tower)
+    {
+    if (mustHaveEnergy && !tower->hasEnergy())
+      return false;
+    return tower->isPowerSrc();
+    });
+  }
+
+TowerPtr TOGameContext::findClosestConnectedMiner(uint towerID, bool mustHaveEnergy) const
+  {
+  return findConnectedTower(towerID, true, [mustHaveEnergy](TowerPtr tower)
+    {
+    if (mustHaveEnergy && !tower->hasEnergy())
+      return false;
+    return tower->getFunction() == Tower::miner;
+    });
+  }
+
+bool TOGameContext::transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const
+  {
+  uint energyTaken = srcTower->takeEnergy(amount, false);
+  uint energyLeftOver = energyTaken - targetTower->storeEnergy(energyTaken);
+  if (energyLeftOver > 0)
+    srcTower->storeEnergy(energyLeftOver);
+  }
+
+const std::set<uint>* TOGameContext::combatTowerGetNetworksInRange(uint towerID) const
+  {
+  const TowerPtr tower = towers.get(towerID);
+  if (tower)
+    {
+    if (tower->getFunction() == Tower::combat && combatTowerNetworks.count(towerID) > 0)
+      return &combatTowerNetworks.at(towerID);
+    }
+  return nullptr;
   }

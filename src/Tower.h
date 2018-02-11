@@ -33,6 +33,8 @@ private:
   int maxHealthPoints = 100;
   int healthPoints = maxHealthPoints;
   bool showDamageEffect = false;
+  uint storedEnergy = 0;
+  uint maxEnergy = 500;
 
 protected:
   float hitRadius = 5;
@@ -64,6 +66,16 @@ public:
   Vector3D getConnectPosition() const { return connectPosition; }
   Vector3D getHitRadius() const { return hitRadius; }
   int getHealthPoints() const { return healthPoints; }
+
+  bool hasEnergy() const { return storedEnergy > 0; }
+  uint getStoredEnergy() const { return storedEnergy; }
+  uint getMaxEnergy() const { return maxEnergy; }
+  void setMaxEnergy(uint max) { maxEnergy = max; }
+
+  // returns the amount taken/stored
+  uint takeEnergy(uint amount, bool allOrNothing);
+  uint storeEnergy(uint amount);
+
   void setPosition(const Vector3D& pos);
   void setTargetOffset(const Vector3D& offset);
   void setConnectOffset(const Vector3D& offset);
@@ -89,10 +101,13 @@ public:
 
   void setTarget(TowerPtr target) { this->target = target; }
   TowerPtr getTarget() { return target.lock(); }
-  virtual void initShooting(GameContext* context) = 0;
-  virtual void updateShooting(GameContext* context, const Vector3D& shootPos) = 0;
-  virtual void endShooting(GameContext* context, const Vector3D& shootPos) = 0;
-  virtual bool isCoolingDown(long currentTime) = 0;
+  virtual void initShooting(GameContext* context, Tower* sourceTower) = 0;
+  virtual void updateIdle(GameContext* context, Tower* sourceTower) {};
+
+  //  returns false when shooting should stop after a call to this
+  virtual bool updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) = 0;
+  virtual void endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) = 0;
+  virtual bool isCoolingDown() = 0;
   };
 
 class TowerFunctionality

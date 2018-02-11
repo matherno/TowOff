@@ -7,24 +7,34 @@
 #include "TimeToLiveActor.h"
 #include "Resources.h"
 
-void InstantWeapon::initShooting(GameContext* context)
+void InstantWeapon::initShooting(GameContext* context, Tower* sourceTower)
   {
   }
 
-void InstantWeapon::updateShooting(GameContext* context, const Vector3D& shootPos)
+bool InstantWeapon::updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
   {
-  if (context->getGameTime() - lastShootTime > cooldownTime)
+  if (cooldownTimer.incrementTimer(context->getDeltaTime()))
     {
+    cooldownTimer.reset();
+    if (sourceTower->getStoredEnergy() < energyPerShot)
+      return false;
+
     if (TowerPtr targetPtr = getTarget())
       {
+      sourceTower->takeEnergy(energyPerShot, true);
       targetPtr->inflictDamage(damagePerShot);
       createBeamShot(context, shootPos, targetPtr->getTargetPosition());
-      lastShootTime = context->getGameTime();
       }
     }
+  return true;
   }
 
-void InstantWeapon::endShooting(GameContext* context, const Vector3D& shootPos)
+void InstantWeapon::updateIdle(GameContext* context, Tower* sourceTower)
+  {
+  cooldownTimer.incrementTimer(context->getDeltaTime());
+  }
+
+void InstantWeapon::endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
   {
 
   }
@@ -54,7 +64,7 @@ void InstantWeapon::createBeamShot(GameContext* context, const Vector3D& shootPo
   context->addActor(GameActorPtr(actor));
   }
 
-bool InstantWeapon::isCoolingDown(long currentTime)
+bool InstantWeapon::isCoolingDown()
   {
-  return currentTime - lastShootTime <= cooldownTime;
+  return !cooldownTimer.timedOut();
   }

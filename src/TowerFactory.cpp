@@ -81,6 +81,8 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
   std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
   weapon->setCooldownTime(1000);
   weapon->setBeamRadius(0.2);
+  if (towerType == TOWER_ENEMY)
+    weapon->setEnergyPerShot(0);
 
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.45, -1));

@@ -4,12 +4,12 @@
 
 #include "ProjectileWeapon.h"
 
-void ProjectileWeapon::initShooting(GameContext* context)
+void ProjectileWeapon::initShooting(GameContext* context, Tower* sourceTower)
   {
 
   }
 
-void ProjectileWeapon::updateShooting(GameContext* context, const Vector3D& shootPos)
+bool ProjectileWeapon::updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
   {
   if (createProjectileFunc && context->getGameTime() - lastShootTime > cooldownTime)
     {
@@ -29,14 +29,15 @@ void ProjectileWeapon::updateShooting(GameContext* context, const Vector3D& shoo
       lastShootTime = context->getGameTime();
       }
     }
+  return true;
   }
 
-void ProjectileWeapon::endShooting(GameContext* context, const Vector3D& shootPos)
+void ProjectileWeapon::endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
   {
 
   }
 
-bool ProjectileWeapon::isCoolingDown(long currentTime)
+bool ProjectileWeapon::isCoolingDown()
   {
-  return currentTime - lastShootTime <= cooldownTime;;
+  return 4 - lastShootTime <= cooldownTime;
   }

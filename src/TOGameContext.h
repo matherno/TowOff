@@ -6,6 +6,7 @@ class TOGameContext;
 #include <GameSystem/GameContextImpl.h>
 #include <ParticleSystem/ParticleSystem.h>
 #include <RenderSystem/RenderableTerrain.h>
+#include <src/GameSystem/Timer.h>
 #include "Tower.h"
 #include "Player.h"
 #include "Projectile.h"
@@ -28,8 +29,8 @@ private:
   HUDHandler hudHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
 
-  //  maps combat towers to the relay towers that they are within range of
-  std::map<uint, std::list<uint>> relayInfluenceMap;
+  //  maps combat towers to the networks (via relay towers) that they are within range of
+  std::map<uint, std::set<uint>> combatTowerNetworks;
 
 public:
   virtual bool initialise() override;
@@ -50,9 +51,19 @@ public:
   TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);
-  bool isConnectedToPowerSrc(uint towerID) const;
-
   TowerPtr createTower(uint towerType, const Vector3D& position = Vector3D(0));
+
+  //  retrieves a tower in the same network as tower of towerID
+  //  findClosest => returns the closest
+  //  qualifyingFunc => will skip towers that this function returns false on
+  typedef std::function<bool(TowerPtr tower)> TowerQualifyingFunc;
+  TowerPtr findConnectedTower(uint towerID, bool findClosest, TowerQualifyingFunc qualifyingFunc) const;
+
+  TowerPtr findClosestConnectedPowerSrc(uint towerID, bool mustHaveEnergy = false) const;
+  TowerPtr findClosestConnectedMiner(uint towerID, bool mustHaveEnergy = false) const;
+  bool transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const;
+  const std::set<uint>* combatTowerGetNetworksInRange(uint towerID) const;
+  long timeBetweenEnergyTransfers() const { return 1000; };
 
   void doTowerDamageEffect(const Tower* tower);
   Vector3D terrainHitTest(uint cursorX, uint cursorY, bool* isLand = nullptr) const;
@@ -69,5 +80,5 @@ protected:
   void initSurface(uint size);
   void initDamageParticleSystem();
   void initUI();
-  void rebuildRelayInfluenceMap();
+  void rebuildCombatTowerNetworksMap();
   };

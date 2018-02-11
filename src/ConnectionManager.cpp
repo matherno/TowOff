@@ -59,19 +59,6 @@ void ConnectionManager::removeTower(uint id)
   rebuildNetworks();
   }
 
-bool ConnectionManager::isTowerConnectedToPowerSrc(uint id) const
-  {
-  if (!containsTower(id))
-    return false;
-
-  int networkID = nodes.get(id)->networkID;
-  if (networkID < 0)
-    return false;
-
-  return networks.contains((uint)networkID) && !networks.get((uint)networkID)->powerSrcNodes.empty();
-  }
-
-
 void recurseNodeConnections(ConnectionNodePtr& parentNode, Network* network)
   {
   for (ConnectionNodePtr& node : *parentNode->connections.getList())
@@ -183,4 +170,25 @@ void ConnectionManager::removePendingRenderables(RenderContext* renderContext)
       }
     }
   beamsToRemove.clear();
+  }
+
+const Network* ConnectionManager::getTowersNetwork(uint towerID) const
+  {
+  if (!containsTower(towerID))
+    return nullptr;
+
+  int networkID = nodes.get(towerID)->networkID;
+  if (networkID < 0 || !networks.contains((uint)networkID))
+    return nullptr;
+
+  return networks.get((uint)networkID).get();
+  }
+
+bool ConnectionManager::areTowersConnected(uint towerID1, uint towerID2) const
+  {
+  const Network* towerNetwork1 = getTowersNetwork(towerID1);
+  const Network* towerNetwork2 = getTowersNetwork(towerID2);
+  if (towerNetwork1 && towerNetwork2)
+    return towerNetwork1->id == towerNetwork2->id;
+  return false;
   }

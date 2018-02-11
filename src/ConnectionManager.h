@@ -43,10 +43,11 @@ public:
 
   void addTower(TowerPtr tower);
   void removeTower(uint id);
-  bool isTowerConnectedToPowerSrc(uint id) const;
+  const Network* getTowersNetwork(uint towerID) const;
   void rebuildNetworks();
   bool containsTower(uint id) const;
   bool areTowersConnectable(TowerPtr towerA, TowerPtr towerB) const;
+  bool areTowersConnected(uint towerID1, uint towerID2) const;
 
 protected:
   void addConnection(ConnectionNodePtr nodeA, ConnectionNodePtr nodeB);

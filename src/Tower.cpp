@@ -67,7 +67,6 @@ void Tower::onUpdate(GameContext* gameContext)
     }
 
   functionality->onUpdate(this, gameContext);
-
   }
 
 void Tower::onDetached(GameContext* gameContext)
@@ -154,5 +153,26 @@ const Transform* Tower::getTurretRotation() const
   if (towerTurret)
     return towerTurret->getTransform();
   return nullptr;
+  }
+
+uint Tower::takeEnergy(uint amount, bool allOrNothing)
+  {
+  if (amount > storedEnergy)
+    {
+    if (allOrNothing)
+      return 0;
+    else
+      amount = storedEnergy;
+    }
+  storedEnergy -= amount;
+  return amount;
+  }
+
+uint Tower::storeEnergy(uint amount)
+  {
+  if (amount + storedEnergy > maxEnergy)
+    amount = maxEnergy - storedEnergy;
+  storedEnergy += amount;
+  return amount;
   }
 
