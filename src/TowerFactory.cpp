@@ -145,3 +145,31 @@ float TowerFactory::getRelayPowerRange(uint towerType)
   return 0;
   }
 
+void TowerFactory::createTowerBoundingBoxes(uint towerType, const Vector3D& position, std::list<BoundingBoxPtr>* boundingBoxes)
+  {
+  auto AddBoundingBox = [position, boundingBoxes](const Vector3D& min, const Vector3D& max)
+    {
+    BoundingBox* bb = new BoundingBox(position + min, position + max);
+    boundingBoxes->push_back(BoundingBoxPtr(bb));
+    };
+
+  switch (towerType)
+    {
+    case TOWER_BASIC:
+    case TOWER_ENEMY:
+      AddBoundingBox(Vector3D(-0.5), Vector3D(0.5));
+      break;
+    case TOWER_PYLON:
+      AddBoundingBox(Vector3D(-0.8, 0, -0.8), Vector3D(0.8, 4.1, 0.8));
+      break;
+    case TOWER_MINER:
+      AddBoundingBox(Vector3D(-1.4, 0, -1.4), Vector3D(1.4, 0.5, 1.4));
+      AddBoundingBox(Vector3D(-0.8, 0, -0.45), Vector3D(0.8, 2.8, 0.45));
+      break;
+    case TOWER_HOMEBASE:
+      AddBoundingBox(Vector3D(-2.6, 0, -2.6), Vector3D(2.6, 0.65, 2.6));
+      AddBoundingBox(Vector3D(-1.3, 0, -1.3), Vector3D(1.3, 5.5, 1.3));
+      break;
+    }
+  }
+

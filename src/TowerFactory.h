@@ -27,4 +27,6 @@ public:
   static TowerPtr createHomeBase(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createPylon(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createMiner(uint id, uint towerType, const Vector3D& position);
+
+  static void createTowerBoundingBoxes(uint towerType, const Vector3D& position, std::list<BoundingBoxPtr>* boundingBoxes);
   };

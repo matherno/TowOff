@@ -105,6 +105,13 @@ void TOGameContext::removeTower(uint id)
   towers.remove(id);
   removeActor(id);
   connectionManager->removeTower(id);
+  if (towerBoundingBoxes.count(id) > 0)
+    {
+    for (uint boxID : towerBoundingBoxes[id])
+      getBoundingBoxManager()->removeBoundingBox(boxID);
+    towerBoundingBoxes.erase(id);
+    }
+
   if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
     rebuildCombatTowerNetworksMap();
   }
@@ -118,6 +125,15 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
     connectionManager->addTower(tower);
   if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
     rebuildCombatTowerNetworksMap();
+
+  std::list<BoundingBoxPtr> boundingBoxes;
+  TowerFactory::createTowerBoundingBoxes(towerType, position, &boundingBoxes);
+  for (BoundingBoxPtr box : boundingBoxes)
+    {
+    uint boxID = getBoundingBoxManager()->addBoundingBox(box, tower->getID());
+    towerBoundingBoxes[tower->getID()].push_back(boxID);
+    }
+
   return tower;
   }
 

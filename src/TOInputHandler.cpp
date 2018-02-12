@@ -97,6 +97,13 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  if (gameContext->getBoundingBoxManager()->boundingBoxPicked())
+    {
+    uint pickedTowerID = (uint)gameContext->getBoundingBoxManager()->getPickedBoundingBoxMeta();
+    toGameContext->removeTower(pickedTowerID);
+    return true;
+    }
+
   HUDHandler* hudHandler = toGameContext->getHUDHandler();
   if (hudHandler->isTowerTypeSelected() && button == MOUSE_LEFT)
     {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GameSystem/GameSystem.h>
+#include <dependencies/RaySplay/include/BoundingBox.h>
 
 /*
 *   

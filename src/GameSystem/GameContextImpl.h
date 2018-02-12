@@ -6,6 +6,7 @@
 #include "GameSystem.h"
 #include "InputManagerImpl.h"
 #include "Camera.h"
+#include "BoundingBoxManagerImpl.h"
 #include <RenderSystem/RenderContextImpl.h>
 #include <set>
 #include <UISystem/UIManagerImpl.h>
@@ -35,6 +36,7 @@ private:
   ProcessStage stage = stageNone;
   std::set<uint> actorsToRemove;
   bool paused = false;
+  BoundingBoxManagerImpl boundingBoxManager;
 
 protected:
   RenderInitConfig renderConfig;
@@ -70,16 +72,27 @@ public:
   virtual InputManager* getInputManager() override { return &inputManager; }
   virtual RenderContext* getRenderContext() override { return &renderContext; }
   virtual UIManager* getUIManager() override { return &uiManager; }
+  virtual BoundingBoxManager* getBoundingBoxManager() override { return &boundingBoxManager; } ;
   virtual const Camera* getCamera() const override { return &camera; }
   virtual const InputManager* getInputManager() const override { return &inputManager; }
   virtual const RenderContext* getRenderContext() const override { return &renderContext; }
   virtual const UIManager* getUIManager() const override { return &uiManager; }
+  virtual const BoundingBoxManager* getBoundingBoxManager() const override { return &boundingBoxManager; } ;
 
-  Vector3D getCursorWorldPos(uint cursorX, uint cursorY) const;
-  Vector3D clipToWorldTransform(const Vector3D& clipSpacePos) const;
-  Vector3D getViewDirection() const;
-  Vector3D getViewDirectionAtCursor(uint cursorX, uint cursorY) const;
+  virtual Vector3D getCursorWorldPos(uint cursorX, uint cursorY) const override;
+  virtual Vector3D clipToWorldTransform(const Vector3D& clipSpacePos) const override;
+  virtual Vector3D getViewDirection() const override;
+  virtual Vector3D getViewDirectionAtCursor(uint cursorX, uint cursorY) const override;
 
 protected:
   void removePendingActors();
+  };
+
+class BBInputHandler : public InputHandler
+  {
+public:
+  BBInputHandler(uint id) : InputHandler(id) {}
+  virtual void onAttached(GameContext* gameContext) override {}
+  virtual void onDetached(GameContext* gameContext) override {}
+  virtual bool onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY) override;
   };

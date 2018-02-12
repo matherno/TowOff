@@ -21,7 +21,9 @@ bool GameContextImpl::initialise()
     }
 
   inputManager.initialise(renderContext.getWindow());
+  boundingBoxManager.initialise();
   uiManager.initialise(this);
+  addInputHandler(InputHandlerPtr(new BBInputHandler(inputManager.getNextHandlerID())));
 
   gameTime = 0;
 
@@ -37,6 +39,7 @@ void GameContextImpl::cleanUp()
   actors.clear();
   actorsToRemove.clear();
   renderContext.cleanUp();
+  boundingBoxManager.cleanUp();
   uiManager.cleanUp(this);
   stage = stageNone;
   }
@@ -82,6 +85,7 @@ uint GameContextImpl::getNextActorID()
 void GameContextImpl::processInputStage()
   {
   stage = stageInput;
+  boundingBoxManager.clearMousePickingResult();
   inputManager.processInput(this);
   stage = stageNone;
   }
@@ -185,4 +189,10 @@ Vector3D GameContextImpl::clipToWorldTransform(const Vector3D& clipSpacePos) con
   {
   using namespace mathernogl;
   return clipSpacePos * matrixInverse(*getRenderContext()->getCameraToClip()) * matrixInverse(*getRenderContext()->getWorldToCamera());
+  }
+
+bool BBInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+  {
+  gameContext->getBoundingBoxManager()->performMousePicking(gameContext, mouseX, mouseY);
+  return false;
   }

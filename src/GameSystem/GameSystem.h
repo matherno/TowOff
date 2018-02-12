@@ -4,6 +4,7 @@
 #include <RenderSystem/RenderSystem.h>
 #include <UISystem/UISystem.h>
 #include "Camera.h"
+#include <BoundingBox.h>
 
 class GameContext;
 class UIManager;
@@ -70,6 +71,31 @@ protected:
   };
 
 /*
+*   BoundingBoxManager, used to handle all bound box operations
+*   Bounding boxes each have an internally assigned unique ID,
+*           and an optional meta data
+*/
+class BoundingBoxManager
+  {
+public:
+  BoundingBoxManager(){};
+  virtual ~BoundingBoxManager(){};
+  virtual void initialise() = 0;
+  virtual void cleanUp() = 0;
+  virtual uint addBoundingBox(const Vector3D& min, const Vector3D& max, double meta = 0) = 0;
+  virtual uint addBoundingBox(BoundingBoxPtr box, double meta = 0) = 0;
+  virtual void updateBoundingBox(uint id, const Vector3D& min, const Vector3D& max) = 0;
+  virtual void removeBoundingBox(uint id) = 0;
+  virtual bool containsBoundingBox(uint id) = 0;
+  virtual void getBoundingBox(uint id, Vector3D* min, Vector3D* max) = 0;
+  virtual BoundingBoxPtr getBoundingBox(uint id) = 0;
+  virtual bool performMousePicking(GameContext* gameContext, uint mouseX, uint mouseY) = 0;
+  virtual uint getPickedBoundingBox() const = 0;
+  virtual double getPickedBoundingBoxMeta() const = 0;
+  virtual bool boundingBoxPicked() const = 0;
+  };
+
+/*
 *   GameContext, the centralised game state and controller
 */
 class GameContext
@@ -99,10 +125,16 @@ public:
   virtual InputManager* getInputManager() = 0;
   virtual RenderContext* getRenderContext() = 0;
   virtual UIManager* getUIManager() = 0;
+  virtual BoundingBoxManager* getBoundingBoxManager() = 0;
   virtual const Camera* getCamera() const = 0;
   virtual const InputManager* getInputManager() const = 0;
   virtual const RenderContext* getRenderContext() const = 0;
   virtual const UIManager* getUIManager() const = 0;
+  virtual const BoundingBoxManager* getBoundingBoxManager() const = 0;
+  virtual Vector3D getCursorWorldPos(uint cursorX, uint cursorY) const = 0;
+  virtual Vector3D clipToWorldTransform(const Vector3D& clipSpacePos) const = 0;
+  virtual Vector3D getViewDirection() const = 0;
+  virtual Vector3D getViewDirectionAtCursor(uint cursorX, uint cursorY) const = 0;
   };
 
 

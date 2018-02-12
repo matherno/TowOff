@@ -98,6 +98,7 @@ MeshStoragePtr RenderContextImpl::createMeshStorage(const std::string& objFilePa
   //todo: cache the mesh storages, ensuring no duplicates are loaded into memory
   MeshStoragePtr meshStorage(new MeshStorage(nextMeshStorageID++));
   loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords);
+  meshStorage->calculateMinMax();
   if(meshStorage->initialiseVAO())
     return meshStorage;
   else

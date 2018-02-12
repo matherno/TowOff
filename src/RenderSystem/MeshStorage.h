@@ -12,6 +12,8 @@ private:
   mathernogl::VertexArray vao;
   int numVertices = 0;
   bool useIndices = true;
+  mathernogl::Vector3D min;
+  mathernogl::Vector3D max;
 
 public:
   std::vector<int> indices;
@@ -26,6 +28,9 @@ public:
   int getNumVertices() const { return numVertices; }
   void cleanUp();
   void setUseIndices(bool use){ useIndices = use; }
+  mathernogl::Vector3D getMin() const;
+  mathernogl::Vector3D getMax() const;
+  void calculateMinMax();
 
 protected:
   bool initVAOWithTexCoords(std::vector<int>* indicesPtr);

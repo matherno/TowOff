@@ -113,3 +113,36 @@ bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
 
   return glGetError() == GL_NO_ERROR;
   }
+
+mathernogl::Vector3D MeshStorage::getMin() const
+  {
+  return min;
+  }
+
+mathernogl::Vector3D MeshStorage::getMax() const
+  {
+  return max;
+  }
+
+void MeshStorage::calculateMinMax()
+  {
+  bool firstVert = true;
+  for (Vector3D& vert : vertices)
+    {
+    if (firstVert)
+      {
+      min = vert;
+      max = vert;
+      firstVert = false;
+      }
+    else
+      {
+      min.x = std::min(min.x, vert.x);
+      min.y = std::min(min.y, vert.y);
+      min.z = std::min(min.z, vert.z);
+      max.x = std::max(max.x, vert.x);
+      max.y = std::max(max.y, vert.y);
+      max.z = std::max(max.z, vert.z);
+      }
+    }
+  }

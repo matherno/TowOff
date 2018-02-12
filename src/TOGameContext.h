@@ -32,6 +32,9 @@ private:
   //  maps combat towers to the networks (via relay towers) that they are within range of
   std::map<uint, std::set<uint>> combatTowerNetworks;
 
+  //  maps tower ids to a list of their bounding box ids
+  std::map<uint, std::list<uint>> towerBoundingBoxes;
+
 public:
   virtual bool initialise() override;
   virtual void cleanUp() override;
