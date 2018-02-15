@@ -11,9 +11,9 @@ set(SOURCE_FILES src/main.cpp src/TestActor.cpp src/TestActor.h src/TestInputHan
 add_executable(TowOff ${SOURCE_FILES} ${LIB_SOURCE_FILES})
 add_library(TowOffLib STATIC ${LIB_SOURCE_FILES})
 
-include_directories(. ../MathernoGL/include ./src ./dependencies/RaySplay/include)
+include_directories(. ./dependencies/MathernoGL/include ./src ./dependencies/RaySplay/include ./dependencies/misc)
 
-set(LIB_MATHERNOGL /home/matt/SoftwareProjects/C++/MathernoGL/cmake-build-debug/libMathernoGL.a )
+set(LIB_MATHERNOGL /home/matt/SoftwareProjects/C++/TowOff/dependencies/MathernoGL/libMathernoGL.a )
 set(LIB_RAYSPLAY /home/matt/SoftwareProjects/C++/TowOff/dependencies/RaySplay/libRaySplayLib.a )
 
 target_link_libraries(TowOff ${LIB_MATHERNOGL} ${LIB_RAYSPLAY} GL GLEW glfw freeimage)
