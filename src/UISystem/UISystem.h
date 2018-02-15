@@ -41,7 +41,7 @@ public:
   virtual void setVerticalAlignment(Alignment alignment) = 0;
   virtual void addChild(UIComponentPtr component) = 0;
   virtual void removeChild(uint id) = 0;
-  virtual void setVisible(bool visible) = 0;
+  virtual void setVisible(bool visible, bool recurseChildren = false) = 0;
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) = 0;
   virtual void setMouseClickCallback(OnMouseClickCallback func) = 0;

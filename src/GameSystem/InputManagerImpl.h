@@ -21,6 +21,7 @@ public:
   virtual void removeHandler(uint id) override;
   virtual void containsHandler(uint id) override;
   virtual void processInput(GameContext* gameContext) override;
+  virtual bool isKeyDown(uint key) const override;
 
   void fireMousePressedEvents(GameContext* gameContext, uint button, uint mouseX, uint mouseY);
   void fireMouseHeldEvents(GameContext* gameContext, uint button, uint mouseX, uint mouseY);
@@ -30,4 +31,5 @@ public:
   void fireKeyPressedEvents(GameContext* gameContext, uint key);
   void fireKeyHeldEvents(GameContext* gameContext, uint key);
   void fireKeyReleasedEvents(GameContext* gameContext, uint key);
+
   };

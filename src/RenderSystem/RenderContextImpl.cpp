@@ -153,7 +153,6 @@ TexturePtr RenderContextImpl::createTexture(const string& imageFilePath)
 
 uint RenderContextImpl::bindTexture(TexturePtr texture)
   {
-  //todo: cache what is bound, and not binding if already bound to a location
   uint glBindLocation = 0;
   if (texIDsToBoundLocals.find(texture->glTexID) != texIDsToBoundLocals.end())
     {
@@ -161,10 +160,14 @@ uint RenderContextImpl::bindTexture(TexturePtr texture)
     }
   else
     {
+    //  nextTexBoundLocal is initialised to 1, and active texture reset back to 0 after binding,
+    //      then external texture bindings don't mess things up
     glBindLocation = nextTexBoundLocal++;
     glActiveTexture(GL_TEXTURE0 + glBindLocation);
     glBindTexture(texture->glTexType, texture->glTexID);
     texIDsToBoundLocals[texture->glTexID] = glBindLocation;
+    glActiveTexture(GL_TEXTURE0);
+    //todo do something clever for when we run out of texture bound locations
     }
   return glBindLocation;
   }

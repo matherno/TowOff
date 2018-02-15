@@ -7,6 +7,7 @@
 *   
 */
 
+typedef std::function<void(const Vector2D& parentPos, const Vector2D& parentSize)> OnRefreshCallback;
 
 class UIPanel : public UIComponent
   {
@@ -28,6 +29,7 @@ private:
   Vector2D currentScreenPos, currentScreenSize;
   bool visible = true;
   OnMouseClickCallback mouseClickCallback;
+  OnRefreshCallback onRefreshCallback;
 
 protected:
   bool isValid = false;
@@ -54,9 +56,11 @@ public:
   virtual void setHeightMatchParent(bool match) override { heightMatchParent = match; }
   virtual void setHorizontalAlignment(Alignment alignment) override { horizAlignment = alignment; }
   virtual void setVerticalAlignment(Alignment alignment) override { vertAlignment = alignment; }
-  virtual void setVisible(bool visible) override;
+  virtual void setVisible(bool visible, bool recurseChildren = false) override;
   virtual void setMouseClickCallback(OnMouseClickCallback func) override { mouseClickCallback = func; }
   virtual void setPadding(float horizPadding, float vertPadding) override;
+
+  void setOnRefreshCallback(OnRefreshCallback func) { onRefreshCallback = func; }
 
 private:
   void addPendingComponents(GameContext* context);

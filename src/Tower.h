@@ -67,6 +67,7 @@ public:
   Vector3D getConnectPosition() const { return connectPosition; }
   Vector3D getHitRadius() const { return hitRadius; }
   int getHealthPoints() const { return healthPoints; }
+  int getMaxHealthPoints() const { return maxHealthPoints; }
 
   bool hasEnergy() const { return storedEnergy > 0; }
   uint getStoredEnergy() const { return storedEnergy; }

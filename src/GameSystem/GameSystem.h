@@ -64,6 +64,7 @@ public:
   virtual void cleanUp() = 0;
   virtual uint getNextHandlerID() = 0;
   virtual void containsHandler(uint id) = 0;
+  virtual bool isKeyDown(uint key) const = 0;
 protected:
   virtual void addHandler(InputHandlerPtr handler) = 0;
   virtual void removeHandler(uint id) = 0;

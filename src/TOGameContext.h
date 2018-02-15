@@ -82,6 +82,5 @@ public:
 protected:
   void initSurface(uint size);
   void initDamageParticleSystem();
-  void initUI();
   void rebuildCombatTowerNetworksMap();
   };

@@ -39,6 +39,9 @@ void UIPanel::cleanUp(GameContext* context)
 
 void UIPanel::refresh(GameContext* context, const Vector2D& parentPos, const Vector2D& parentSize)
   {
+  if (onRefreshCallback)
+    onRefreshCallback(parentPos, parentSize);
+
   if (renderable)
     {
     Vector2D adjustedSize = size;
@@ -152,11 +155,16 @@ void UIPanel::removePendingComponents(GameContext* context)
   childrenToRemove.clear();
   }
 
-void UIPanel::setVisible(bool visible)
+void UIPanel::setVisible(bool visible, bool recurseChildren)
   {
   this->visible = visible;
   if(renderable)
     renderable->setVisible(visible);
+  if (recurseChildren)
+    {
+    for (UIComponentPtr child : *children.getList())
+      child->setVisible(visible, recurseChildren);
+    }
   }
 
 bool UIPanel::mouseClick(GameContext* context, uint mouseX, uint mouseY)

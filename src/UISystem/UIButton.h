@@ -12,6 +12,7 @@ typedef std::shared_ptr<UIToggleButtonGroup> UIToggleButtonGroupPtr;
 class UIButton : public UIPanel
   {
 private:
+  friend class UIToggleButtonGroup;
   bool pressed = false;
   bool toggle = false;
   float highlightWidth = 1;
@@ -38,6 +39,7 @@ public:
 protected:
   bool onButtonClick(uint mouseX, uint mouseY);
   void onUnpress(uint mouseX, uint mouseY);
+  void onForceUnpress();
   void updateGroup(uint mouseX, uint mouseY);
   };
 
@@ -46,4 +48,10 @@ class UIToggleButtonGroup
 private:
   friend class UIButton;
   mathernogl::MappedList<UIButton*> toggleButtons;
+public:
+  void forceDeselectAll()
+    {
+    for (UIButton* button : *toggleButtons.getList())
+      button->onForceUnpress();
+    }
   };

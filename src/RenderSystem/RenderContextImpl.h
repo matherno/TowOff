@@ -23,7 +23,7 @@ private:
   Matrix4 cameraToClipTransform;
   TransformStack transformStack;
   std::map<uint, uint> texIDsToBoundLocals;
-  uint nextTexBoundLocal = 0;
+  uint nextTexBoundLocal = 1;
 
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;

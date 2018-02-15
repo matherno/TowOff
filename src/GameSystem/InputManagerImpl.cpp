@@ -37,6 +37,11 @@ uint InputManagerImpl::getNextHandlerID()
   return nextHandlerID++;
   }
 
+bool InputManagerImpl::isKeyDown(uint key) const
+  {
+  return inputSource.isKeyAction(key, mathernogl::INPUT_HELD);
+  }
+
 void InputManagerImpl::processInput(GameContext* gameContext)
   {
   inputSource.checkHeldButtons();

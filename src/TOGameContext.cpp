@@ -23,7 +23,7 @@ bool TOGameContext::initialise()
   addInputHandler(inputHandler);
   initSurface(6);
   initDamageParticleSystem();
-  initUI();
+  hudHandler.initialiseUI(this);
   connectionManager.reset(new ConnectionManager(getNextActorID()));
   addActor(connectionManager);
   return success;
@@ -48,6 +48,7 @@ void TOGameContext::processInputStage()
 void TOGameContext::processUpdateStage()
   {
   GameContextImpl::processUpdateStage();
+  hudHandler.updateUI(this);
   }
 
 void TOGameContext::processDrawStage()
@@ -216,11 +217,6 @@ bool TOGameContext::isPositionLand(const Vector3D& worldPos) const
   if (height != TERRAIN_OUT_OF_BOUNDS)
     return height >= LAND_HEIGHT;
   return false;
-  }
-
-void TOGameContext::initUI()
-  {
-  hudHandler.initialiseUI(this);
   }
 
 uint TOGameContext::getActivePlayer() const

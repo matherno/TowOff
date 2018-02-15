@@ -39,6 +39,7 @@ void UIRenderable::render(RenderContext* renderContext)
   if (!visible)
     return;
 
+  clearGLErrors();
   vao.bind();
   renderContext->activateShaderProgram(shaderProgram);
   setFaceCulling(false);
@@ -54,7 +55,6 @@ void UIRenderable::render(RenderContext* renderContext)
     shaderProgram->setVarInt("inUseSolidColour", 1);
     shaderProgram->setVarVec3("inColour", colour);
     }
-  clearGLErrors();
   glDrawArrays(GL_TRIANGLES, 0, 6);
   ASSERT_NO_GL_ERROR();
   }

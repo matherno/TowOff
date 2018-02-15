@@ -97,14 +97,15 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  HUDHandler* hudHandler = toGameContext->getHUDHandler();
+
   if (gameContext->getBoundingBoxManager()->boundingBoxPicked())
     {
     uint pickedTowerID = (uint)gameContext->getBoundingBoxManager()->getPickedBoundingBoxMeta();
-    toGameContext->removeTower(pickedTowerID);
+    hudHandler->setTowerFocused(toGameContext->getTower(pickedTowerID));
     return true;
     }
 
-  HUDHandler* hudHandler = toGameContext->getHUDHandler();
   if (hudHandler->isTowerTypeSelected() && button == MOUSE_LEFT)
     {
     bool isOnLand = false;
@@ -117,14 +118,14 @@ bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
         tower->setPlayerNum(2);
       else
         tower->setPlayerNum(1);
+
+      if (!gameContext->getInputManager()->isKeyDown(KEY_LCTRL))
+        endTowerPlacingMode(gameContext);
       return true;
       }
     }
-  else if (button == MOUSE_RIGHT)
-    {
-    activePlayer = 0;
-    return true;
-    }
+
+  hudHandler->setTowerFocused(nullptr);
   return false;
   }
 
@@ -134,5 +135,11 @@ bool TOInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset
   zoomOffset = mathernogl::clampf(zoomOffset, minZoom, maxZoom);
   refreshCamera(gameContext->getCamera());
   return true;
+  }
+
+void TOInputHandler::endTowerPlacingMode(GameContext* gameContext)
+  {
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  toGameContext->getHUDHandler()->deselectTowerType();
   }
 

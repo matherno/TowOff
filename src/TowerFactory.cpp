@@ -125,6 +125,7 @@ TowerPtr TowerFactory::createPylon(uint id, uint towerType, const Vector3D& posi
 TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& position)
   {
   TowerFunctionalityMiner* function = new TowerFunctionalityMiner();
+  function->setEnergyTransferRate(20);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setConnectOffset(Vector3D(0, 2.61, 0));
@@ -157,7 +158,7 @@ void TowerFactory::createTowerBoundingBoxes(uint towerType, const Vector3D& posi
     {
     case TOWER_BASIC:
     case TOWER_ENEMY:
-      AddBoundingBox(Vector3D(-0.5), Vector3D(0.5));
+      AddBoundingBox(Vector3D(-0.7, 0, -0.7), Vector3D(0.7, 1.3, 0.7));
       break;
     case TOWER_PYLON:
       AddBoundingBox(Vector3D(-0.8, 0, -0.8), Vector3D(0.8, 4.1, 0.8));

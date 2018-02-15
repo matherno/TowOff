@@ -49,6 +49,12 @@ void UIButton::onUnpress(uint mouseX, uint mouseY)
     buttonClickCallback(mouseX, mouseY);
   }
 
+void UIButton::onForceUnpress()
+  {
+  pressed = false;
+  setButtonHighlightColour(pressedColour, unpressedColour);
+  }
+
 void UIButton::updateGroup(uint mouseX, uint mouseY)
   {
   if (group)
