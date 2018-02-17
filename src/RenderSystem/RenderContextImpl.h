@@ -48,6 +48,8 @@ public:
   virtual MeshStoragePtr createEmptyMeshStorage() override;
   virtual TexturePtr createTexture(const string& imageFilePath) override;
 
+  virtual RenderableSetPtr createRenderableSet() override;
+
   virtual void pushTransform(const mathernogl::Transform* transform) override;
   virtual void popTransform() override;
   virtual const mathernogl::Transform* getStackedTransform() override;

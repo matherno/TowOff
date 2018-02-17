@@ -49,20 +49,9 @@ void HUDHandler::updateUI(GameContext* context)
     }
   }
 
-void HUDHandler::onSelectedTowerType(uint towerType)
-  {
-  selectedTowerType = towerType;
-  }
-
 void HUDHandler::deselectTowerType()
   {
-  selectedTowerType = -1;
   towerButtonGroup->forceDeselectAll();
-  }
-
-void HUDHandler::onDeselectedTowerType()
-  {
-  selectedTowerType = -1;
   }
 
 void HUDHandler::setTowerFocused(TowerPtr tower)
@@ -145,15 +134,38 @@ void HUDHandler::setupTowerBuildPanel(GameContext* context)
     button->setHorizontalAlignment(alignmentStart);
     button->setHighlightWidth(3);
     button->setGroup(towerButtonGroup);
-    button->setMouseClickCallback([this, towerTypeID, button](uint x, uint y) -> bool
+    button->setMouseClickCallback([this, towerTypeID, button, context](uint x, uint y) -> bool
                                     {
                                     if (button->isToggledDown())
-                                      onSelectedTowerType(towerTypeID);
+                                      startTowerPlacingMode(context, towerTypeID);
                                     else
-                                      onDeselectedTowerType();
+                                      endTowerPlacingMode(context);
                                     return true;
                                     });
     subPanel->addChild(UIComponentPtr(button));
     ++towerNum;
     }
   }
+
+void HUDHandler::endTowerPlacingMode(GameContext* gameContext)
+  {
+  if (placementHandler)
+    {
+    gameContext->removeInputHandler(placementHandler);
+    placementHandler.reset();
+    }
+  deselectTowerType();
+  }
+
+void HUDHandler::startTowerPlacingMode(GameContext* gameContext, uint towerTypeID)
+  {
+  if (placementHandler)
+    {
+    gameContext->removeInputHandler(placementHandler);
+    placementHandler.reset();
+    }
+  placementHandler.reset(new TowerPlacementHandler(gameContext->getInputManager()->getNextHandlerID(), towerTypeID));
+  placementHandler->setEndHandlerCallback([this, gameContext]() { endTowerPlacingMode(gameContext); });
+  gameContext->addInputHandler(placementHandler);
+  }
+

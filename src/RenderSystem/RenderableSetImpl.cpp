@@ -48,3 +48,9 @@ int RenderableSetImpl::count() const
   {
   return renderables.count();
   }
+
+void RenderableSetImpl::forEachChild(std::function<void(RenderablePtr)> function)
+  {
+  for (RenderablePtr& child : *renderables.getList())
+    function(child);
+  }

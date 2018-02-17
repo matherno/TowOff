@@ -29,6 +29,7 @@ void RenderableMesh::render(RenderContext* renderContext)
     shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0);
     shaderProgram->setVarInt("inUseSingleColour", 1);
     shaderProgram->setVarVec3("inColour", colour);
+    shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1));
     setDepthTest(true);
     setAlphaBlending(true);
     setFaceCulling(true);

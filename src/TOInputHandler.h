@@ -36,7 +36,6 @@ public:
   void refreshCamera(Camera* camera) const;
   void setActivePlayer(uint player) { activePlayer = player; }
   uint getActivePlayer() const { return activePlayer; }
-  void endTowerPlacingMode(GameContext* gameContext);
 
   virtual void onAttached(GameContext* gameContext) override;
   virtual bool onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY) override;

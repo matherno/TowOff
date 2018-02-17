@@ -22,6 +22,7 @@ private:
   mathernogl::GPUBufferStatic vbo;
   mathernogl::MappedList<Line> lines;
   uint nextLineID = 0;
+  bool rebuildDisabled = false;
 
 public:
   RenderableLines(uint id);
@@ -32,7 +33,9 @@ public:
 
   uint addLine(const Vector3D& start, const Vector3D& end, const Vector3D& colour, float alpha = 1.0f);
   void removeLine(uint lineID);
+  void clearLines();
 
-protected:
+  void enableRebuild(){ rebuildDisabled = false; }
+  void disableRebuild(){ rebuildDisabled = true; }
   void rebuildBuffer();
   };

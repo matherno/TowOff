@@ -9,6 +9,8 @@
 class GameContext;
 class UIManager;
 
+typedef std::function<void()> CallbackFunc;
+
 /*
 *   GameActor, an actor in the game representing an object with some behaviour and/or visual presence in the scene
 */
@@ -63,10 +65,11 @@ public:
   virtual void initialise(mathernogl::Window* window) = 0;
   virtual void cleanUp() = 0;
   virtual uint getNextHandlerID() = 0;
-  virtual void containsHandler(uint id) = 0;
+  virtual bool containsHandler(uint id) const = 0;
   virtual bool isKeyDown(uint key) const = 0;
 protected:
   virtual void addHandler(InputHandlerPtr handler) = 0;
+  virtual void addPriorityHandler(InputHandlerPtr handler) = 0;
   virtual void removeHandler(uint id) = 0;
   virtual void processInput(GameContext* gameContext) = 0;
   };
@@ -111,7 +114,7 @@ public:
   virtual int getNumActors() = 0;
   virtual uint getNextActorID() = 0;
   virtual bool gotActor(uint id) = 0;
-  virtual void addInputHandler(InputHandlerPtr handler) = 0;
+  virtual void addInputHandler(InputHandlerPtr handler, bool priorityHandler = false) = 0;
   virtual void removeInputHandler(InputHandlerPtr handler) = 0;
   virtual long getGameTime() = 0;
   virtual long getDeltaTime() = 0;

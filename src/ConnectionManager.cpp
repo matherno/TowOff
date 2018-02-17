@@ -102,18 +102,25 @@ bool ConnectionManager::containsTower(uint id) const
   return nodes.contains(id);
   }
 
-bool ConnectionManager::areTowersConnectable(TowerPtr towerA, TowerPtr towerB) const
+bool ConnectionManager::areTowersConnectable(TowerPtr towerA, TowerPtr towerB)
   {
-  float minRadius = std::min(towerA->getConnectRadius(), towerB->getConnectRadius());
-  if(towerA->getPosition().distanceToPoint(towerB->getPosition()) > minRadius)
+  if (!areTowersInRange(towerA->getPosition(), towerA->getConnectRadius(), towerB->getPosition(), towerB->getConnectRadius()))
     return false;
+  return areTowerFunctionsCompatible(towerA->getFunction(), towerB->getFunction());
+  }
 
-  Tower::TowerFunction towerAFunction = towerA->getFunction();
-  Tower::TowerFunction towerBFunction = towerB->getFunction();
+bool ConnectionManager::areTowersInRange(const Vector3D& towerAPos, float towerAConnectRadius, const Vector3D& towerBPos, float towerBConnectRadius)
+  {
+  float minRadius = std::min(towerAConnectRadius, towerBConnectRadius);
+  return towerAPos.distanceToPoint(towerBPos) <= minRadius;
+  }
 
+bool ConnectionManager::areTowerFunctionsCompatible(Tower::TowerFunction towerAFunction, Tower::TowerFunction towerBFunction)
+  {
+  if (towerAFunction == Tower::combat || towerBFunction == Tower::combat)
+    return false;
   if (towerAFunction == Tower::relay || towerBFunction == Tower::relay)
     return true;
-
   return towerAFunction != towerBFunction;
   }
 

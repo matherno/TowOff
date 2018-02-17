@@ -11,7 +11,10 @@ struct TowerType
   {
   string name;
   string iconFilePath;
-  std::function<TowerPtr(uint, uint, const Vector3D&)> createFunction;
+  string baseMeshFilePath;
+  string turretMeshFilePath;
+  Vector3D connectOffset;
+  float connectRadius;
   };
 
 class TowerFactory
@@ -20,6 +23,7 @@ public:
   static const std::map<uint, TowerType>* getTowerTypeMap();
   static const TowerType* getTowerType(uint towerType);
   static float getRelayPowerRange(uint towerType);
+  static Tower::TowerFunction getTowerFunction(uint towerType);
 
   static TowerPtr createTower(uint towerType, uint id, const Vector3D& position);
   static TowerPtr createBasicTowerProj(uint id, uint towerType, const Vector3D& position);
@@ -29,4 +33,5 @@ public:
   static TowerPtr createMiner(uint id, uint towerType, const Vector3D& position);
 
   static void createTowerBoundingBoxes(uint towerType, const Vector3D& position, std::list<BoundingBoxPtr>* boundingBoxes);
+
   };

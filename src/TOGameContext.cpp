@@ -19,7 +19,7 @@ bool TOGameContext::initialise()
   {
   renderConfig.windowName = "TowOff";
   bool success = GameContextImpl::initialise();
-  inputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), -20, 0, -45));
+  InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), -20, 0, -45));
   addInputHandler(inputHandler);
   initSurface(6);
   initDamageParticleSystem();
@@ -201,6 +201,7 @@ void TOGameContext::doTowerDamageEffect(const Tower* tower)
 
 Vector3D TOGameContext::terrainHitTest(uint cursorX, uint cursorY, bool* isLand /*= nullptr*/) const
   {
+  ASSERT(LAND_HEIGHT == 0, "This assumes that land height is 0");
   Vector3D cursorWorldPos = getCursorWorldPos(cursorX, cursorY);
   Vector3D cursorViewDir = getViewDirectionAtCursor(cursorX, cursorY);
   ASSERT (cursorViewDir.y != 0, "View is parallel to terrain, can't hit!");
@@ -217,16 +218,6 @@ bool TOGameContext::isPositionLand(const Vector3D& worldPos) const
   if (height != TERRAIN_OUT_OF_BOUNDS)
     return height >= LAND_HEIGHT;
   return false;
-  }
-
-uint TOGameContext::getActivePlayer() const
-  {
-  return inputHandler->getActivePlayer();
-  }
-
-void TOGameContext::setActivePlayer(uint player)
-  {
-  inputHandler->setActivePlayer(player);
   }
 
 bool isCombatTowerInRange(const TowerPtr& combatTower, const TowerPtr& relayTower)

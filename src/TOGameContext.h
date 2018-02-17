@@ -25,7 +25,6 @@ private:
   TowerList towers;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
   ParticleSystemPtr towerDamageParticles;
-  std::shared_ptr<TOInputHandler> inputHandler;
   HUDHandler hudHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
 
@@ -51,6 +50,7 @@ public:
   HUDHandler* getHUDHandler(){ return &hudHandler; }
 
   TowerPtr getTower(uint id);
+  TowerList* getTowers() { return &towers; }
   TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);

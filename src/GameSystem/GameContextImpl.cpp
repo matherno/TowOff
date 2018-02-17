@@ -22,8 +22,8 @@ bool GameContextImpl::initialise()
 
   inputManager.initialise(renderContext.getWindow());
   boundingBoxManager.initialise();
+  addInputHandler(InputHandlerPtr(new BBInputHandler(inputManager.getNextHandlerID())), true);
   uiManager.initialise(this);
-  addInputHandler(InputHandlerPtr(new BBInputHandler(inputManager.getNextHandlerID())));
 
   gameTime = 0;
 
@@ -117,9 +117,12 @@ void GameContextImpl::processDrawStage()
   stage = stageNone;
   }
 
-void GameContextImpl::addInputHandler(InputHandlerPtr handler)
+void GameContextImpl::addInputHandler(InputHandlerPtr handler, bool priorityHandler)
   {
-  inputManager.addHandler(handler);
+  if (priorityHandler)
+    inputManager.addPriorityHandler(handler);
+  else
+    inputManager.addHandler(handler);
   handler->onAttached(this);
   }
 

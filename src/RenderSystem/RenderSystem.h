@@ -48,6 +48,7 @@ public:
   virtual void addRenderable(RenderablePtr renderable) = 0;
   virtual void removeRenderable(int id) = 0;
   virtual bool containsRenderable(int id) const = 0;
+  virtual void forEachChild(std::function<void(RenderablePtr child)>) = 0;
   virtual int count() const = 0;
   };
 typedef std::shared_ptr<RenderableSet> RenderableSetPtr;
@@ -90,6 +91,7 @@ public:
   virtual MeshStoragePtr createMeshStorage(const string& objFilePath) = 0;
   virtual MeshStoragePtr createEmptyMeshStorage() = 0;
   virtual TexturePtr createTexture(const string& imageFilePath) = 0;
+  virtual RenderableSetPtr createRenderableSet() = 0;
   virtual void pushTransform(const Transform* transform) = 0;
   virtual void popTransform() = 0;
   virtual const Transform* getStackedTransform() = 0;

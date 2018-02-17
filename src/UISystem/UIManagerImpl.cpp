@@ -25,7 +25,7 @@ bool UIManagerImpl::initialise(GameContext* context)
   rootComponent->refresh(context, Vector2D(0, 0), context->getRenderContext()->getWindow()->getSize());
   rootComponent->setVisible(false);
   UIInputHandler* inputHandler = new UIInputHandler(context->getInputManager()->getNextHandlerID());
-  context->addInputHandler(InputHandlerPtr(inputHandler));
+  context->addInputHandler(InputHandlerPtr(inputHandler), true);
   return true;
   }
 

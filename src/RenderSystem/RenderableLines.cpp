@@ -62,6 +62,9 @@ void RenderableLines::removeLine(uint lineID)
 
 void RenderableLines::rebuildBuffer()
   {
+  if (rebuildDisabled)
+    return;
+
   std::vector<float> data;
   for (const Line& line : *lines.getList())
     {
@@ -83,4 +86,10 @@ void RenderableLines::rebuildBuffer()
     }
   vbo.bind();
   vbo.copyDataFloat(data);
+  }
+
+void RenderableLines::clearLines()
+  {
+  lines.clear();
+  rebuildBuffer();
   }

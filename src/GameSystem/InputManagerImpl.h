@@ -9,6 +9,7 @@ class InputManagerImpl : public InputManager
   {
 private:
   mathernogl::MappedList<InputHandlerPtr> handlers;
+  mathernogl::MappedList<InputHandlerPtr> priorityHandlers;
   uint nextHandlerID = 1;
   InputSource inputSource;
   int prevMouseX, prevMouseY;
@@ -18,8 +19,9 @@ public:
   virtual void cleanUp() override;
   virtual uint getNextHandlerID() override;
   virtual void addHandler(InputHandlerPtr handler) override;
+  virtual void addPriorityHandler(InputHandlerPtr handler) override;
   virtual void removeHandler(uint id) override;
-  virtual void containsHandler(uint id) override;
+  virtual bool containsHandler(uint id) const override;
   virtual void processInput(GameContext* gameContext) override;
   virtual bool isKeyDown(uint key) const override;
 
@@ -31,5 +33,4 @@ public:
   void fireKeyPressedEvents(GameContext* gameContext, uint key);
   void fireKeyHeldEvents(GameContext* gameContext, uint key);
   void fireKeyReleasedEvents(GameContext* gameContext, uint key);
-
   };

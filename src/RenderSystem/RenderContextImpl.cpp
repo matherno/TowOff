@@ -172,3 +172,8 @@ uint RenderContextImpl::bindTexture(TexturePtr texture)
   return glBindLocation;
   }
 
+RenderableSetPtr RenderContextImpl::createRenderableSet()
+  {
+  return RenderableSetPtr(new RenderableSetImpl(getNextRenderableID()));
+  }
+

@@ -28,3 +28,18 @@ bool UIInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
     }
   return false;
   }
+
+bool UIInputHandler::onMouseHeld(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+  {
+  return gameContext->getUIManager()->hitTest(mouseX, mouseY);
+  }
+
+bool UIInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+  {
+  return gameContext->getUIManager()->hitTest(mouseX, mouseY);
+  }
+
+bool UIInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset, uint mouseX, uint mouseY)
+  {
+  return gameContext->getUIManager()->hitTest(mouseX, mouseY);
+  }

@@ -19,17 +19,26 @@ void InputManagerImpl::cleanUp()
 
 void InputManagerImpl::addHandler(InputHandlerPtr handler)
   {
-  handlers.add(handler, handler->getID());
+  handlers.addFront(handler, handler->getID());
+  }
+
+//  priority handlers are always called to handle input before the regular ones
+void InputManagerImpl::addPriorityHandler(InputHandlerPtr handler)
+  {
+  priorityHandlers.addFront(handler, handler->getID());
   }
 
 void InputManagerImpl::removeHandler(uint id)
   {
-  handlers.remove(id);
+  if (handlers.contains(id))
+    handlers.remove(id);
+  if (priorityHandlers.contains(id))
+    priorityHandlers.remove(id);
   }
 
-void InputManagerImpl::containsHandler(uint id)
+bool InputManagerImpl::containsHandler(uint id) const
   {
-  handlers.contains(id);
+  return handlers.contains(id) || priorityHandlers.contains(id);
   }
 
 uint InputManagerImpl::getNextHandlerID()
@@ -90,6 +99,11 @@ void InputManagerImpl::processInput(GameContext* gameContext)
 
 void InputManagerImpl::fireMousePressedEvents(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onMousePressed(gameContext, button, mouseX, mouseY))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onMousePressed(gameContext, button, mouseX, mouseY))
@@ -99,6 +113,11 @@ void InputManagerImpl::fireMousePressedEvents(GameContext* gameContext, uint but
 
 void InputManagerImpl::fireMouseHeldEvents(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onMouseHeld(gameContext, button, mouseX, mouseY))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onMouseHeld(gameContext, button, mouseX, mouseY))
@@ -108,6 +127,11 @@ void InputManagerImpl::fireMouseHeldEvents(GameContext* gameContext, uint button
 
 void InputManagerImpl::fireMouseReleasedEvents(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onMouseReleased(gameContext, button, mouseX, mouseY))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onMouseReleased(gameContext, button, mouseX, mouseY))
@@ -117,6 +141,11 @@ void InputManagerImpl::fireMouseReleasedEvents(GameContext* gameContext, uint bu
 
 void InputManagerImpl::fireMouseScrollEvents(GameContext* gameContext, double scrollOffset, uint mouseX, uint mouseY)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onMouseScroll(gameContext, scrollOffset, mouseX, mouseY))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onMouseScroll(gameContext, scrollOffset, mouseX, mouseY))
@@ -126,6 +155,11 @@ void InputManagerImpl::fireMouseScrollEvents(GameContext* gameContext, double sc
 
 void InputManagerImpl::fireMouseMoveEvents(GameContext* gameContext, uint mouseX, uint mouseY, uint prevMouseX, uint prevMouseY)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onMouseMove(gameContext, mouseX, mouseY, prevMouseX, prevMouseY))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onMouseMove(gameContext, mouseX, mouseY, prevMouseX, prevMouseY))
@@ -135,6 +169,11 @@ void InputManagerImpl::fireMouseMoveEvents(GameContext* gameContext, uint mouseX
 
 void InputManagerImpl::fireKeyPressedEvents(GameContext* gameContext, uint key)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onKeyPressed(gameContext, key))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onKeyPressed(gameContext, key))
@@ -144,6 +183,11 @@ void InputManagerImpl::fireKeyPressedEvents(GameContext* gameContext, uint key)
 
 void InputManagerImpl::fireKeyHeldEvents(GameContext* gameContext, uint key)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onKeyHeld(gameContext, key))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onKeyHeld(gameContext, key))
@@ -153,6 +197,11 @@ void InputManagerImpl::fireKeyHeldEvents(GameContext* gameContext, uint key)
 
 void InputManagerImpl::fireKeyReleasedEvents(GameContext* gameContext, uint key)
   {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (handler->onKeyReleased(gameContext, key))
+      return;
+    }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (handler->onKeyReleased(gameContext, key))

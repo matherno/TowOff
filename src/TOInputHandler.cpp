@@ -106,25 +106,6 @@ bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
     return true;
     }
 
-  if (hudHandler->isTowerTypeSelected() && button == MOUSE_LEFT)
-    {
-    bool isOnLand = false;
-    Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY, &isOnLand);
-    if (isOnLand)
-      {
-      uint towerType = hudHandler->getTowerTypeSelected();
-      TowerPtr tower = toGameContext->createTower(towerType, terrainPos);
-      if (TowerFactory::getTowerType(towerType)->name == "Enemy Tower")
-        tower->setPlayerNum(2);
-      else
-        tower->setPlayerNum(1);
-
-      if (!gameContext->getInputManager()->isKeyDown(KEY_LCTRL))
-        endTowerPlacingMode(gameContext);
-      return true;
-      }
-    }
-
   hudHandler->setTowerFocused(nullptr);
   return false;
   }
@@ -136,10 +117,3 @@ bool TOInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset
   refreshCamera(gameContext->getCamera());
   return true;
   }
-
-void TOInputHandler::endTowerPlacingMode(GameContext* gameContext)
-  {
-  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
-  toGameContext->getHUDHandler()->deselectTowerType();
-  }
-

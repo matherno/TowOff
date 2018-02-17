@@ -62,7 +62,7 @@ void UIButton::updateGroup(uint mouseX, uint mouseY)
     for (UIButton* button : *group->toggleButtons.getList())
       {
       if (button->getID() != getID())
-        button->onUnpress(mouseX, mouseY);
+        button->onForceUnpress();
       }
     }
   }

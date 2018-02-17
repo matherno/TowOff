@@ -23,6 +23,13 @@ public:
     itemIters[id] = --items.end();
     }
 
+  void addFront(T item, uint id)
+    {
+    remove(id);
+    items.push_front(item);
+    itemIters[id] = items.begin();
+    }
+
   void remove(uint id)
     {
     if (contains(id))

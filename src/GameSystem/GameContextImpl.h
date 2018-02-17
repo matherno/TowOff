@@ -54,7 +54,7 @@ public:
   virtual bool gotActor(uint id) override;
   virtual uint getNextActorID() override;
 
-  virtual void addInputHandler(InputHandlerPtr handler) override;
+  virtual void addInputHandler(InputHandlerPtr handler, bool priorityHandler = false) override;
   virtual void removeInputHandler(InputHandlerPtr handler) override;
 
   virtual long getGameTime() override { return gameTime; }

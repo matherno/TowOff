@@ -15,6 +15,7 @@ private:
   ShaderProgramPtr shaderProgram;
   bool lightShaded = true;
   Vector3D colour = Vector3D(0.2, 0.5, 0.6);
+  float transparency = 0;
 
 public:
   RenderableMesh(uint id);
@@ -26,6 +27,7 @@ public:
   void setMeshStorage(MeshStoragePtr meshStorage) { this->meshStorage = meshStorage; }
   MeshStoragePtr getMeshStorage(MeshStoragePtr meshStorage) const { return meshStorage; }
   void setColour(Vector3D colour){ this->colour = colour; }
+  void setTransparency(float transparency) { this->transparency = transparency; }
 
   void setLightShaded(bool lightShaded){ this->lightShaded = lightShaded; }
   };

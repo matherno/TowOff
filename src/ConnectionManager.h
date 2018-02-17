@@ -46,8 +46,11 @@ public:
   const Network* getTowersNetwork(uint towerID) const;
   void rebuildNetworks();
   bool containsTower(uint id) const;
-  bool areTowersConnectable(TowerPtr towerA, TowerPtr towerB) const;
   bool areTowersConnected(uint towerID1, uint towerID2) const;
+
+  static bool areTowersConnectable(TowerPtr towerA, TowerPtr towerB);
+  static bool areTowersInRange(const Vector3D& towerAPos, float towerAConnectRadius, const Vector3D& towerBPos, float towerBConnectRadius);
+  static bool areTowerFunctionsCompatible(Tower::TowerFunction towerAFunction, Tower::TowerFunction towerBFunction);
 
 protected:
   void addConnection(ConnectionNodePtr nodeA, ConnectionNodePtr nodeB);
