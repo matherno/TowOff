@@ -8,6 +8,7 @@
 #include "TowerPlacementHandler.h"
 #include "TowerFactory.h"
 #include "TOGameContext.h"
+#include "PhasingMesh.h"
 
 TowerPlacementHandler::TowerPlacementHandler(uint id, uint towerTypeID) : InputHandler(id), towerTypeID(towerTypeID)
   {}
@@ -21,7 +22,7 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
 
   if (!type->baseMeshFilePath.empty())
     {
-    RenderableMesh* mesh = new RenderableMesh(renderContext->getNextRenderableID());
+    PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID());
     mesh->setMeshStorage(renderContext->createMeshStorage(type->baseMeshFilePath));
     mesh->initialise(renderContext);
     towerHighlight->addRenderable(RenderablePtr(mesh));
@@ -29,7 +30,7 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
 
   if (!type->turretMeshFilePath.empty())
     {
-    RenderableMesh* mesh = new RenderableMesh(renderContext->getNextRenderableID());
+    PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID());
     mesh->setMeshStorage(renderContext->createMeshStorage(type->turretMeshFilePath));
     mesh->initialise(renderContext);
     towerHighlight->addRenderable(RenderablePtr(mesh));
@@ -65,8 +66,10 @@ bool TowerPlacementHandler::onMouseReleased(GameContext* gameContext, uint butto
     {
     if (isPositionValid)
       {
-      TowerPtr tower = toGameContext->createTower(towerTypeID, towerHighlightPos);
-      if (TowerFactory::getTowerType(towerTypeID)->name == "Enemy Tower")
+      const TowerType* towerType = TowerFactory::getTowerType(towerTypeID);
+      bool needsConstruction = towerType->name != "Home Base" && towerType->name != "Enemy Tower";
+      TowerPtr tower = toGameContext->createTower(towerTypeID, towerHighlightPos, needsConstruction);
+      if (towerType->name == "Enemy Tower")
         tower->setPlayerNum(2);
       else
         tower->setPlayerNum(1);

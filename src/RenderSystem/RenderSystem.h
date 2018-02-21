@@ -21,6 +21,7 @@ class Renderable {
 private:
   const uint id;
   mathernogl::Transform transform;
+  Vector4D clipPlane = Vector4D(0);
 
 public:
   Renderable(uint id) : id(id) {}
@@ -32,7 +33,9 @@ public:
   virtual void render(RenderContext* renderContext) = 0;
   virtual Transform* getTransform() { return &transform; }
   virtual const Transform* getTransform() const { return &transform; }
+  virtual const Vector4D* getClippingPlane() const { return &clipPlane; }
   virtual void setTransform(const Transform& transform) { this->transform = transform; }
+  virtual void setClippingPlane(const Vector4D& plane) { this->clipPlane = plane; }
   };
 typedef std::shared_ptr<Renderable> RenderablePtr;
 
@@ -97,5 +100,8 @@ public:
   virtual const Transform* getStackedTransform() = 0;
   virtual mathernogl::Window* getWindow() = 0;
   virtual const mathernogl::Window* getWindow() const = 0;
+  virtual void setClippingPlane(const Vector4D& plane) = 0;
+  virtual void disableClippingPlane() = 0;
+  virtual bool isClippingEnabled() = 0;
   };
 typedef std::shared_ptr<RenderContext> RenderContextPtr;

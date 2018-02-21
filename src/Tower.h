@@ -16,13 +16,14 @@ class Tower : public GameActor
 public:
   enum TowerFunction
     {
+    none,
     combat,
     storage,
     relay,
     miner,
     };
 
-private:
+protected:
   uint towerType;
   TowerFunctionalityPtr functionality;
   RenderablePtr towerBase;
@@ -36,8 +37,6 @@ private:
   bool showDamageEffect = false;
   uint storedEnergy = 0;
   uint maxEnergy = 500;
-
-protected:
   float hitRadius = 5;
   float connectRadius = 10;
   string baseModelFile, turretModelFile = "";
@@ -49,7 +48,8 @@ public:
   virtual ~Tower() {};
   void setPlayerNum(uint playerNum);
   uint getPlayerNum() const { return playerNum; }
-  TowerFunction getFunction() const;
+
+  virtual TowerFunction getFunction() const;
   bool isPowerSrc() const { return getFunction() == miner || getFunction() == storage; }
   uint getTowerType() const { return towerType; }
   void setBaseModelFilePath(string filePath){ baseModelFile = filePath; }
@@ -68,6 +68,7 @@ public:
   Vector3D getHitRadius() const { return hitRadius; }
   int getHealthPoints() const { return healthPoints; }
   int getMaxHealthPoints() const { return maxHealthPoints; }
+  virtual bool isUnderConstruction() const{ return false; }
 
   bool hasEnergy() const { return storedEnergy > 0; }
   uint getStoredEnergy() const { return storedEnergy; }
@@ -87,6 +88,8 @@ public:
   float getConnectRadius() const { return connectRadius; }
   void setTurretRotation(const Vector3D& targetPos);
   const Transform* getTurretRotation() const;
+  RenderablePtr getBaseMeshRenderable() { return towerBase; }
+  RenderablePtr getTurretMeshRenderable() { return towerTurret; }
   };
 
 typedef std::shared_ptr<Tower> TowerPtr;

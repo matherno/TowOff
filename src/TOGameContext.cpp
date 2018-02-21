@@ -10,6 +10,7 @@
 #include "InstantWeapon.h"
 #include "TOInputHandler.h"
 #include "TowerFactory.h"
+#include "UnderConstructTower.h"
 
 #define LAND_HEIGHT 0
 #define WATER_HEIGHT -1
@@ -117,11 +118,17 @@ void TOGameContext::removeTower(uint id)
     rebuildCombatTowerNetworksMap();
   }
 
-TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
+TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position, bool underConstruction)
   {
-  TowerPtr tower = TowerFactory::createTower(towerType, getNextActorID(), position);
+  TowerPtr tower;
+  if (underConstruction)
+    tower = TowerFactory::createUnderConstructTower(towerType, getNextActorID(), position);
+  else
+    tower = TowerFactory::createTower(towerType, getNextActorID(), position);
+
   towers.add(tower, tower->getID());
   addActor(tower);
+
   if (tower->getFunction() != Tower::combat)
     connectionManager->addTower(tower);
   if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
@@ -134,7 +141,6 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position)
     uint boxID = getBoundingBoxManager()->addBoundingBox(box, tower->getID());
     towerBoundingBoxes[tower->getID()].push_back(boxID);
     }
-
   return tower;
   }
 
@@ -304,8 +310,10 @@ TowerPtr TOGameContext::findConnectedTower(uint towerID, bool findClosest, TOGam
 
 TowerPtr TOGameContext::findClosestConnectedPowerSrc(uint towerID, bool mustHaveEnergy) const
   {
-  return findConnectedTower(towerID, true, [mustHaveEnergy](TowerPtr tower)
+  return findConnectedTower(towerID, true, [mustHaveEnergy, this](TowerPtr tower)
     {
+    if (tower->isUnderConstruction())
+      return false;
     if (mustHaveEnergy && !tower->hasEnergy())
       return false;
     return tower->isPowerSrc();
@@ -314,15 +322,17 @@ TowerPtr TOGameContext::findClosestConnectedPowerSrc(uint towerID, bool mustHave
 
 TowerPtr TOGameContext::findClosestConnectedMiner(uint towerID, bool mustHaveEnergy) const
   {
-  return findConnectedTower(towerID, true, [mustHaveEnergy](TowerPtr tower)
+  return findConnectedTower(towerID, true, [mustHaveEnergy, this](TowerPtr tower)
     {
+    if (tower->isUnderConstruction())
+      return false;
     if (mustHaveEnergy && !tower->hasEnergy())
       return false;
     return tower->getFunction() == Tower::miner;
     });
   }
 
-bool TOGameContext::transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const
+void TOGameContext::transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const
   {
   uint energyTaken = srcTower->takeEnergy(amount, false);
   uint energyLeftOver = energyTaken - targetTower->storeEnergy(energyTaken);

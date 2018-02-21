@@ -26,6 +26,7 @@ public:
   static Tower::TowerFunction getTowerFunction(uint towerType);
 
   static TowerPtr createTower(uint towerType, uint id, const Vector3D& position);
+  static TowerPtr createUnderConstructTower(uint towerType, uint id, const Vector3D& position);
   static TowerPtr createBasicTowerProj(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createBasicTower(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createHomeBase(uint id, uint towerType, const Vector3D& position);

@@ -54,7 +54,7 @@ public:
   TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);
-  TowerPtr createTower(uint towerType, const Vector3D& position = Vector3D(0));
+  TowerPtr createTower(uint towerType, const Vector3D& position, bool underConstruction);
 
   //  retrieves a tower in the same network as tower of towerID
   //  findClosest => returns the closest
@@ -64,7 +64,7 @@ public:
 
   TowerPtr findClosestConnectedPowerSrc(uint towerID, bool mustHaveEnergy = false) const;
   TowerPtr findClosestConnectedMiner(uint towerID, bool mustHaveEnergy = false) const;
-  bool transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const;
+  void transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const;
   const std::set<uint>* combatTowerGetNetworksInRange(uint towerID) const;
   long timeBetweenEnergyTransfers() const { return 1000; };
 

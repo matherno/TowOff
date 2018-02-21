@@ -6,6 +6,7 @@
 #include "ConnectionManager.h"
 #include "Resources.h"
 #include "TimeToLiveActor.h"
+#include "UnderConstructTower.h"
 
 
 ConnectionManager::ConnectionManager(uint id) : GameActor(id)
@@ -104,6 +105,8 @@ bool ConnectionManager::containsTower(uint id) const
 
 bool ConnectionManager::areTowersConnectable(TowerPtr towerA, TowerPtr towerB)
   {
+  if (towerA->isUnderConstruction() && towerB->isUnderConstruction())
+    return false;
   if (!areTowersInRange(towerA->getPosition(), towerA->getConnectRadius(), towerB->getPosition(), towerB->getConnectRadius()))
     return false;
   return areTowerFunctionsCompatible(towerA->getFunction(), towerB->getFunction());
@@ -117,6 +120,8 @@ bool ConnectionManager::areTowersInRange(const Vector3D& towerAPos, float towerA
 
 bool ConnectionManager::areTowerFunctionsCompatible(Tower::TowerFunction towerAFunction, Tower::TowerFunction towerBFunction)
   {
+  if (towerAFunction == Tower::none || towerBFunction == Tower::none)
+    return false;
   if (towerAFunction == Tower::combat || towerBFunction == Tower::combat)
     return false;
   if (towerAFunction == Tower::relay || towerBFunction == Tower::relay)
@@ -152,6 +157,9 @@ void ConnectionManager::addPendingRenderables(RenderContext* renderContext)
     Vector3D colour(0.2, 0.2, 0.7);
     if (firstTower->getFunction() == Tower::relay && secondTower->getFunction() == Tower::relay)
       colour.set(0, 0.1, 0.6);
+    if (firstTower->isUnderConstruction() || secondTower->isUnderConstruction())
+      colour.set(0.4, 0.4, 0.1);
+
     connectionBeamIDs[nodePair] = beamsRenderable->addLine(start, end, colour, 0.8);
     }
   beamsToCreate.clear();

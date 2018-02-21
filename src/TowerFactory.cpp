@@ -8,6 +8,7 @@
 #include "Resources.h"
 #include "InstantWeapon.h"
 #include "TowerFunctionalities.h"
+#include "UnderConstructTower.h"
 
 #define TOWER_HOMEBASE  0
 #define TOWER_BASIC     1
@@ -74,6 +75,14 @@ void setCommonTowerParameters(TowerPtr tower, uint towerType)
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
   }
 
+TowerPtr TowerFactory::createUnderConstructTower(uint towerType, uint id, const Vector3D& position)
+  {
+  TowerPtr tower(new UnderConstructTower(id, towerType));
+  tower->setPosition(position);
+  setCommonTowerParameters(tower, towerType);
+  return tower;
+  }
+
 TowerPtr TowerFactory::createBasicTowerProj(uint id, uint towerType, const Vector3D& position)
   {
   std::unique_ptr<ProjectileWeapon> weapon(new ProjectileWeapon());
@@ -119,6 +128,8 @@ TowerPtr TowerFactory::createHomeBase(uint id, uint towerType, const Vector3D& p
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
+  tower->setMaxEnergy(20000);
+  tower->storeEnergy(tower->getMaxEnergy());
   setCommonTowerParameters(tower, towerType);
   return tower;
   }

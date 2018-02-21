@@ -25,7 +25,7 @@ void Tower::onAttached(GameContext* gameContext)
     if (meshStorage)
       {
       RenderableMesh* renderable = new RenderableMesh(context->getNextRenderableID());
-      renderable->setMeshStorage(MeshStoragePtr(meshStorage));
+      renderable->setMeshStorage(meshStorage);
       renderable->initialise(context);
       renderable->getTransform()->translate(position);
       towerBase = RenderablePtr(renderable);
@@ -40,7 +40,7 @@ void Tower::onAttached(GameContext* gameContext)
     if (meshStorage)
       {
       RenderableMesh* renderable = new RenderableMesh(context->getNextRenderableID());
-      renderable->setMeshStorage(MeshStoragePtr(meshStorage));
+      renderable->setMeshStorage(meshStorage);
       renderable->initialise(context);
       renderable->getTransform()->translate(position);
       towerTurret = RenderablePtr(renderable);
@@ -48,7 +48,8 @@ void Tower::onAttached(GameContext* gameContext)
       }
     }
 
-  functionality->onAttached(this, gameContext);
+  if (functionality)
+    functionality->onAttached(this, gameContext);
   }
 
 void Tower::onUpdate(GameContext* gameContext)
@@ -66,12 +67,15 @@ void Tower::onUpdate(GameContext* gameContext)
     return;
     }
 
-  functionality->onUpdate(this, gameContext);
+  if (functionality)
+    functionality->onUpdate(this, gameContext);
   }
 
 void Tower::onDetached(GameContext* gameContext)
   {
-  functionality->onDetached(this, gameContext);
+  if (functionality)
+    functionality->onDetached(this, gameContext);
+
   if (towerBase)
     {
     gameContext->getRenderContext()->getRenderableSet()->removeRenderable(towerBase->getID());
@@ -145,7 +149,10 @@ void Tower::setTurretRotation(const Vector3D& targetPos)
 
 Tower::TowerFunction Tower::getFunction() const
   {
-  return functionality->function;
+  if (functionality)
+    return functionality->function;
+  else
+    return Tower::none;
   }
 
 const Transform* Tower::getTurretRotation() const

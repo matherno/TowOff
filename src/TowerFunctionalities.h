@@ -10,7 +10,7 @@ private:
   std::unique_ptr<TowerWeapon> weapon;
   Vector3D shootOffset;
   Timer transferEnergyTimer;
-  float energyTransferRate = 2;   // base value of how much energy per second this takes from power sources
+  float energyTransferRate = 15;   // base value of how much energy per second this takes from power sources
 
 public:
   TowerFunctionalityCombat() : TowerFunctionality(Tower::combat) {}
@@ -33,7 +33,7 @@ class TowerFunctionalityStorage : public TowerFunctionality
   {
 private:
   Timer transferEnergyTimer;
-  float energyTransferRate = 10;   // base value of how much energy per second this takes from miners
+  float energyTransferRate = 25;   // base value of how much energy per second this takes from miners
 
 public:
   TowerFunctionalityStorage() : TowerFunctionality(Tower::storage) {}
@@ -47,7 +47,7 @@ class TowerFunctionalityMiner : public TowerFunctionality
   {
 private:
   Timer transferEnergyTimer;
-  float energyTransferRate = 20;   // base value of how much energy per second this takes from resources
+  float energyTransferRate = 15;   // base value of how much energy per second this takes from resources
 
 public:
   TowerFunctionalityMiner() : TowerFunctionality(Tower::miner) {}

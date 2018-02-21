@@ -10,6 +10,9 @@
 #define SHADER_VAR_WORLD_TO_CAMERA "inWorldToCamera"
 #define SHADER_VAR_CAMERA_TO_CLIP "inCameraToClip"
 #define SHADER_VAR_SCREEN_SIZE "inScreenSize"
+#define SHADER_VAR_CLIPPING_ENABLED "inClippingEnabled"
+#define SHADER_VAR_CLIP_PLANE "inClipPlane"
+#define SHADER_VAR_TIME_MS "inTimeMS"
 
 class RenderContextImpl : public RenderContext
   {
@@ -24,6 +27,8 @@ private:
   TransformStack transformStack;
   std::map<uint, uint> texIDsToBoundLocals;
   uint nextTexBoundLocal = 1;
+  Vector4D clipPlane = Vector4D(0);
+  long startTime = mathernogl::getTimeMS();
 
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;
@@ -53,4 +58,8 @@ public:
   virtual void pushTransform(const mathernogl::Transform* transform) override;
   virtual void popTransform() override;
   virtual const mathernogl::Transform* getStackedTransform() override;
+
+  virtual void setClippingPlane(const Vector4D& plane) override;
+  virtual void disableClippingPlane() override;
+  virtual bool isClippingEnabled() override;
   };

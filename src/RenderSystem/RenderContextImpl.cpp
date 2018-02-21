@@ -50,7 +50,9 @@ void RenderContextImpl::render()
     transformStack.clear();
     window->clear();
     pushTransform(renderableSet->getTransform());
+    setClippingPlane(*renderableSet->getClippingPlane());
     renderableSet->render(this);
+    disableClippingPlane();
     popTransform();
     window->update();
     isRendering = false;
@@ -65,6 +67,7 @@ bool RenderContextImpl::isWindowOpen() const
 void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
   {
   //todo: keep track of enabled shader and don't enable this if already enabled
+  //todo: keep state of whether or not each shader program has already been given these variables that frame (not for clipping uniforms)
   shaderProgram->enable();
 
   if (shaderProgram->hasUniformVariable(SHADER_VAR_WORLD_TO_CAMERA))
@@ -80,6 +83,15 @@ void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
     }
   if (shaderProgram->hasUniformVariable(SHADER_VAR_SCREEN_SIZE))
     shaderProgram->setVarVec2(SHADER_VAR_SCREEN_SIZE, getWindow()->getSize());
+
+  bool enableClipping = clipPlane.x != 0 || clipPlane.y != 0 || clipPlane.z != 0;
+  if (shaderProgram->hasUniformVariable(SHADER_VAR_CLIPPING_ENABLED))
+    shaderProgram->setVarInt(SHADER_VAR_CLIPPING_ENABLED, enableClipping ? 1 : 0);
+  if (enableClipping && shaderProgram->hasUniformVariable(SHADER_VAR_CLIP_PLANE))
+    shaderProgram->setVarVec4(SHADER_VAR_CLIP_PLANE, clipPlane);
+
+  if (shaderProgram->hasUniformVariable(SHADER_VAR_TIME_MS))
+    shaderProgram->setVarInt(SHADER_VAR_TIME_MS, (int)(getTimeMS() - startTime));
 
   //todo: put vert to world shader variable set in a more appropriate place
 
@@ -175,5 +187,30 @@ uint RenderContextImpl::bindTexture(TexturePtr texture)
 RenderableSetPtr RenderContextImpl::createRenderableSet()
   {
   return RenderableSetPtr(new RenderableSetImpl(getNextRenderableID()));
+  }
+
+void RenderContextImpl::setClippingPlane(const Vector4D& plane)
+  {
+  bool clippingEnabled = isClippingEnabled();
+  if (plane.x != 0 || plane.y != 0 || plane.z != 0)
+    {
+    if (!clippingEnabled)
+      glEnable(GL_CLIP_DISTANCE0);
+    clipPlane = plane;
+    }
+  }
+
+void RenderContextImpl::disableClippingPlane()
+  {
+  if (isClippingEnabled())
+    {
+    glDisable(GL_CLIP_DISTANCE0);
+    clipPlane.set(0, 0, 0, 0);
+    }
+  }
+
+bool RenderContextImpl::isClippingEnabled()
+  {
+  return (clipPlane.x != 0 || clipPlane.y != 0 || clipPlane.z != 0);
   }
 

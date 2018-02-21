@@ -24,17 +24,24 @@ void RenderableMesh::render(RenderContext* renderContext)
   {
   if (meshStorage)
     {
+    clearGLErrors();
     meshStorage->getVAO().bind();
     renderContext->activateShaderProgram(shaderProgram);
-    shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0);
-    shaderProgram->setVarInt("inUseSingleColour", 1);
-    shaderProgram->setVarVec3("inColour", colour);
-    shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1));
+    shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0, true);
+    shaderProgram->setVarInt("inUseSingleColour", 1, true);
+    shaderProgram->setVarVec3("inColour", colour, true);
+    shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1), true);
     setDepthTest(true);
-    setAlphaBlending(true);
-    setFaceCulling(true);
-    clearGLErrors();
+    setAlphaBlending(transparency > 0.00001f);
+    setFaceCulling(backFaceCulling);
+    if (wireframeMode)
+      {
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      glLineWidth(1);
+      }
     glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
+    if (wireframeMode)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     ASSERT_NO_GL_ERROR();
     }
   }

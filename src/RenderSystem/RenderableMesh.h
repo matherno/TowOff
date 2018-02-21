@@ -10,12 +10,14 @@
 
 class RenderableMesh : public Renderable
   {
-private:
+protected:
   MeshStoragePtr meshStorage;
   ShaderProgramPtr shaderProgram;
   bool lightShaded = true;
   Vector3D colour = Vector3D(0.2, 0.5, 0.6);
   float transparency = 0;
+  bool backFaceCulling = true;
+  bool wireframeMode = false;
 
 public:
   RenderableMesh(uint id);
@@ -28,6 +30,8 @@ public:
   MeshStoragePtr getMeshStorage(MeshStoragePtr meshStorage) const { return meshStorage; }
   void setColour(Vector3D colour){ this->colour = colour; }
   void setTransparency(float transparency) { this->transparency = transparency; }
+  void setBackFaceCulling(float backFaceCulling) { this->backFaceCulling = backFaceCulling; }
+  void setWireframeMode(bool enable) { wireframeMode = enable; }
 
   void setLightShaded(bool lightShaded){ this->lightShaded = lightShaded; }
   };
