@@ -7,7 +7,9 @@
 using namespace mathernogl;
 
 RenderableMesh::RenderableMesh(uint id) : Renderable(id)
-  {}
+  {
+  drawStyle = DRAW_STYLE_SINGLE_COLOUR;
+  }
 
 void RenderableMesh::initialise(RenderContext* renderContext)
   {
@@ -26,11 +28,17 @@ void RenderableMesh::render(RenderContext* renderContext)
     {
     clearGLErrors();
     meshStorage->getVAO().bind();
+
     renderContext->activateShaderProgram(shaderProgram);
     shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0, true);
-    shaderProgram->setVarInt("inUseSingleColour", 1, true);
-    shaderProgram->setVarVec3("inColour", colour, true);
     shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1), true);
+
+    shaderProgram->setVarInt("inDrawStyle", drawStyle, true);
+    if (drawStyle == DRAW_STYLE_TEXTURE && texture)
+      shaderProgram->setVarInt("inTexture", renderContext->bindTexture(texture), true);
+    if (drawStyle == DRAW_STYLE_SINGLE_COLOUR)
+      shaderProgram->setVarVec3("inColour", colour, true);
+
     setDepthTest(true);
     setAlphaBlending(transparency > 0.00001f);
     setFaceCulling(backFaceCulling);
@@ -44,4 +52,23 @@ void RenderableMesh::render(RenderContext* renderContext)
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     ASSERT_NO_GL_ERROR();
     }
+  }
+
+void RenderableMesh::setDrawStyleSingleColour(Vector3D colour)
+  {
+  drawStyle = DRAW_STYLE_SINGLE_COLOUR;
+  texture.reset();
+  this->colour = colour;
+  }
+
+void RenderableMesh::setDrawStyleTexture(TexturePtr texture)
+  {
+  drawStyle = DRAW_STYLE_TEXTURE;
+  this->texture = texture;
+  }
+
+void RenderableMesh::setDrawStyleVertColours()
+  {
+  drawStyle = DRAW_STYLE_VERT_COLOUR;
+  texture.reset();
   }

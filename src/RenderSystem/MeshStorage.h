@@ -5,6 +5,10 @@
 
 #include <mathernogl/MathernoGL.h>
 
+#define DRAW_STYLE_SINGLE_COLOUR 1
+#define DRAW_STYLE_TEXTURE       2
+#define DRAW_STYLE_VERT_COLOUR   3
+
 class MeshStorage
   {
 private:
@@ -14,6 +18,7 @@ private:
   bool useIndices = true;
   mathernogl::Vector3D min;
   mathernogl::Vector3D max;
+  bool storingTexCoords = false;
 
 public:
   std::vector<int> indices;
@@ -31,6 +36,7 @@ public:
   mathernogl::Vector3D getMin() const;
   mathernogl::Vector3D getMax() const;
   void calculateMinMax();
+  bool gotTexCoords() const { return storingTexCoords; }
 
 protected:
   bool initVAOWithTexCoords(std::vector<int>* indicesPtr);

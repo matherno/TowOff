@@ -8,6 +8,7 @@
 #include "InstantWeapon.h"
 #include "ProjectileWeapon.h"
 #include "TowerFactory.h"
+#include "Resources.h"
 
 Tower::Tower(uint id, uint towerType, TowerFunctionalityPtr functionality)
   : GameActor(id), towerType(towerType), functionality(std::move(functionality))
@@ -16,35 +17,38 @@ Tower::Tower(uint id, uint towerType, TowerFunctionalityPtr functionality)
 
 void Tower::onAttached(GameContext* gameContext)
   {
-  RenderContext* context = gameContext->getRenderContext();
+  RenderContext* renderContext = gameContext->getRenderContext();
+  TexturePtr paletteTexture = renderContext->createTexture(IMAGE_TEXTURE_PALETTE);
 
   //  tower base renderable
   if (!baseModelFile.empty())
     {
-    MeshStoragePtr meshStorage = context->createMeshStorage(baseModelFile);
+    MeshStoragePtr meshStorage = renderContext->createMeshStorage(baseModelFile);
     if (meshStorage)
       {
-      RenderableMesh* renderable = new RenderableMesh(context->getNextRenderableID());
+      RenderableMesh* renderable = new RenderableMesh(renderContext->getNextRenderableID());
       renderable->setMeshStorage(meshStorage);
-      renderable->initialise(context);
+      renderable->initialise(renderContext);
       renderable->getTransform()->translate(position);
+      renderable->setDrawStyleTexture(paletteTexture);
       towerBase = RenderablePtr(renderable);
-      context->getRenderableSet()->addRenderable(towerBase);
+      renderContext->getRenderableSet()->addRenderable(towerBase);
       }
     }
 
   //  tower turret renderable
   if (!turretModelFile.empty())
     {
-    MeshStoragePtr meshStorage = context->createMeshStorage(turretModelFile);
+    MeshStoragePtr meshStorage = renderContext->createMeshStorage(turretModelFile);
     if (meshStorage)
       {
-      RenderableMesh* renderable = new RenderableMesh(context->getNextRenderableID());
+      RenderableMesh* renderable = new RenderableMesh(renderContext->getNextRenderableID());
       renderable->setMeshStorage(meshStorage);
-      renderable->initialise(context);
+      renderable->initialise(renderContext);
       renderable->getTransform()->translate(position);
+      renderable->setDrawStyleTexture(paletteTexture);
       towerTurret = RenderablePtr(renderable);
-      context->getRenderableSet()->addRenderable(towerTurret);
+      renderContext->getRenderableSet()->addRenderable(towerTurret);
       }
     }
 

@@ -68,6 +68,9 @@ bool TowerPlacementHandler::onMouseReleased(GameContext* gameContext, uint butto
       {
       const TowerType* towerType = TowerFactory::getTowerType(towerTypeID);
       bool needsConstruction = towerType->name != "Home Base" && towerType->name != "Enemy Tower";
+#if 1
+      needsConstruction = false;    // for testing
+#endif
       TowerPtr tower = toGameContext->createTower(towerTypeID, towerHighlightPos, needsConstruction);
       if (towerType->name == "Enemy Tower")
         tower->setPlayerNum(2);
@@ -116,7 +119,7 @@ void TowerPlacementHandler::setupHighlightColour()
                                  {
                                  RenderableMesh* mesh = dynamic_cast<RenderableMesh*>(child.get());
                                  if (mesh)
-                                   mesh->setColour(colour);
+                                   mesh->setDrawStyleSingleColour(colour);
                                  });
   }
 

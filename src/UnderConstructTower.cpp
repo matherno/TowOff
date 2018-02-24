@@ -92,7 +92,7 @@ RenderablePtr UnderConstructTower::createTowerMesh(MeshStoragePtr& meshStorage, 
   towerMesh->setMeshStorage(meshStorage);
   towerMesh->getTransform()->translate(position);
   towerMesh->setPhaseSpeed(-0.007f);
-  towerMesh->setColour(phasingColour);
+  towerMesh->setDrawStyleSingleColour(phasingColour);
   towerMesh->initialise(context);
   RenderablePtr meshPtr(towerMesh);
   context->getRenderableSet()->addRenderable(meshPtr);
@@ -106,7 +106,7 @@ RenderablePtr UnderConstructTower::createTowerMeshWF(MeshStoragePtr& meshStorage
   towerMeshWF->initialise(context);
   towerMeshWF->getTransform()->translate(position);
   towerMeshWF->setWireframeMode(true);
-  towerMeshWF->setColour(wfColour);
+  towerMeshWF->setDrawStyleSingleColour(wfColour);
   towerMeshWF->setLightShaded(false);
   towerMeshWF->setTransparency(0.3);
   RenderablePtr meshPtr(towerMeshWF);

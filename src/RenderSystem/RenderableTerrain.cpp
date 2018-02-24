@@ -50,7 +50,7 @@ void RenderableTerrain::cleanUp(RenderContext* renderContext)
 void RenderableTerrain::render(RenderContext* renderContext)
   {
   renderContext->activateShaderProgram(shaderProgram);
-  shaderProgram->setVarInt("inUseSingleColour", 0);
+  shaderProgram->setVarInt("inDrawStyle", DRAW_STYLE_VERT_COLOUR);
   meshStorage->getVAO().bind();
   setDepthTest(true);
   setAlphaBlending(true);

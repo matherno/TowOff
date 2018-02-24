@@ -4,6 +4,11 @@
 
 #include "MeshStorage.h"
 
+#define SHADER_LOCATION_VERT  0
+#define SHADER_LOCATION_NORM  1
+#define SHADER_LOCATION_COL   2
+#define SHADER_LOCATION_TEX   3
+
 using namespace mathernogl;
 
 bool MeshStorage::initialiseVAO()
@@ -66,13 +71,14 @@ bool MeshStorage::initVAOWithTexCoords(std::vector<int>* indicesPtr)
   buffer.copyDataFloat(bufferData);
   vao.init();
   vao.bind();
-  vao.linkBufferAsFloats(buffer, 0 * sizeof(float), 5 * sizeof(float), 3, 0, false);
-  vao.linkBufferAsFloats(buffer, 3 * sizeof(float), 5 * sizeof(float), 3, 1, false);
-  vao.linkBufferAsFloats(buffer, 6 * sizeof(float), 6 * sizeof(float), 2, 2, false);
+  vao.linkBufferAsFloats(buffer, 0 * sizeof(float), 5 * sizeof(float), 3, SHADER_LOCATION_VERT, false);
+  vao.linkBufferAsFloats(buffer, 3 * sizeof(float), 5 * sizeof(float), 3, SHADER_LOCATION_NORM, false);
+  vao.linkBufferAsFloats(buffer, 6 * sizeof(float), 6 * sizeof(float), 2, SHADER_LOCATION_TEX, false);
   vao.unbind();
   buffer.cleanUp();
   ASSERT_NO_GL_ERROR();
 
+  storingTexCoords = true;
   return glGetError() == GL_NO_ERROR;
   }
 
@@ -104,13 +110,14 @@ bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
   buffer.copyDataFloat(bufferData);
   vao.init();
   vao.bind();
-  vao.linkBufferAsFloats(buffer, 0 * sizeof(float), 6 * sizeof(float), 3, 0, false);
-  vao.linkBufferAsFloats(buffer, 3 * sizeof(float), 6 * sizeof(float), 3, 1, false);
-  vao.linkBufferAsFloats(buffer, 6 * sizeof(float), 6 * sizeof(float), 3, 2, false);
+  vao.linkBufferAsFloats(buffer, 0 * sizeof(float), 6 * sizeof(float), 3, SHADER_LOCATION_VERT, false);
+  vao.linkBufferAsFloats(buffer, 3 * sizeof(float), 6 * sizeof(float), 3, SHADER_LOCATION_NORM, false);
+  vao.linkBufferAsFloats(buffer, 6 * sizeof(float), 6 * sizeof(float), 3, SHADER_LOCATION_COL, false);
   vao.unbind();
   buffer.cleanUp();
   ASSERT_NO_GL_ERROR();
 
+  storingTexCoords = false;
   return glGetError() == GL_NO_ERROR;
   }
 
