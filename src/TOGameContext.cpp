@@ -245,7 +245,7 @@ void TOGameContext::rebuildCombatTowerNetworksMap()
 
     for (const TowerPtr& relayTower : *towers.getList())
       {
-      if (relayTower->getFunction() != Tower::relay)
+      if (relayTower->isUnderConstruction() || relayTower->getFunction() != Tower::relay)
         continue;
 
       if(isCombatTowerInRange(combatTower, relayTower))
