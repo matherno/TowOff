@@ -19,7 +19,6 @@ void RenderableMesh::initialise(RenderContext* renderContext)
 
 void RenderableMesh::cleanUp(RenderContext* renderContext)
   {
-  shaderProgram->cleanUp();
   }
 
 void RenderableMesh::render(RenderContext* renderContext)

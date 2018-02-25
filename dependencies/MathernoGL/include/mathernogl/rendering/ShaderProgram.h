@@ -37,6 +37,7 @@ public:
 	void enable() const;
 	void disable() const;
   bool hasUniformVariable(const std::string& name) const;
+  unsigned int getGLID() const { return glID; }
 
 private:
 	unsigned int createShader(GLuint glType, const std::string& shaderSrc);

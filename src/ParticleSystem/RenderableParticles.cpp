@@ -42,7 +42,6 @@ void RenderableParticles::initialise(RenderContext* renderContext)
 
 void RenderableParticles::cleanUp(RenderContext* renderContext)
   {
-  shaderProgram->cleanUp();
   }
 
 void RenderableParticles::render(RenderContext* renderContext)

@@ -18,6 +18,8 @@ int main()
   TOGameContext context;
   context.initialise();
 
+
+
   while(context.getRenderContext()->isWindowOpen())
     {
     context.startFrame();

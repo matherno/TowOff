@@ -51,9 +51,11 @@ void RenderableTerrain::render(RenderContext* renderContext)
   {
   renderContext->activateShaderProgram(shaderProgram);
   shaderProgram->setVarInt("inDrawStyle", DRAW_STYLE_VERT_COLOUR);
+  shaderProgram->setVarFloat("inAlpha", 1);
+  shaderProgram->setVarInt("inLightShaded", 1);
   meshStorage->getVAO().bind();
   setDepthTest(true);
-  setAlphaBlending(true);
+  setAlphaBlending(false);
   setFaceCulling(false);
   glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
   }

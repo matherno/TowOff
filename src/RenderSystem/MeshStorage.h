@@ -37,6 +37,7 @@ public:
   mathernogl::Vector3D getMax() const;
   void calculateMinMax();
   bool gotTexCoords() const { return storingTexCoords; }
+  uint getID() const { return id; }
 
 protected:
   bool initVAOWithTexCoords(std::vector<int>* indicesPtr);

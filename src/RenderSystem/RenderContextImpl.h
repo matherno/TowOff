@@ -5,6 +5,7 @@
 
 #include "RenderSystem.h"
 #include "TransformStack.h"
+#include "ResourceCache.h"
 
 #define SHADER_VAR_VERT_TO_WORLD "inVertToWorld"
 #define SHADER_VAR_WORLD_TO_CAMERA "inWorldToCamera"
@@ -29,6 +30,9 @@ private:
   uint nextTexBoundLocal = 1;
   Vector4D clipPlane = Vector4D(0);
   long startTime = mathernogl::getTimeMS();
+  uint boundShaderID = 0;
+  ResourceCache resourceCache;
+  int maxNumTextureLocations = 48;
 
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;

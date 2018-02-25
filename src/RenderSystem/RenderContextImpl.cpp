@@ -15,6 +15,7 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
     {
     window->setClearColour(0, 0, 0);
     renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
+    glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxNumTextureLocations);
     ASSERT_NO_GL_ERROR();
     return true;
     }
@@ -23,7 +24,19 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
 
 bool RenderContextImpl::cleanUp()
   {
-  //todo: cleanup all opengl objects
+  resourceCache.forEachShaderProgram([](ShaderProgramPtr shaderProgram)
+    {
+    shaderProgram->cleanUp();
+    });
+  resourceCache.forEachMeshStorage([](MeshStoragePtr meshStorage)
+    {
+    meshStorage->cleanUp();
+    });
+  resourceCache.forEachTexture([](TexturePtr texture)
+    {
+    texture->cleanUp();
+    });
+  resourceCache.clearAll();
   return true;
   }
 
@@ -48,6 +61,7 @@ void RenderContextImpl::render()
     {
     isRendering = true;
     transformStack.clear();
+    boundShaderID = 0;
     window->clear();
     pushTransform(renderableSet->getTransform());
     setClippingPlane(*renderableSet->getClippingPlane());
@@ -66,55 +80,72 @@ bool RenderContextImpl::isWindowOpen() const
 
 void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
   {
-  //todo: keep track of enabled shader and don't enable this if already enabled
-  //todo: keep state of whether or not each shader program has already been given these variables that frame (not for clipping uniforms)
-  shaderProgram->enable();
-
-  if (shaderProgram->hasUniformVariable(SHADER_VAR_WORLD_TO_CAMERA))
-    shaderProgram->setVarMat4(SHADER_VAR_WORLD_TO_CAMERA, worldToCameraTransform);
-  if (shaderProgram->hasUniformVariable(SHADER_VAR_CAMERA_TO_CLIP))
-    shaderProgram->setVarMat4(SHADER_VAR_CAMERA_TO_CLIP, cameraToClipTransform);
-  if (shaderProgram->hasUniformVariable(SHADER_VAR_VERT_TO_WORLD))
+  if (shaderProgram->getGLID() != boundShaderID)
     {
-    if (getStackedTransform())
-      shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, *getStackedTransform()->getTransformMatrix());
-    else
-      shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, Matrix4(1));
+    shaderProgram->enable();
+    boundShaderID = shaderProgram->getGLID();
     }
-  if (shaderProgram->hasUniformVariable(SHADER_VAR_SCREEN_SIZE))
-    shaderProgram->setVarVec2(SHADER_VAR_SCREEN_SIZE, getWindow()->getSize());
 
+  //todo: keep state of whether or not each shader program has already been given these variables that frame (not for clipping uniforms)
+
+  //  transform matrices
+  shaderProgram->setVarMat4(SHADER_VAR_WORLD_TO_CAMERA, worldToCameraTransform, true);
+  shaderProgram->setVarMat4(SHADER_VAR_CAMERA_TO_CLIP, cameraToClipTransform, true);
+  if (getStackedTransform())
+    shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, *getStackedTransform()->getTransformMatrix(), true);
+  else
+    shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, Matrix4(1), true);
+
+  //  clipping
   bool enableClipping = clipPlane.x != 0 || clipPlane.y != 0 || clipPlane.z != 0;
-  if (shaderProgram->hasUniformVariable(SHADER_VAR_CLIPPING_ENABLED))
-    shaderProgram->setVarInt(SHADER_VAR_CLIPPING_ENABLED, enableClipping ? 1 : 0);
-  if (enableClipping && shaderProgram->hasUniformVariable(SHADER_VAR_CLIP_PLANE))
-    shaderProgram->setVarVec4(SHADER_VAR_CLIP_PLANE, clipPlane);
+  shaderProgram->setVarInt(SHADER_VAR_CLIPPING_ENABLED, enableClipping ? 1 : 0, true);
+  if (enableClipping)
+    shaderProgram->setVarVec4(SHADER_VAR_CLIP_PLANE, clipPlane, true);
 
-  if (shaderProgram->hasUniformVariable(SHADER_VAR_TIME_MS))
-    shaderProgram->setVarInt(SHADER_VAR_TIME_MS, (int)(getTimeMS() - startTime));
-
-  //todo: put vert to world shader variable set in a more appropriate place
+  //  misc
+  shaderProgram->setVarVec2(SHADER_VAR_SCREEN_SIZE, getWindow()->getSize(), true);
+  shaderProgram->setVarInt(SHADER_VAR_TIME_MS, (int)(getTimeMS() - startTime), true);
 
   }
 
-ShaderProgramPtr RenderContextImpl::createShaderProgram(const std::vector<Shader>* shaders)
+void logCreateShaderProgram(ShaderProgramPtr shaderProgram, const std::vector<mathernogl::Shader>* shaders)
   {
-  //todo: cache all created shader programs, and ensure that duplicates aren't created
-  ShaderProgram* shaderProgram = new ShaderProgram();
-  shaderProgram->init(*shaders);
-  return ShaderProgramPtr(shaderProgram);
+  string msg = "Created shader program: " + std::to_string(shaderProgram->getGLID());
+  for (const mathernogl::Shader& shader : *shaders)
+    msg += ", '" + shader.filePath + "'";
+  logInfo(msg);
   }
 
+ShaderProgramPtr RenderContextImpl::createShaderProgram(const std::vector<mathernogl::Shader>* shaders)
+  {
+  if (ShaderProgramPtr cachedShaderProgram = resourceCache.getShaderProgram(shaders))
+    return cachedShaderProgram;
+
+  ShaderProgramPtr shaderProgram (new ShaderProgram());
+  shaderProgram->init(*shaders);
+  resourceCache.addShaderProgram(shaderProgram, shaders);
+  logCreateShaderProgram(shaderProgram, shaders);
+  return shaderProgram;
+  }
 MeshStoragePtr RenderContextImpl::createMeshStorage(const std::string& objFilePath)
   {
-  //todo: cache the mesh storages, ensuring no duplicates are loaded into memory
+  if (MeshStoragePtr cachedMeshStorage = resourceCache.getMeshStorage(objFilePath))
+    return cachedMeshStorage;
+
   MeshStoragePtr meshStorage(new MeshStorage(nextMeshStorageID++));
   loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords);
   meshStorage->calculateMinMax();
   if(meshStorage->initialiseVAO())
+    {
+    resourceCache.addMeshStorage(meshStorage, objFilePath);
+    logInfo("Created mesh storage: " + std::to_string(meshStorage->getID()) + ", '" + objFilePath + "'");
     return meshStorage;
+    }
   else
+    {
+    logWarning("Failed to create mesh storage!: " + std::to_string(meshStorage->getID()) + ", '" + objFilePath + "'");
     return nullptr;
+    }
   }
 
 MeshStoragePtr RenderContextImpl::createEmptyMeshStorage()
@@ -159,8 +190,13 @@ const Matrix4* RenderContextImpl::getCameraToClip() const
 
 TexturePtr RenderContextImpl::createTexture(const string& imageFilePath)
   {
-  //todo: cache these
-  return TexturePtr(createTextureFromFile(imageFilePath, false));
+  if (TexturePtr texture = resourceCache.getTexture(imageFilePath))
+    return texture;
+
+  TexturePtr texture = TexturePtr(createTextureFromFile(imageFilePath, false));
+  resourceCache.addTexture(texture, imageFilePath);
+  logInfo("Created texture: " + std::to_string(texture->glTexID) + ", '" + imageFilePath + "'");
+  return texture;
   }
 
 uint RenderContextImpl::bindTexture(TexturePtr texture)
@@ -172,6 +208,12 @@ uint RenderContextImpl::bindTexture(TexturePtr texture)
     }
   else
     {
+    if (nextTexBoundLocal >= maxNumTextureLocations)
+      {
+      logWarning("Ran out of texture bound locations! Max: " + std::to_string(maxNumTextureLocations));
+      nextTexBoundLocal = 1;
+      }
+
     //  nextTexBoundLocal is initialised to 1, and active texture reset back to 0 after binding,
     //      then external texture bindings don't mess things up
     glBindLocation = nextTexBoundLocal++;
@@ -179,7 +221,6 @@ uint RenderContextImpl::bindTexture(TexturePtr texture)
     glBindTexture(texture->glTexType, texture->glTexID);
     texIDsToBoundLocals[texture->glTexID] = glBindLocation;
     glActiveTexture(GL_TEXTURE0);
-    //todo do something clever for when we run out of texture bound locations
     }
   return glBindLocation;
   }
@@ -213,4 +254,3 @@ bool RenderContextImpl::isClippingEnabled()
   {
   return (clipPlane.x != 0 || clipPlane.y != 0 || clipPlane.z != 0);
   }
-
