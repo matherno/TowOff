@@ -9,6 +9,7 @@ GameContextImpl::GameContextImpl()
   renderConfig.windowName = "Testing";
   renderConfig.windowWidth = 1800;
   renderConfig.windowHeight = 900;
+  renderConfig.antiAliasing = true;
   }
 
 bool GameContextImpl::initialise()

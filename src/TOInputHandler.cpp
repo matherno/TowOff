@@ -97,16 +97,14 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
-  HUDHandler* hudHandler = toGameContext->getHUDHandler();
-
   if (gameContext->getBoundingBoxManager()->boundingBoxPicked())
     {
     uint pickedTowerID = (uint)gameContext->getBoundingBoxManager()->getPickedBoundingBoxMeta();
-    hudHandler->setTowerFocused(toGameContext->getTower(pickedTowerID));
+    toGameContext->focusTower(pickedTowerID);
     return true;
     }
 
-  hudHandler->setTowerFocused(nullptr);
+  toGameContext->unfocusTower();
   return false;
   }
 

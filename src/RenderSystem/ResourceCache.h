@@ -1,7 +1,7 @@
 #pragma once
 
 #include <set>
-#include <dependencies/RaySplay/include/Shader.h>
+#include <Shader.h>
 #include "RenderSystem.h"
 
 /*

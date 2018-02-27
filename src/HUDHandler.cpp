@@ -25,39 +25,34 @@ void HUDHandler::initialiseUI(GameContext* context)
 
 void HUDHandler::updateUI(GameContext* context)
   {
-  if (TowerPtr tower = focusedTower.lock())
+  TOGameContext* toGameContext = TOGameContext::cast(context);
+  if (TowerPtr focusedTower = toGameContext->getFocusedTower())
     {
-    const TowerType* type = TowerFactory::getTowerType(tower->getTowerType());
-    if (newFocusedTower)
+    if (!activeHUDTower || activeHUDTower->getID() != focusedTower->getID())
       {
+      const TowerType* type = TowerFactory::getTowerType(focusedTower->getTowerType());
+      activeHUDTower = focusedTower;
       towerFocusPanel->setVisible(true, true);
       towerIcon->setBackgroundTexture(context->getRenderContext()->createTexture(type->iconFilePath));
       towerIcon->invalidate();
-      newFocusedTower = false;
       }
 
     //  update health bar
-    UIProgressBar::updateProgressBar(towerHealthBar.get(), tower->getHealthPoints(), tower->getMaxHealthPoints());
+    UIProgressBar::updateProgressBar(towerHealthBar.get(), focusedTower->getHealthPoints(), focusedTower->getMaxHealthPoints());
 
     //  update energy bar
-    UIProgressBar::updateProgressBar(towerEnergyBar.get(), tower->getStoredEnergy(), tower->getMaxEnergy());
+    UIProgressBar::updateProgressBar(towerEnergyBar.get(), focusedTower->getStoredEnergy(), focusedTower->getMaxEnergy());
     }
   else
     {
     towerFocusPanel->setVisible(false, true);
-    focusedTower.reset();
+    activeHUDTower.reset();
     }
   }
 
 void HUDHandler::deselectTowerType()
   {
   towerButtonGroup->forceDeselectAll();
-  }
-
-void HUDHandler::setTowerFocused(TowerPtr tower)
-  {
-  focusedTower = tower;
-  newFocusedTower = true;
   }
 
 void HUDHandler::setupTowerFocusPanel(GameContext* context)
@@ -159,6 +154,8 @@ void HUDHandler::endTowerPlacingMode(GameContext* gameContext)
 
 void HUDHandler::startTowerPlacingMode(GameContext* gameContext, uint towerTypeID)
   {
+  TOGameContext::cast(gameContext)->unfocusTower();
+
   if (placementHandler)
     {
     gameContext->removeInputHandler(placementHandler);

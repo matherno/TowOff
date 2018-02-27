@@ -1,6 +1,6 @@
 #pragma once
 
-#include <src/RenderSystem/RenderableLines.h>
+#include <RenderSystem/RenderableLines.h>
 #include "Tower.h"
 
 /*
@@ -31,8 +31,6 @@ private:
   mathernogl::MappedList<NetworkPtr> networks;
   std::shared_ptr<RenderableLines> beamsRenderable;
   std::map<std::pair<uint, uint>, uint> connectionBeamIDs;
-  std::list<std::pair<uint, uint>> beamsToCreate;
-  std::list<std::pair<uint, uint>> beamsToRemove;
 
 public:
   ConnectionManager(uint id);
@@ -55,7 +53,5 @@ public:
 protected:
   void addConnection(ConnectionNodePtr nodeA, ConnectionNodePtr nodeB);
   void removeConnection(ConnectionNodePtr nodeA, ConnectionNodePtr nodeB);
-  void addPendingRenderables(RenderContext* renderContext);
-  void removePendingRenderables(RenderContext* renderContext);
 
   };

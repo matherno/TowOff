@@ -1,7 +1,7 @@
 #pragma once
 
-#include <src/GameSystem/GameSystem.h>
-#include <src/GameSystem/Timer.h>
+#include <GameSystem/GameSystem.h>
+#include <GameSystem/Timer.h>
 #include "Tower.h"
 
 /*

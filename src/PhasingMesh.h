@@ -1,6 +1,6 @@
 #pragma once
 
-#include <src/RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableMesh.h>
 
 /*
 *   

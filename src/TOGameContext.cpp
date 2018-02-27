@@ -27,6 +27,8 @@ bool TOGameContext::initialise()
   hudHandler.initialiseUI(this);
   connectionManager.reset(new ConnectionManager(getNextActorID()));
   addActor(connectionManager);
+  rangeFieldManager.reset(new RangeFieldManager(getNextActorID()));
+  addActor(rangeFieldManager);
   return success;
   }
 
@@ -37,6 +39,7 @@ void TOGameContext::cleanUp()
     getRenderContext()->getRenderableSet()->removeRenderable(surfaceMesh->getID());
     surfaceMesh->cleanUp(getRenderContext());
     removeActor(connectionManager->getID());
+    removeActor(rangeFieldManager->getID());
     }
   GameContextImpl::cleanUp();
   }
@@ -103,6 +106,9 @@ TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower, bool onlyEnemies)
 
 void TOGameContext::removeTower(uint id)
   {
+  if (focusedTower && focusedTower->getID() == id)
+    unfocusTower();
+
   TowerPtr tower = getTower(id);
   towers.remove(id);
   removeActor(id);
@@ -350,3 +356,61 @@ const std::set<uint>* TOGameContext::combatTowerGetNetworksInRange(uint towerID)
     }
   return nullptr;
   }
+
+void TOGameContext::displayTowerRangeField(Tower* tower)
+  {
+  float radius = TowerFactory::getTowerRange(tower->getTowerType());
+  if (radius > 0)
+    {
+    hideTowerRangeField(tower);
+    towerRangeFields[tower->getID()] = rangeFieldManager->createRangeField(tower->getPosition() + Vector3D(0, 0.02, 0), radius, Vector3D(0.1, 0.5, 0.5));
+    }
+  }
+
+void TOGameContext::hideTowerRangeField(Tower* tower)
+  {
+  if (towerRangeFields.count(tower->getID()) > 0)
+    {
+    rangeFieldManager->removeRangeField(towerRangeFields[tower->getID()]);
+    towerRangeFields.erase(tower->getID());
+    }
+  }
+
+void TOGameContext::displayAllRangeFields()
+  {
+  for (TowerPtr tower : *towers.getList())
+    {
+    if (!tower->isUnderConstruction())
+      displayTowerRangeField(tower.get());
+    }
+  }
+
+void TOGameContext::hideAllRangeFields()
+  {
+  for (auto pair : towerRangeFields)
+    rangeFieldManager->removeRangeField(pair.second);
+  towerRangeFields.clear();
+  }
+
+void TOGameContext::focusTower(TowerPtr tower)
+  {
+  unfocusTower();
+  displayTowerRangeField(tower.get());
+  focusedTower = tower;
+  }
+
+void TOGameContext::focusTower(uint towerID)
+  {
+  if (TowerPtr tower = getTower(towerID))
+    focusTower(tower);
+  }
+
+void TOGameContext::unfocusTower()
+  {
+  if (focusedTower)
+    {
+    hideTowerRangeField(focusedTower.get());
+    focusedTower = nullptr;
+    }
+  }
+

@@ -1,8 +1,8 @@
 #pragma once
 
 #include <UISystem/UIPanel.h>
-#include <src/UISystem/UIProgressBar.h>
-#include <src/UISystem/UIButton.h>
+#include <UISystem/UIProgressBar.h>
+#include <UISystem/UIButton.h>
 #include "Tower.h"
 #include "TowerPlacementHandler.h"
 
@@ -19,15 +19,13 @@ private:
   std::shared_ptr<UIProgressBar> towerHealthBar;
   std::shared_ptr<UIProgressBar> towerEnergyBar;
   UIToggleButtonGroupPtr towerButtonGroup;
-  std::weak_ptr<Tower> focusedTower;
-  bool newFocusedTower = false;
+  TowerPtr activeHUDTower;
   std::shared_ptr<TowerPlacementHandler> placementHandler;
 
 public:
   void initialiseUI(GameContext* context);
   void updateUI(GameContext* context);
   void deselectTowerType();
-  void setTowerFocused(TowerPtr tower);
 
 protected:
   void setupTowerFocusPanel(GameContext* context);

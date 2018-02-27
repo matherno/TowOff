@@ -2,7 +2,7 @@
 // Created by matt on 1/02/18.
 //
 
-#include <src/RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableMesh.h>
 #include "ConnectionManager.h"
 #include "Resources.h"
 #include "TimeToLiveActor.h"
@@ -21,8 +21,6 @@ void ConnectionManager::onAttached(GameContext* gameContext)
 
 void ConnectionManager::onUpdate(GameContext* gameContext)
   {
-  addPendingRenderables(gameContext->getRenderContext());
-  removePendingRenderables(gameContext->getRenderContext());
   }
 
 void ConnectionManager::onDetached(GameContext* gameContext)
@@ -131,60 +129,46 @@ bool ConnectionManager::areTowerFunctionsCompatible(Tower::TowerFunction towerAF
 
 void ConnectionManager::addConnection(ConnectionNodePtr nodeA, ConnectionNodePtr nodeB)
   {
-  nodeA->connections.add(nodeB, nodeB->tower->getID());
-  nodeB->connections.add(nodeA, nodeA->tower->getID());
-  beamsToCreate.emplace_back(nodeA->tower->getID(), nodeB->tower->getID());
+  uint towerAID = nodeA->tower->getID();
+  uint towerBID = nodeB->tower->getID();
+  nodeA->connections.add(nodeB, towerBID);
+  nodeB->connections.add(nodeA, towerAID);
+
+  TowerPtr firstTower = nodeA->tower;
+  TowerPtr secondTower = nodeB->tower;
+  Vector3D start = firstTower->getConnectPosition();
+  Vector3D end = secondTower->getConnectPosition();
+  Vector3D colour(0.2, 0.2, 0.7);
+  if (firstTower->getFunction() == Tower::relay && secondTower->getFunction() == Tower::relay)
+    colour.set(0, 0.1, 0.6);
+  if (firstTower->isUnderConstruction() || secondTower->isUnderConstruction())
+    colour.set(0.4, 0.4, 0.1);
+
+  connectionBeamIDs[std::make_pair(towerAID, towerBID)] = beamsRenderable->addLine(start, end, colour, 0.8);
   }
 
 void ConnectionManager::removeConnection(ConnectionNodePtr nodeA, ConnectionNodePtr nodeB)
   {
-  nodeA->connections.remove(nodeB->tower->getID());
-  nodeB->connections.remove(nodeA->tower->getID());
-  beamsToRemove.emplace_back(nodeA->tower->getID(), nodeB->tower->getID());
-  }
+  uint towerAID = nodeA->tower->getID();
+  uint towerBID = nodeB->tower->getID();
+  nodeA->connections.remove(towerBID);
+  nodeB->connections.remove(towerAID);
 
-void ConnectionManager::addPendingRenderables(RenderContext* renderContext)
-  {
-  for (std::pair<uint, uint>& nodePair : beamsToCreate)
+  std::pair<uint, uint> nodePair(towerAID, towerBID);
+  if (connectionBeamIDs.count(nodePair) > 0)
     {
-    if (connectionBeamIDs.count(nodePair) > 0)
-      continue;
-
-    TowerPtr firstTower = nodes.get(nodePair.first)->tower;
-    TowerPtr secondTower = nodes.get(nodePair.second)->tower;
-    Vector3D start = firstTower->getConnectPosition();
-    Vector3D end = secondTower->getConnectPosition();
-    Vector3D colour(0.2, 0.2, 0.7);
-    if (firstTower->getFunction() == Tower::relay && secondTower->getFunction() == Tower::relay)
-      colour.set(0, 0.1, 0.6);
-    if (firstTower->isUnderConstruction() || secondTower->isUnderConstruction())
-      colour.set(0.4, 0.4, 0.1);
-
-    connectionBeamIDs[nodePair] = beamsRenderable->addLine(start, end, colour, 0.8);
+    uint lineID = connectionBeamIDs[nodePair];
+    beamsRenderable->removeLine(lineID);
     }
-  beamsToCreate.clear();
-  }
-
-void ConnectionManager::removePendingRenderables(RenderContext* renderContext)
-  {
-  for (std::pair<uint, uint>& nodePair : beamsToRemove)
+  else
     {
+    nodePair = std::make_pair(towerBID, towerAID);
     if (connectionBeamIDs.count(nodePair) > 0)
       {
       uint lineID = connectionBeamIDs[nodePair];
       beamsRenderable->removeLine(lineID);
       }
-    else
-      {
-      std::pair<uint, uint> nodePairReverse = std::make_pair(nodePair.second, nodePair.first);
-      if (connectionBeamIDs.count(nodePairReverse) > 0)
-        {
-        uint lineID = connectionBeamIDs[nodePairReverse];
-        beamsRenderable->removeLine(lineID);
-        }
-      }
     }
-  beamsToRemove.clear();
   }
 
 const Network* ConnectionManager::getTowersNetwork(uint towerID) const

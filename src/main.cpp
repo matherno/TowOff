@@ -7,6 +7,7 @@
 #include <ParticleSystem/RenderableParticles.h>
 #include <ParticleSystem/ParticleSystem.h>
 #include <UISystem/UIPanel.h>
+#include <RenderSystem/RenderableLineStrips.h>
 #include "TestActor.h"
 #include "TestInputHandler.h"
 #include "TOInputHandler.h"
@@ -17,8 +18,6 @@ int main()
   {
   TOGameContext context;
   context.initialise();
-
-
 
   while(context.getRenderContext()->isWindowOpen())
     {

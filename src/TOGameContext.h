@@ -6,13 +6,14 @@ class TOGameContext;
 #include <GameSystem/GameContextImpl.h>
 #include <ParticleSystem/ParticleSystem.h>
 #include <RenderSystem/RenderableTerrain.h>
-#include <src/GameSystem/Timer.h>
+#include <GameSystem/Timer.h>
 #include "Tower.h"
 #include "Player.h"
 #include "Projectile.h"
 #include "TOInputHandler.h"
 #include "HUDHandler.h"
 #include "ConnectionManager.h"
+#include "RangeFieldManager.h"
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
@@ -27,12 +28,17 @@ private:
   ParticleSystemPtr towerDamageParticles;
   HUDHandler hudHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
+  std::shared_ptr<RangeFieldManager> rangeFieldManager;
+  TowerPtr focusedTower = nullptr;
 
   //  maps combat towers to the networks (via relay towers) that they are within range of
   std::map<uint, std::set<uint>> combatTowerNetworks;
 
   //  maps tower ids to a list of their bounding box ids
   std::map<uint, std::list<uint>> towerBoundingBoxes;
+
+  //  maps tower ids to their displayed range field
+  std::map<uint, uint> towerRangeFields;
 
 public:
   virtual bool initialise() override;
@@ -71,6 +77,16 @@ public:
   void doTowerDamageEffect(const Tower* tower);
   Vector3D terrainHitTest(uint cursorX, uint cursorY, bool* isLand = nullptr) const;
   bool isPositionLand(const Vector3D& position) const;
+
+  void displayTowerRangeField(Tower* tower);
+  void hideTowerRangeField(Tower* tower);
+  void displayAllRangeFields();
+  void hideAllRangeFields();
+
+  void focusTower(TowerPtr tower);
+  void focusTower(uint towerID);
+  void unfocusTower();
+  TowerPtr getFocusedTower() { return focusedTower; }
 
   inline static TOGameContext* cast(GameContext* context)
     {

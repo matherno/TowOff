@@ -1,7 +1,8 @@
 #pragma once
 
-#include <src/GameSystem/GameSystem.h>
-#include <src/RenderSystem/RenderableLines.h>
+#include <GameSystem/GameSystem.h>
+#include <RenderSystem/RenderableLines.h>
+#include "RangeFieldManager.h"
 
 /*
 *   
@@ -13,13 +14,14 @@ private:
   const uint towerTypeID;
   RenderableSetPtr towerHighlight;
   std::shared_ptr<RenderableLines> towerConnectionHighlights;
+  std::shared_ptr<RenderableLineStrips> towerRangeHighlight;
   Vector3D towerHighlightPos;
   bool isPositionValid = false;
   CallbackFunc endHandlerCallback;
   Vector3D highlightColourValid = Vector3D(0.1, 0.5, 0.1);
   Vector3D highlightColourInvalid = Vector3D(0.5, 0.1, 0.1);
-  Vector3D connectionColour = Vector3D(0.5);
-  float connectionColourAlpha = 0.5f;
+  Vector3D previewColour = Vector3D(0.5);
+  float previewColourAlpha = 0.5f;
 
 public:
   TowerPlacementHandler(uint id, uint towerTypeID);
@@ -35,4 +37,5 @@ private:
 
   void setupHighlightColour ();
   void setupConnectionHighlights (GameContext* gameContext);
+  void setupRangeHighlight (GameContext* gameContext);
   };

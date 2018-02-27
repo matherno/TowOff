@@ -155,6 +155,14 @@ TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& posi
   return tower;
   }
 
+float TowerFactory::getTowerRange(uint towerType)
+  {
+  if (getTowerFunction(towerType) == Tower::relay)
+    return getRelayPowerRange(towerType);
+  // else if combat, return combat range...
+  return 0;
+  }
+
 float TowerFactory::getRelayPowerRange(uint towerType)
   {
   switch (towerType)

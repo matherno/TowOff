@@ -1,6 +1,6 @@
 #pragma once
 
-#include <src/RenderSystem/RenderSystem.h>
+#include <RenderSystem/RenderSystem.h>
 #include "Tower.h"
 
 /*
@@ -22,6 +22,7 @@ class TowerFactory
 public:
   static const std::map<uint, TowerType>* getTowerTypeMap();
   static const TowerType* getTowerType(uint towerType);
+  static float getTowerRange(uint towerType);
   static float getRelayPowerRange(uint towerType);
   static Tower::TowerFunction getTowerFunction(uint towerType);
 

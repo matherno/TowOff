@@ -2,9 +2,9 @@
 // Created by matt on 16/02/18.
 //
 
-#include <src/RenderSystem/RenderableMesh.h>
-#include <src/RenderSystem/RenderableSetImpl.h>
-#include <src/GameSystem/InputCodes.h>
+#include <RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableSetImpl.h>
+#include <GameSystem/InputCodes.h>
 #include "TowerPlacementHandler.h"
 #include "TowerFactory.h"
 #include "TOGameContext.h"
@@ -40,8 +40,15 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
   towerConnectionHighlights->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(towerConnectionHighlights);
 
+  towerRangeHighlight.reset(new RenderableLineStrips(renderContext->getNextRenderableID()));
+  towerRangeHighlight->initialise(renderContext);
+  towerRangeHighlight->setLineWidth(3);
+  renderContext->getRenderableSet()->addRenderable(towerRangeHighlight);
+
   towerHighlightPos.set(0, 0, 0);
   setupHighlightColour();
+  setupRangeHighlight(gameContext);
+  TOGameContext::cast(gameContext)->displayAllRangeFields();
   }
 
 void TowerPlacementHandler::onDetached(GameContext* gameContext)
@@ -55,8 +62,11 @@ void TowerPlacementHandler::onDetached(GameContext* gameContext)
   renderContext->getRenderableSet()->removeRenderable(towerHighlight->getID());
   towerHighlight->cleanUp(renderContext);
 
+  TOGameContext::cast(gameContext)->hideAllRangeFields();
   renderContext->getRenderableSet()->removeRenderable(towerConnectionHighlights->getID());
   towerConnectionHighlights->cleanUp(renderContext);
+  renderContext->getRenderableSet()->removeRenderable(towerRangeHighlight->getID());
+  towerRangeHighlight->cleanUp(renderContext);
   }
 
 bool TowerPlacementHandler::onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
@@ -77,8 +87,16 @@ bool TowerPlacementHandler::onMouseReleased(GameContext* gameContext, uint butto
       else
         tower->setPlayerNum(1);
 
-      if (!gameContext->getInputManager()->isKeyDown(KEY_LCTRL) && endHandlerCallback)
-        endHandlerCallback();
+      if (!gameContext->getInputManager()->isKeyDown(KEY_LCTRL))
+        {
+        if (endHandlerCallback)
+          endHandlerCallback();
+        }
+      else
+        {
+        //  placing another tower
+        toGameContext->displayAllRangeFields();
+        }
       }
     }
   else if (button == MOUSE_RIGHT)
@@ -99,6 +117,7 @@ bool TowerPlacementHandler::onMouseMove(GameContext* gameContext, uint mouseX, u
     setupHighlightColour();
     }
   setupConnectionHighlights(gameContext);
+  setupRangeHighlight(gameContext);
   return true;
   }
 
@@ -139,9 +158,24 @@ void TowerPlacementHandler::setupConnectionHighlights(GameContext* gameContext)
       continue;
     if (!ConnectionManager::areTowerFunctionsCompatible(tower->getFunction(), towerHighlightFunction))
       continue;
-    towerConnectionHighlights->addLine(towerHighlightConnectPos, tower->getConnectPosition(), connectionColour, connectionColourAlpha);
+    towerConnectionHighlights->addLine(towerHighlightConnectPos, tower->getConnectPosition(), previewColour, previewColourAlpha);
     }
 
   towerConnectionHighlights->enableRebuild();
   towerConnectionHighlights->rebuildBuffer();
+  }
+
+void TowerPlacementHandler::setupRangeHighlight(GameContext* gameContext)
+  {
+  towerRangeHighlight->disableRebuild();
+  towerRangeHighlight->clearLineStrips();
+
+  towerRangeHighlight->startLineStrip(previewColour, previewColourAlpha);
+  float radius = TowerFactory::getTowerRange(towerTypeID);
+  if (radius > 0)
+    towerRangeHighlight->addXZPlaneCircle(towerHighlightPos + Vector3D(0, 0.02, 0), radius, 60);
+  towerRangeHighlight->finishLineStrip();
+
+  towerRangeHighlight->enableRebuild();
+  towerRangeHighlight->rebuildBuffer();
   }
