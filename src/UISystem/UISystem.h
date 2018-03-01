@@ -35,6 +35,8 @@ public:
   virtual void invalidate() = 0;
   virtual void setOffset(const Vector2D& offset) = 0;
   virtual void setSize(const Vector2D& size) = 0;
+  virtual Vector2D getOffset() const = 0;
+  virtual Vector2D getSize() const = 0;
   virtual void setWidthMatchParent(bool match) = 0;
   virtual void setHeightMatchParent(bool match) = 0;
   virtual void setHorizontalAlignment(Alignment alignment) = 0;
@@ -42,6 +44,7 @@ public:
   virtual void addChild(UIComponentPtr component) = 0;
   virtual void removeChild(uint id) = 0;
   virtual void setVisible(bool visible, bool recurseChildren = false) = 0;
+  virtual bool isVisible() const = 0;
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) = 0;
   virtual void setMouseClickCallback(OnMouseClickCallback func) = 0;

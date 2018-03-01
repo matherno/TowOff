@@ -12,9 +12,14 @@ private:
   ShaderProgramPtr shaderProgram;
   mathernogl::VertexArray vao;
   mathernogl::GPUBufferStatic vertBuffer;
+  mathernogl::GPUBufferStatic texCoordBuffer;
   Vector3D colour;
   TexturePtr texture;
+  bool alphaTexture = false;
   bool visible = true;
+  Vector2D texCoordBL = Vector2D(0, 0);
+  Vector2D texCoordTR = Vector2D(1, 1);
+  bool initialised = false;
 
 public:
   UIRenderable(uint id);
@@ -25,6 +30,11 @@ public:
 
   void setVisible(bool visible){ this->visible = visible; }
   void refresh(const Vector2D& position, const Vector2D& size);
-  void setColour(const Vector3D& colour){ this->colour = colour; };
-  void setTexture(TexturePtr texture){ this->texture = texture; };
+  void setColour(const Vector3D& colour){ this->colour = colour; }
+  //  alpha texture means that it uses the assigned single colour and the textures alpha value for the final RGBA of the UI quad
+  void setTexture(TexturePtr texture, bool alphaTexture){ this->texture = texture; this->alphaTexture = alphaTexture; }
+  void setTextureCoords(const Vector2D& bottomLeft, const Vector2D& topRight);
+
+protected:
+  void refreshTexCoords();
   };

@@ -135,6 +135,7 @@ public:
   virtual const RenderContext* getRenderContext() const = 0;
   virtual const UIManager* getUIManager() const = 0;
   virtual const BoundingBoxManager* getBoundingBoxManager() const = 0;
+  virtual FontPtr getDefaultFont() = 0;
   virtual Vector3D getCursorWorldPos(uint cursorX, uint cursorY) const = 0;
   virtual Vector3D clipToWorldTransform(const Vector3D& clipSpacePos) const = 0;
   virtual Vector3D getViewDirection() const = 0;

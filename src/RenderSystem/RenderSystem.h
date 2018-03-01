@@ -5,6 +5,7 @@
 
 #include <mathernogl/MathernoGL.h>
 #include "MeshStorage.h"
+#include "Font.h"
 
 typedef mathernogl::Matrix4 Matrix4;
 typedef mathernogl::Vector4D Vector4D;
@@ -95,6 +96,7 @@ public:
   virtual MeshStoragePtr createEmptyMeshStorage() = 0;
   virtual TexturePtr createTexture(const string& imageFilePath) = 0;
   virtual RenderableSetPtr createRenderableSet() = 0;
+  virtual FontPtr createFont(const string& fntFilePath, const string& glyphsFilePath) = 0;
   virtual void pushTransform(const Transform* transform) = 0;
   virtual void popTransform() = 0;
   virtual const Transform* getStackedTransform() = 0;

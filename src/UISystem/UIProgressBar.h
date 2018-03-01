@@ -24,5 +24,6 @@ public:
   virtual void refresh(GameContext* context, const Vector2D& parentPos, const Vector2D& parentSize) override;
 
   //  changes bar value and calls invalidate, only if bar value is different to current
-  static void updateProgressBar(UIProgressBar* bar, double value, double max);
+  //  returns true if bar progress was changed
+  static bool updateProgressBar(UIProgressBar* bar, double value, double max);
   };

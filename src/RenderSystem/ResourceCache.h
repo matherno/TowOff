@@ -17,6 +17,7 @@ private:
 
   std::map<string, MeshStoragePtr> meshStorages;
   std::map<string, TexturePtr> textures;
+  std::map<string, mathernogl::FontDefinitionPtr> fontDefinitions;
 
 public:
   ShaderProgramPtr getShaderProgram(const std::vector<mathernogl::Shader>* shaders);
@@ -30,6 +31,9 @@ public:
   TexturePtr getTexture(const string& imageFilePath);
   void addTexture(TexturePtr texture, const string& imageFilePath);
   void forEachTexture(std::function<void(TexturePtr texture)> func);
+
+  mathernogl::FontDefinitionPtr getFontDefinition(const string& fntFilePath);
+  void addFontDefinition(mathernogl::FontDefinitionPtr fontDef, const string& fntFilePath);
 
   void clearAll();
   };

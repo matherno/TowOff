@@ -47,6 +47,8 @@ public:
   virtual void processUpdateStage() override;
   virtual void processDrawStage() override;
 
+  virtual FontPtr getDefaultFont() override;
+
   Player* getPlayer(uint num);
   Player* createPlayer();
   int numPlayers() const { return (int)players.size(); }

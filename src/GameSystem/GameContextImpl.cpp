@@ -195,6 +195,11 @@ Vector3D GameContextImpl::clipToWorldTransform(const Vector3D& clipSpacePos) con
   return clipSpacePos * matrixInverse(*getRenderContext()->getCameraToClip()) * matrixInverse(*getRenderContext()->getWorldToCamera());
   }
 
+FontPtr GameContextImpl::getDefaultFont()
+  {
+  return nullptr;
+  }
+
 bool BBInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
   gameContext->getBoundingBoxManager()->performMousePicking(gameContext, mouseX, mouseY);

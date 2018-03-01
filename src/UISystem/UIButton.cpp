@@ -22,7 +22,7 @@ void UIButton::refresh(GameContext* context, const Vector2D& parentPos, const Ve
   buttonImageComponent->setHeightMatchParent(true);
   buttonImageComponent->setWidthMatchParent(true);
   buttonImageComponent->setPadding(highlightWidth, highlightWidth);
-  buttonImageComponent->setBackgroundTexture(buttonTexture);
+  buttonImageComponent->setTexture(buttonTexture);
   buttonImageComponent->setMouseClickCallback([this](uint mouseX, uint mouseY)
                                                 {
                                                 return onButtonClick(mouseX, mouseY);
@@ -77,7 +77,7 @@ void UIButton::setButtonHighlightColour(const Vector3D& pressedColour, const Vec
   {
   this->pressedColour = pressedColour;
   this->unpressedColour = unpressedColour;
-  setBackgroundColour(pressed ? pressedColour : unpressedColour);
+  setColour(pressed ? pressedColour : unpressedColour);
   invalidate();
   }
 

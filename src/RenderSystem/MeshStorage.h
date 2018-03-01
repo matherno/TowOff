@@ -5,9 +5,9 @@
 
 #include <mathernogl/MathernoGL.h>
 
-#define DRAW_STYLE_SINGLE_COLOUR 1
-#define DRAW_STYLE_TEXTURE       2
-#define DRAW_STYLE_VERT_COLOUR   3
+#define MESH_DRAW_STYLE_SINGLE_COLOUR 1
+#define MESH_DRAW_STYLE_TEXTURE       2
+#define MESH_DRAW_STYLE_VERT_COLOUR   3
 
 class MeshStorage
   {

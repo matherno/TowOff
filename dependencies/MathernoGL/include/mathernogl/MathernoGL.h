@@ -28,6 +28,7 @@
 #include <mathernogl/utils/MeshUtils.h>
 #include <mathernogl/utils/MappedList.h>
 #include <mathernogl/utils/Misc.h>
+#include <mathernogl/utils/FontImporter.h>
 
 #include <mathernogl/maths/Maths.h>
 

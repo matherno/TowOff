@@ -60,6 +60,19 @@ void ResourceCache::addTexture(TexturePtr texture, const string& imageFilePath)
   textures[imageFilePath] = texture;
   }
 
+mathernogl::FontDefinitionPtr ResourceCache::getFontDefinition(const string& fntFilePath)
+  {
+  if (fontDefinitions.count(fntFilePath) > 0)
+    return fontDefinitions[fntFilePath];
+  return nullptr;
+  }
+
+void ResourceCache::addFontDefinition(mathernogl::FontDefinitionPtr fontDef, const string& fntFilePath)
+  {
+  fontDefinitions[fntFilePath] = fontDef;
+  }
+
+
 void ResourceCache::forEachShaderProgram(std::function<void(ShaderProgramPtr shaderProgram)> func)
   {
   for (ShaderProgramAndFiles& pair : shaderPrograms)
@@ -83,4 +96,5 @@ void ResourceCache::clearAll()
   shaderPrograms.clear();
   meshStorages.clear();
   textures.clear();
+  fontDefinitions.clear();
   }

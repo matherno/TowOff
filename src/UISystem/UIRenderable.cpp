@@ -6,6 +6,10 @@
 
 using namespace mathernogl;
 
+#define UI_DRAW_STYLE_SINGLE_COLOUR  1
+#define UI_DRAW_STYLE_TEXTURE        2
+#define UI_DRAW_STYLE_ALPHA_TEXTURE  3
+
 UIRenderable::UIRenderable(uint id) : Renderable(id)
   {}
 
@@ -19,19 +23,19 @@ void UIRenderable::initialise(RenderContext* renderContext)
   vao.bind();
   vao.linkBufferAsFloats(vertBuffer, 2, 0, false);
 
-  mathernogl::GPUBufferStatic texCoordBuffer;
   texCoordBuffer.init();
-  texCoordBuffer.copyDataFloat({ 0,1, 1,1, 1,0, 0,1, 0,0, 1,0});
+  refreshTexCoords();
   vao.linkBufferAsFloats(texCoordBuffer, 2, 1, false);
   vao.unbind();
-  texCoordBuffer.cleanUp();
+
+  initialised = true;
   }
 
 void UIRenderable::cleanUp(RenderContext* renderContext)
   {
   vao.cleanUp();
   vertBuffer.cleanUp();
-  shaderProgram->cleanUp();
+  texCoordBuffer.cleanUp();
   }
 
 void UIRenderable::render(RenderContext* renderContext)
@@ -45,16 +49,14 @@ void UIRenderable::render(RenderContext* renderContext)
   setFaceCulling(false);
   setDepthTest(true);
   setAlphaBlending(true);
+  shaderProgram->setVarVec3("inColour", colour);
   if (texture)
     {
-    shaderProgram->setVarInt("inUseSolidColour", 0);
+    shaderProgram->setVarInt("inDrawStyle", alphaTexture ? UI_DRAW_STYLE_ALPHA_TEXTURE : UI_DRAW_STYLE_TEXTURE);
     shaderProgram->setVarInt("inTexture", renderContext->bindTexture(texture));
     }
   else
-    {
-    shaderProgram->setVarInt("inUseSolidColour", 1);
-    shaderProgram->setVarVec3("inColour", colour);
-    }
+    shaderProgram->setVarInt("inDrawStyle", UI_DRAW_STYLE_SINGLE_COLOUR);
   glDrawArrays(GL_TRIANGLES, 0, 6);
   ASSERT_NO_GL_ERROR();
   }
@@ -69,5 +71,28 @@ void UIRenderable::refresh(const Vector2D& position, const Vector2D& size)
       position.x,           position.y,
       position.x,           position.y + size.y,
       position.x + size.x,  position.y + size.y,
+    });
+  }
+
+void UIRenderable::setTextureCoords(const Vector2D& bottomLeft, const Vector2D& topRight)
+  {
+  texCoordBL = bottomLeft;
+  texCoordTR = topRight;
+  if (initialised)
+    refreshTexCoords();
+  }
+
+void UIRenderable::refreshTexCoords()
+  {
+  Vector2D& bottomLeft = texCoordBL;
+  Vector2D& topRight = texCoordTR;
+  texCoordBuffer.copyDataFloat(
+    {
+      bottomLeft.x, topRight.y,
+      topRight.x,   topRight.y,
+      topRight.x,   bottomLeft.y,
+      bottomLeft.x, topRight.y,
+      bottomLeft.x, bottomLeft.y,
+      topRight.x,   bottomLeft.y
     });
   }

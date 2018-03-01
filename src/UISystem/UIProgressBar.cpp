@@ -25,7 +25,7 @@ void UIProgressBar::refresh(GameContext* context, const Vector2D& parentPos, con
   barComponent->setVerticalAlignment(Alignment::alignmentCentre);
   barComponent->setHeightMatchParent(true);
   barComponent->setPadding(barPadding, barPadding);
-  barComponent->setBackgroundColour(barColour);
+  barComponent->setColour(barColour);
   barComponent->setOffset(Vector2D(barPadding, 0));
   UIPanel::refresh(context, parentPos, parentSize);
   }
@@ -44,12 +44,15 @@ void UIProgressBar::setBarPadding(uint padding)
   {
   barPadding = padding;
   }
-void UIProgressBar::updateProgressBar(UIProgressBar* bar, double value, double max)
+
+bool UIProgressBar::updateProgressBar(UIProgressBar* bar, double value, double max)
   {
   double progressBarValue = bar->getProgress() * max;
   if (progressBarValue != value)
     {
     bar->setProgress(value / max);
     bar->invalidate();
+    return true;
     }
+  return false;
   }

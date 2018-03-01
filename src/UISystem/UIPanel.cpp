@@ -18,8 +18,8 @@ void UIPanel::initialise(GameContext* context)
 
 void UIPanel::onUpdate(GameContext* context)
   {
-  addPendingComponents(context);
   removePendingComponents(context);
+  addPendingComponents(context);
   refreshPendingComponents(context);
   for (UIComponentPtr& child : *children.getList())
     child->onUpdate(context);
@@ -91,8 +91,9 @@ void UIPanel::refresh(GameContext* context, const Vector2D& parentPos, const Vec
     adjustedSize.y = std::max(adjustedSize.y, 1.0f);
 
     renderable->setColour(colour);
-    renderable->setTexture(texture);
+    renderable->setTexture(texture, alphaTexture);
     renderable->setVisible(visible);
+    renderable->setTextureCoords(texCoordBL, texCoordTR);
     renderable->refresh(position, adjustedSize);
     for (UIComponentPtr& child : *children.getList())
       child->refresh(context, position, adjustedSize);

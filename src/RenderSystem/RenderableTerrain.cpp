@@ -50,7 +50,7 @@ void RenderableTerrain::cleanUp(RenderContext* renderContext)
 void RenderableTerrain::render(RenderContext* renderContext)
   {
   renderContext->activateShaderProgram(shaderProgram);
-  shaderProgram->setVarInt("inDrawStyle", DRAW_STYLE_VERT_COLOUR);
+  shaderProgram->setVarInt("inDrawStyle", MESH_DRAW_STYLE_VERT_COLOUR);
   shaderProgram->setVarFloat("inAlpha", 1);
   shaderProgram->setVarInt("inLightShaded", 1);
   meshStorage->getVAO().bind();

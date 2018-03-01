@@ -199,6 +199,20 @@ TexturePtr RenderContextImpl::createTexture(const string& imageFilePath)
   return texture;
   }
 
+FontPtr RenderContextImpl::createFont(const string& fntFilePath, const string& glyphsFilePath)
+  {
+  TexturePtr glyphsTexture = createTexture(glyphsFilePath);
+  FontDefinitionPtr fontDefinition = resourceCache.getFontDefinition(fntFilePath);
+  if (!fontDefinition)
+    {
+    fontDefinition = readFontFile(fntFilePath);
+    resourceCache.addFontDefinition(fontDefinition, fntFilePath);
+    logInfo("Created font: '" + fntFilePath + "'");
+    }
+  return FontPtr(new Font(fontDefinition, glyphsTexture));
+  }
+
+
 uint RenderContextImpl::bindTexture(TexturePtr texture)
   {
   uint glBindLocation = 0;

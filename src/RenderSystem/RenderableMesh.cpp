@@ -8,7 +8,7 @@ using namespace mathernogl;
 
 RenderableMesh::RenderableMesh(uint id) : Renderable(id)
   {
-  drawStyle = DRAW_STYLE_SINGLE_COLOUR;
+  drawStyle = MESH_DRAW_STYLE_SINGLE_COLOUR;
   }
 
 void RenderableMesh::initialise(RenderContext* renderContext)
@@ -33,9 +33,9 @@ void RenderableMesh::render(RenderContext* renderContext)
     shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1), true);
 
     shaderProgram->setVarInt("inDrawStyle", drawStyle, true);
-    if (drawStyle == DRAW_STYLE_TEXTURE && texture)
+    if (drawStyle == MESH_DRAW_STYLE_TEXTURE && texture)
       shaderProgram->setVarInt("inTexture", renderContext->bindTexture(texture), true);
-    if (drawStyle == DRAW_STYLE_SINGLE_COLOUR)
+    if (drawStyle == MESH_DRAW_STYLE_SINGLE_COLOUR)
       shaderProgram->setVarVec3("inColour", colour, true);
 
     setDepthTest(true);
@@ -55,19 +55,19 @@ void RenderableMesh::render(RenderContext* renderContext)
 
 void RenderableMesh::setDrawStyleSingleColour(Vector3D colour)
   {
-  drawStyle = DRAW_STYLE_SINGLE_COLOUR;
+  drawStyle = MESH_DRAW_STYLE_SINGLE_COLOUR;
   texture.reset();
   this->colour = colour;
   }
 
 void RenderableMesh::setDrawStyleTexture(TexturePtr texture)
   {
-  drawStyle = DRAW_STYLE_TEXTURE;
+  drawStyle = MESH_DRAW_STYLE_TEXTURE;
   this->texture = texture;
   }
 
 void RenderableMesh::setDrawStyleVertColours()
   {
-  drawStyle = DRAW_STYLE_VERT_COLOUR;
+  drawStyle = MESH_DRAW_STYLE_VERT_COLOUR;
   texture.reset();
   }

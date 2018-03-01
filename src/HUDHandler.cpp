@@ -7,13 +7,132 @@
 #include "TOGameContext.h"
 #include "Resources.h"
 
+/*
+ *  TowerFocusPanel
+ */
+
+void TowerFocusPanel::initialise(GameContext* context)
+  {
+  UIPanel::initialise(context);
+
+  UIManager* uiManager = context->getUIManager();
+  icon.reset(new UIPanel(uiManager->getNextComponentID()));
+  icon->setOffset(Vector2D(20, 10));
+  icon->setSize(Vector2D(75));
+  icon->setColour(Vector3D(0.2));
+  addChild(icon);
+
+  static const Vector2D healthBarOffset = Vector2D(120, 15);
+  static const Vector2D statsBarSize = Vector2D(200, 23);
+  static const uint statsBarsGap = 10;
+  static const uint statsTextGap = 5;
+  static const uint statsTextSize = 18;
+
+  healthBar.reset(new UIProgressBar(uiManager->getNextComponentID()));
+  healthBar->setOffset(healthBarOffset);
+  healthBar->setSize(statsBarSize);
+  healthBar->setColour(Vector3D(0.2));
+  healthBar->setBarColour(Vector3D(0.6, 0.1, 0.1));
+  addChild(healthBar);
+
+  healthText.reset(new UIText(uiManager->getNextComponentID()));
+  healthText->setOffset(healthBarOffset + Vector2D(statsBarSize.x + statsTextGap, 0));
+  healthText->setSize(statsBarSize);
+  healthText->setFontSize(statsTextSize);
+  healthText->setFontColour(Vector3D(0));
+  healthText->showBackground(false);
+  healthText->setTextCentreAligned(true);
+  addChild(healthText);
+
+  energyBar.reset(new UIProgressBar(uiManager->getNextComponentID()));
+  energyBar->setOffset(healthBarOffset + Vector2D(0, statsBarSize.y + statsBarsGap));
+  energyBar->setSize(statsBarSize);
+  energyBar->setColour(Vector3D(0.2));
+  energyBar->setBarColour(Vector3D(0, 0.2, 0.8));
+  addChild(energyBar);
+
+  energyText.reset(new UIText(uiManager->getNextComponentID()));
+  energyText->setOffset(healthBarOffset + Vector2D(statsBarSize.x + statsTextGap, statsBarSize.y + statsBarsGap));
+  energyText->setSize(statsBarSize);
+  energyText->setFontSize(statsTextSize);
+  energyText->setFontColour(Vector3D(0));
+  energyText->showBackground(false);
+  energyText->setTextCentreAligned(true);
+  addChild(energyText);
+
+  FontPtr nameFont = context->getRenderContext()->createFont(FONT_UNISPACE_FNT, FONT_UNISPACE_GLYPHS);
+  nameText.reset(new UIText(uiManager->getNextComponentID(), nameFont));
+  nameText->setOffset(Vector2D(20, -5));
+  nameText->setSize(Vector2D(250, 40));
+  nameText->setVerticalAlignment(alignmentEnd);
+  nameText->setFontSize(30);
+  nameText->setFontColour(Vector3D(0));
+  nameText->showBackground(false);
+  addChild(nameText);
+  }
+
+string createProgressString(int amount, int max)
+  {
+  std::ostringstream stringStream;
+  stringStream << amount << "/" << max;
+  return stringStream.str();
+  }
+
+void TowerFocusPanel::updateTowerInfo(GameContext* context)
+  {
+  TOGameContext* toGameContext = TOGameContext::cast(context);
+
+  if (TowerPtr focusedTower = toGameContext->getFocusedTower())
+    {
+    setVisible(true, true);
+
+    bool newFocusTower = false;
+    if (!activeFocusTower || focusedTower->getID() != activeFocusTower->getID())
+      {
+      activeFocusTower = focusedTower;
+      const TowerType* type = TowerFactory::getTowerType(activeFocusTower->getTowerType());
+      icon->setTexture(context->getRenderContext()->createTexture(type->iconFilePath));
+      icon->invalidate();
+      nameText->setText(type->name);
+      nameText->invalidate();
+      newFocusTower = true;
+      }
+
+    const int healthPoints = focusedTower->getHealthPoints();
+    const int maxHealthPoints = focusedTower->getMaxHealthPoints();
+    if (UIProgressBar::updateProgressBar(healthBar.get(), healthPoints, maxHealthPoints) || newFocusTower)
+      {
+      healthText->setText(createProgressString(healthPoints, maxHealthPoints));
+      healthText->invalidate();
+      }
+
+    const int storedEnergy = focusedTower->getStoredEnergy();
+    const int maxEnergy = focusedTower->getMaxEnergy();
+    if(UIProgressBar::updateProgressBar(energyBar.get(), storedEnergy, maxEnergy) || newFocusTower)
+      {
+      energyText->setText(createProgressString(storedEnergy, maxEnergy));
+      energyText->invalidate();
+      }
+    }
+  else
+    {
+    setVisible(false, true);
+    activeFocusTower.reset();
+    }
+  }
+
+
+/*
+ *  HUDHandler
+ */
+
 void HUDHandler::initialiseUI(GameContext* context)
   {
   UIManager* uiManager = context->getUIManager();
   mainUIPanel.reset(new UIPanel(uiManager->getNextComponentID()));
   mainUIPanel->setOffset(Vector2D(0, 0));
   mainUIPanel->setSize(Vector2D(300, 170));
-  mainUIPanel->setBackgroundColour(Vector3D(0.4, 0.3, 0.1));
+  mainUIPanel->setColour(Vector3D(0.4, 0.3, 0.1));
   mainUIPanel->setHorizontalAlignment(alignmentEnd);
   mainUIPanel->setVerticalAlignment(alignmentEnd);
   mainUIPanel->setWidthMatchParent(true);
@@ -25,29 +144,7 @@ void HUDHandler::initialiseUI(GameContext* context)
 
 void HUDHandler::updateUI(GameContext* context)
   {
-  TOGameContext* toGameContext = TOGameContext::cast(context);
-  if (TowerPtr focusedTower = toGameContext->getFocusedTower())
-    {
-    if (!activeHUDTower || activeHUDTower->getID() != focusedTower->getID())
-      {
-      const TowerType* type = TowerFactory::getTowerType(focusedTower->getTowerType());
-      activeHUDTower = focusedTower;
-      towerFocusPanel->setVisible(true, true);
-      towerIcon->setBackgroundTexture(context->getRenderContext()->createTexture(type->iconFilePath));
-      towerIcon->invalidate();
-      }
-
-    //  update health bar
-    UIProgressBar::updateProgressBar(towerHealthBar.get(), focusedTower->getHealthPoints(), focusedTower->getMaxHealthPoints());
-
-    //  update energy bar
-    UIProgressBar::updateProgressBar(towerEnergyBar.get(), focusedTower->getStoredEnergy(), focusedTower->getMaxEnergy());
-    }
-  else
-    {
-    towerFocusPanel->setVisible(false, true);
-    activeHUDTower.reset();
-    }
+  towerFocusPanel->updateTowerInfo(context);
   }
 
 void HUDHandler::deselectTowerType()
@@ -58,42 +155,15 @@ void HUDHandler::deselectTowerType()
 void HUDHandler::setupTowerFocusPanel(GameContext* context)
   {
   UIManager* uiManager = context->getUIManager();
-
-  towerFocusPanel.reset(new UIPanel(uiManager->getNextComponentID()));
+  towerFocusPanel.reset(new TowerFocusPanel(uiManager->getNextComponentID()));
   towerFocusPanel->setOffset(Vector2D(-10, 0));
   towerFocusPanel->setSize(Vector2D(600, 100));
-  towerFocusPanel->setBackgroundColour(Vector3D(0.3, 0.3, 0.25));
+  towerFocusPanel->setColour(Vector3D(0.3, 0.3, 0.25));
   towerFocusPanel->setVerticalAlignment(alignmentCentre);
   towerFocusPanel->setHorizontalAlignment(alignmentEnd);
   towerFocusPanel->setHeightMatchParent(true);
   towerFocusPanel->setPadding(10, 10);
   mainUIPanel->addChild(towerFocusPanel);
-
-  towerIcon.reset(new UIPanel(uiManager->getNextComponentID()));
-  towerIcon->setOffset(Vector2D(20, 10));
-  towerIcon->setSize(Vector2D(75));
-  towerIcon->setBackgroundColour(Vector3D(0.2));
-  towerIcon->setVerticalAlignment(alignmentStart);
-  towerIcon->setHorizontalAlignment(alignmentStart);
-  towerFocusPanel->addChild(towerIcon);
-
-  towerEnergyBar.reset(new UIProgressBar(uiManager->getNextComponentID()));
-  towerEnergyBar->setOffset(Vector2D(120, 45));
-  towerEnergyBar->setSize(Vector2D(200, 20));
-  towerEnergyBar->setBackgroundColour(Vector3D(0.2));
-  towerEnergyBar->setVerticalAlignment(alignmentStart);
-  towerEnergyBar->setHorizontalAlignment(alignmentStart);
-  towerEnergyBar->setBarColour(Vector3D(0, 0.2, 0.8));
-  towerFocusPanel->addChild(towerEnergyBar);
-
-  towerHealthBar.reset(new UIProgressBar(uiManager->getNextComponentID()));
-  towerHealthBar->setOffset(Vector2D(120, 15));
-  towerHealthBar->setSize(Vector2D(200, 20));
-  towerHealthBar->setBackgroundColour(Vector3D(0.2));
-  towerHealthBar->setVerticalAlignment(alignmentStart);
-  towerHealthBar->setHorizontalAlignment(alignmentStart);
-  towerHealthBar->setBarColour(Vector3D(0.6, 0.1, 0.1));
-  towerFocusPanel->addChild(towerHealthBar);
   }
 
 void HUDHandler::setupTowerBuildPanel(GameContext* context)
@@ -103,7 +173,7 @@ void HUDHandler::setupTowerBuildPanel(GameContext* context)
   UIPanel* subPanel = new UIPanel(uiManager->getNextComponentID());
   subPanel->setOffset(Vector2D(0, 0));
   subPanel->setSize(Vector2D(100, 100));
-  subPanel->setBackgroundColour(Vector3D(0.35, 0.35, 0.3));
+  subPanel->setColour(Vector3D(0.35, 0.35, 0.3));
   subPanel->setVerticalAlignment(alignmentCentre);
   subPanel->setHorizontalAlignment(alignmentCentre);
   subPanel->setHeightMatchParent(true);

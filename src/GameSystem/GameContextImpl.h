@@ -65,7 +65,6 @@ public:
   virtual void processDrawStage() override;
   virtual void endFrame(float maxFPS) override;
   virtual void setPaused(bool pause) override;
-
   virtual bool isPaused() const override;
 
   virtual Camera* getCamera() override { return &camera; }
@@ -78,6 +77,7 @@ public:
   virtual const RenderContext* getRenderContext() const override { return &renderContext; }
   virtual const UIManager* getUIManager() const override { return &uiManager; }
   virtual const BoundingBoxManager* getBoundingBoxManager() const override { return &boundingBoxManager; } ;
+  virtual FontPtr getDefaultFont() override;
 
   virtual Vector3D getCursorWorldPos(uint cursorX, uint cursorY) const override;
   virtual Vector3D clipToWorldTransform(const Vector3D& clipSpacePos) const override;

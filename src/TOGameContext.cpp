@@ -51,8 +51,8 @@ void TOGameContext::processInputStage()
 
 void TOGameContext::processUpdateStage()
   {
-  GameContextImpl::processUpdateStage();
   hudHandler.updateUI(this);
+  GameContextImpl::processUpdateStage();
   }
 
 void TOGameContext::processDrawStage()
@@ -412,5 +412,10 @@ void TOGameContext::unfocusTower()
     hideTowerRangeField(focusedTower.get());
     focusedTower = nullptr;
     }
+  }
+
+FontPtr TOGameContext::getDefaultFont()
+  {
+  return getRenderContext()->createFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS);
   }
 
