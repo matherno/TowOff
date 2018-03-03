@@ -6,12 +6,13 @@
 #include "RenderableParticles.h"
 
 ParticleSystem::ParticleSystem(uint id, bool renderAsPoints) : GameActor(id), renderAsPoints(renderAsPoints)
-  {}
-
-void ParticleSystem::onAttached(GameContext* gameContext)
   {
   setParticleSpawnPoint();
   setParticleDirectionRandom();
+  }
+
+void ParticleSystem::onAttached(GameContext* gameContext)
+  {
   }
 
 void ParticleSystem::onUpdate(GameContext* gameContext)
@@ -24,17 +25,30 @@ void ParticleSystem::onUpdate(GameContext* gameContext)
     emitter->updateParticles(gameContext->getDeltaTime());
     if (depthTesting && !renderAsPoints)
       emitter->sortParticles(gameContext->getCamera()->getWorldToCamera()->getTransformMatrix());
-    item.timeToLive -= gameContext->getDeltaTime();
-    if (item.timeToLive <= 0)
+
+    if (item.endEmitterCallback)
       {
-      emittersToRemove.emplace_back(item.id);
-      gameContext->getRenderContext()->getRenderableSet()->removeRenderable(item.renderable->getID());
-      item.renderable->cleanUp(gameContext->getRenderContext());
-      item.renderable.reset();
+      if (item.endEmitterCallback())
+        {
+        emitter->setSpawningState(false);
+        item.endEmitterCallback = nullptr;
+        item.timeToLive = timeAlive;
+        }
       }
-    else if (item.timeToLive <= timeAlive)
+    else
       {
-      emitter->setSpawningState(false);
+      item.timeToLive -= gameContext->getDeltaTime();
+      if (item.timeToLive <= 0)
+        {
+        emittersToRemove.emplace_back(item.id);
+        gameContext->getRenderContext()->getRenderableSet()->removeRenderable(item.renderable->getID());
+        item.renderable->cleanUp(gameContext->getRenderContext());
+        item.renderable.reset();
+        }
+      else if (item.timeToLive <= timeAlive)
+        {
+        emitter->setSpawningState(false);
+        }
       }
     }
 
@@ -85,6 +99,16 @@ void ParticleSystem::setInitVelocity(double velocity)
 
 void ParticleSystem::addEmitter(const Vector3D& position, long timeToLive, const Vector3D& colour, double particleSize /*= -1*/)
   {
+  addEmitter(position, timeToLive, nullptr, colour, particleSize);
+  }
+
+void ParticleSystem::addEmitter(const Vector3D& position, EndEmitterCallback callback, const Vector3D& colour, double particleSize)
+  {
+  addEmitter(position, 0, callback, colour, particleSize);
+  }
+
+void ParticleSystem::addEmitter(const Vector3D& position, long timeToLive, EndEmitterCallback callback, const Vector3D& colour, double particleSize)
+  {
   ParticleEmitterPtr emitter(new ParticleEmitter());
   emitter->setGravityAccel(gravityAccel);
   emitter->setInitVelocity(initVelocity);
@@ -97,6 +121,7 @@ void ParticleSystem::addEmitter(const Vector3D& position, long timeToLive, const
 
   ParticleSystemItem item;
   item.id = nextEmitterID++;
+  item.endEmitterCallback = callback;
   item.timeToLive = timeToLive + timeAlive;   // allows for extra time for particles to die off
   item.baseEmitter = emitter;
   item.colour = colour;
@@ -236,4 +261,3 @@ void ParticleSystem::setTranslation(const Vector3D& translation)
     }
   this->translation = translation;
   }
-

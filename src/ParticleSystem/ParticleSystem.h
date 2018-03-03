@@ -7,12 +7,15 @@
 *   
 */
 
+typedef std::function<bool()> EndEmitterCallback;
+
 struct ParticleSystemItem
   {
   uint id;
   ParticleEmitterPtr baseEmitter;
   RenderablePtr renderable;
   long timeToLive;
+  EndEmitterCallback endEmitterCallback;
   Vector3D colour;
   double size;
   };
@@ -44,6 +47,7 @@ public:
   void setTranslation(const Vector3D& translation);
   Vector3D getTranslation() const { return translation; }
   void addEmitter(const Vector3D& position, long timeToLive, const Vector3D& colour = Vector3D(1), double particleSize = -1);
+  void addEmitter(const Vector3D& position, EndEmitterCallback callback, const Vector3D& colour = Vector3D(1), double particleSize = -1);
   void setGravityAccel(double gravityAccel);
   void setTimeBetweenSpawns(long timeBetweenSpawns);
   void setTimeAlive(long timeAlive);
@@ -70,6 +74,7 @@ public:
   virtual void onDetached(GameContext* gameContext) override;
 
 protected:
+  void addEmitter(const Vector3D& position, long timeToLive, EndEmitterCallback callback, const Vector3D& colour, double particleSize);
   void initNewRenderables(RenderContext* renderContext);
   };
 

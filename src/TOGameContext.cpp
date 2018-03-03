@@ -23,8 +23,8 @@ bool TOGameContext::initialise()
   InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), -20, 0, -45));
   addInputHandler(inputHandler);
   initSurface(6);
-  initDamageParticleSystem();
   hudHandler.initialiseUI(this);
+  specialEffectsHandler.initialise(this);
   connectionManager.reset(new ConnectionManager(getNextActorID()));
   addActor(connectionManager);
   rangeFieldManager.reset(new RangeFieldManager(getNextActorID()));
@@ -38,6 +38,7 @@ void TOGameContext::cleanUp()
     {
     getRenderContext()->getRenderableSet()->removeRenderable(surfaceMesh->getID());
     surfaceMesh->cleanUp(getRenderContext());
+    specialEffectsHandler.cleanUp(this);
     removeActor(connectionManager->getID());
     removeActor(rangeFieldManager->getID());
     }
@@ -52,6 +53,7 @@ void TOGameContext::processInputStage()
 void TOGameContext::processUpdateStage()
   {
   hudHandler.updateUI(this);
+  specialEffectsHandler.update(this);
   GameContextImpl::processUpdateStage();
   }
 
@@ -192,23 +194,6 @@ void TOGameContext::initSurface(uint size)
   waterMesh->getTransform()->translate(Vector3D(translation, WATER_HEIGHT, translation));
   waterMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(waterMesh);
-  }
-
-void TOGameContext::initDamageParticleSystem()
-  {
-  ParticleSystem* system = new ParticleSystem(getNextActorID(), true);
-  system->setGravityAccel(0.00001);
-  system->setTimeBetweenSpawns(7);
-  system->setInitVelocity(0.007);
-  system->setTimeAlive(300);
-  system->setParticleSize(4);
-  towerDamageParticles.reset(system);
-  addActor(towerDamageParticles);
-  }
-
-void TOGameContext::doTowerDamageEffect(const Tower* tower)
-  {
-  towerDamageParticles->addEmitter(tower->getTargetPosition(), 50, Vector3D(0.9, 0, 0));
   }
 
 Vector3D TOGameContext::terrainHitTest(uint cursorX, uint cursorY, bool* isLand /*= nullptr*/) const
@@ -417,5 +402,10 @@ void TOGameContext::unfocusTower()
 FontPtr TOGameContext::getDefaultFont()
   {
   return getRenderContext()->createFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS);
+  }
+
+void TOGameContext::doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour)
+  {
+  specialEffectsHandler.towerDamageEffect(this, tower, effectColour);
   }
 

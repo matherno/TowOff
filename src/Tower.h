@@ -68,6 +68,7 @@ public:
   Vector3D getHitRadius() const { return hitRadius; }
   int getHealthPoints() const { return healthPoints; }
   int getMaxHealthPoints() const { return maxHealthPoints; }
+  float getHealthFactor() const { return (float)healthPoints / (float)maxHealthPoints; }
   virtual bool isUnderConstruction() const{ return false; }
 
   bool hasEnergy() const { return storedEnergy > 0; }

@@ -14,6 +14,7 @@ class TOGameContext;
 #include "HUDHandler.h"
 #include "ConnectionManager.h"
 #include "RangeFieldManager.h"
+#include "SpecialEffectsHandler.h"
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
@@ -25,8 +26,8 @@ private:
   std::vector<PlayerPtr> players;
   TowerList towers;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
-  ParticleSystemPtr towerDamageParticles;
   HUDHandler hudHandler;
+  SpecialEffectsHandler specialEffectsHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
   std::shared_ptr<RangeFieldManager> rangeFieldManager;
   TowerPtr focusedTower = nullptr;
@@ -76,7 +77,6 @@ public:
   const std::set<uint>* combatTowerGetNetworksInRange(uint towerID) const;
   long timeBetweenEnergyTransfers() const { return 1000; };
 
-  void doTowerDamageEffect(const Tower* tower);
   Vector3D terrainHitTest(uint cursorX, uint cursorY, bool* isLand = nullptr) const;
   bool isPositionLand(const Vector3D& position) const;
 
@@ -90,6 +90,8 @@ public:
   void unfocusTower();
   TowerPtr getFocusedTower() { return focusedTower; }
 
+  void doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour = Vector3D(0.9, 0, 0));
+
   inline static TOGameContext* cast(GameContext* context)
     {
     TOGameContext* toContext = dynamic_cast<TOGameContext*>(context);
@@ -99,6 +101,5 @@ public:
 
 protected:
   void initSurface(uint size);
-  void initDamageParticleSystem();
   void rebuildCombatTowerNetworksMap();
   };
