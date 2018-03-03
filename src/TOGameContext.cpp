@@ -22,7 +22,7 @@ bool TOGameContext::initialise()
   bool success = GameContextImpl::initialise();
   InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), -20, 0, -45));
   addInputHandler(inputHandler);
-  initSurface(6);
+  initSurface(7);
   hudHandler.initialiseUI(this);
   specialEffectsHandler.initialise(this);
   connectionManager.reset(new ConnectionManager(getNextActorID()));
@@ -169,7 +169,7 @@ void TOGameContext::initSurface(uint size)
   {
   RenderContext* renderContext = getRenderContext();
   std::shared_ptr<HeightMap> heightMap(new HeightMap());
-  HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.7);
+  HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.75);
 
   for (float& height : heightMap->heights)
     {
@@ -179,12 +179,13 @@ void TOGameContext::initSurface(uint size)
       height = WATER_FLOOR_HEIGHT;
     }
 
-  const float cellSize = 2;
+  const float cellSize = 1;
   const uint numCells = (uint)pow(2, (int)size);
   const float translation = (float)numCells*cellSize*-0.5f;
   surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize));
   surfaceMesh->setMultiColour(Vector3D(0.2, 0.4, 0.2), Vector3D(0.1, 0.3, 0.0));
   surfaceMesh->getTransform()->translate(Vector3D(translation, 0, translation));
+  surfaceMesh->setClippingPlane(Vector4D(0, 1, 0, -WATER_HEIGHT));
   surfaceMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(surfaceMesh);
 
