@@ -27,3 +27,7 @@
 
 #define FONT_DEFAULT_FNT                    FONT_BERILIN_FNT
 #define FONT_DEFAULT_GLYPHS                 FONT_BERILIN_GLYPHS
+
+#define IMAGE_MAINMENU_NEW                  "resources/ui/MainMenuNew.png"
+#define IMAGE_MAINMENU_LOAD                 "resources/ui/MainMenuLoad.png"
+#define IMAGE_MAINMENU_QUIT                 "resources/ui/MainMenuQuit.png"

@@ -60,7 +60,7 @@ void TowerFocusPanel::initialise(GameContext* context)
   energyText->setTextCentreAligned(true);
   addChild(energyText);
 
-  FontPtr nameFont = context->getRenderContext()->createFont(FONT_UNISPACE_FNT, FONT_UNISPACE_GLYPHS);
+  FontPtr nameFont = context->getRenderContext()->getSharedFont(FONT_UNISPACE_FNT, FONT_UNISPACE_GLYPHS);
   nameText.reset(new UIText(uiManager->getNextComponentID(), nameFont));
   nameText->setOffset(Vector2D(20, -5));
   nameText->setSize(Vector2D(250, 40));
@@ -91,7 +91,7 @@ void TowerFocusPanel::updateTowerInfo(GameContext* context)
       {
       activeFocusTower = focusedTower;
       const TowerType* type = TowerFactory::getTowerType(activeFocusTower->getTowerType());
-      icon->setTexture(context->getRenderContext()->createTexture(type->iconFilePath));
+      icon->setTexture(context->getRenderContext()->getSharedTexture(type->iconFilePath));
       icon->invalidate();
       nameText->setText(type->name);
       nameText->invalidate();
@@ -193,7 +193,7 @@ void HUDHandler::setupTowerBuildPanel(GameContext* context)
     UIButton* button = new UIButton(uiManager->getNextComponentID(), true);
     button->setOffset(Vector2D(50 + towerNum * 70, 20));
     button->setSize(Vector2D(50, 50));
-    button->setButtonTexture(context->getRenderContext()->createTexture(towerType.iconFilePath));
+    button->setButtonTexture(context->getRenderContext()->getSharedTexture(towerType.iconFilePath));
     button->setButtonHighlightColour(Vector3D(0.3, 0.3, 1));
     button->setVerticalAlignment(alignmentStart);
     button->setHorizontalAlignment(alignmentStart);
@@ -234,5 +234,10 @@ void HUDHandler::startTowerPlacingMode(GameContext* gameContext, uint towerTypeI
   placementHandler.reset(new TowerPlacementHandler(gameContext->getInputManager()->getNextHandlerID(), towerTypeID));
   placementHandler->setEndHandlerCallback([this, gameContext]() { endTowerPlacingMode(gameContext); });
   gameContext->addInputHandler(placementHandler);
+  }
+
+void HUDHandler::cleanUp(GameContext* context)
+  {
+  endTowerPlacingMode(context);
   }
 

@@ -9,6 +9,10 @@ using namespace mathernogl;
 
 bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
   {
+  nextTexBoundLocal = 1;
+  nextMeshStorageID = 1;
+  nextRenderableID = 1;
+
   clearGLErrors();
   window.reset(initGL(initConfig->windowName, initConfig->windowWidth, initConfig->windowHeight, initConfig->fullscreen, initConfig->antiAliasing));
   if (window)
@@ -37,6 +41,8 @@ bool RenderContextImpl::cleanUp()
     texture->cleanUp();
     });
   resourceCache.clearAll();
+  window->close();
+  texIDsToBoundLocals.clear();
   return true;
   }
 
@@ -116,7 +122,7 @@ void logCreateShaderProgram(ShaderProgramPtr shaderProgram, const std::vector<ma
   logInfo(msg);
   }
 
-ShaderProgramPtr RenderContextImpl::createShaderProgram(const std::vector<mathernogl::Shader>* shaders)
+ShaderProgramPtr RenderContextImpl::getSharedShaderProgram(const std::vector<mathernogl::Shader>* shaders)
   {
   if (ShaderProgramPtr cachedShaderProgram = resourceCache.getShaderProgram(shaders))
     return cachedShaderProgram;
@@ -127,7 +133,7 @@ ShaderProgramPtr RenderContextImpl::createShaderProgram(const std::vector<mather
   logCreateShaderProgram(shaderProgram, shaders);
   return shaderProgram;
   }
-MeshStoragePtr RenderContextImpl::createMeshStorage(const std::string& objFilePath)
+MeshStoragePtr RenderContextImpl::getSharedMeshStorage(const std::string& objFilePath)
   {
   if (MeshStoragePtr cachedMeshStorage = resourceCache.getMeshStorage(objFilePath))
     return cachedMeshStorage;
@@ -188,7 +194,7 @@ const Matrix4* RenderContextImpl::getCameraToClip() const
   return &cameraToClipTransform;
   }
 
-TexturePtr RenderContextImpl::createTexture(const string& imageFilePath)
+TexturePtr RenderContextImpl::getSharedTexture(const string& imageFilePath)
   {
   if (TexturePtr texture = resourceCache.getTexture(imageFilePath))
     return texture;
@@ -199,9 +205,9 @@ TexturePtr RenderContextImpl::createTexture(const string& imageFilePath)
   return texture;
   }
 
-FontPtr RenderContextImpl::createFont(const string& fntFilePath, const string& glyphsFilePath)
+FontPtr RenderContextImpl::getSharedFont(const string& fntFilePath, const string& glyphsFilePath)
   {
-  TexturePtr glyphsTexture = createTexture(glyphsFilePath);
+  TexturePtr glyphsTexture = getSharedTexture(glyphsFilePath);
   FontDefinitionPtr fontDefinition = resourceCache.getFontDefinition(fntFilePath);
   if (!fontDefinition)
     {

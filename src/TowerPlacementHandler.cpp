@@ -23,7 +23,7 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
   if (!type->baseMeshFilePath.empty())
     {
     PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID());
-    mesh->setMeshStorage(renderContext->createMeshStorage(type->baseMeshFilePath));
+    mesh->setMeshStorage(renderContext->getSharedMeshStorage(type->baseMeshFilePath));
     mesh->initialise(renderContext);
     towerHighlight->addRenderable(RenderablePtr(mesh));
     }
@@ -31,7 +31,7 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
   if (!type->turretMeshFilePath.empty())
     {
     PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID());
-    mesh->setMeshStorage(renderContext->createMeshStorage(type->turretMeshFilePath));
+    mesh->setMeshStorage(renderContext->getSharedMeshStorage(type->turretMeshFilePath));
     mesh->initialise(renderContext);
     towerHighlight->addRenderable(RenderablePtr(mesh));
     }

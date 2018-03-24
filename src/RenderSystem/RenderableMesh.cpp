@@ -14,7 +14,7 @@ RenderableMesh::RenderableMesh(uint id) : Renderable(id)
 void RenderableMesh::initialise(RenderContext* renderContext)
   {
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/MeshVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/MeshFS.glsl") };
-  shaderProgram = renderContext->createShaderProgram(&shaders);
+  shaderProgram = renderContext->getSharedShaderProgram(&shaders);
   }
 
 void RenderableMesh::cleanUp(RenderContext* renderContext)

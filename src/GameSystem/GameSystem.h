@@ -104,8 +104,10 @@ public:
 */
 class GameContext
   {
+private:
+  RenderContextPtr renderContext;
 public:
-  GameContext(){};
+  GameContext(RenderContextPtr renderContext) : renderContext(renderContext) {};
   virtual ~GameContext(){};
   virtual bool initialise() = 0;
   virtual void cleanUp() = 0;
@@ -125,14 +127,16 @@ public:
   virtual void endFrame(float maxFPS) = 0;
   virtual void setPaused(bool pause) = 0;
   virtual bool isPaused() const = 0;
+  virtual void endContext() = 0;
+  virtual bool isContextEnded() const = 0;
   virtual Camera* getCamera() = 0;
   virtual InputManager* getInputManager() = 0;
-  virtual RenderContext* getRenderContext() = 0;
+  virtual RenderContext* getRenderContext() { return renderContext.get(); }
   virtual UIManager* getUIManager() = 0;
   virtual BoundingBoxManager* getBoundingBoxManager() = 0;
   virtual const Camera* getCamera() const = 0;
   virtual const InputManager* getInputManager() const = 0;
-  virtual const RenderContext* getRenderContext() const = 0;
+  virtual const RenderContext* getRenderContext() const { return renderContext.get(); };
   virtual const UIManager* getUIManager() const = 0;
   virtual const BoundingBoxManager* getBoundingBoxManager() const = 0;
   virtual FontPtr getDefaultFont() = 0;

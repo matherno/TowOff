@@ -98,3 +98,4 @@ void ResourceCache::clearAll()
   textures.clear();
   fontDefinitions.clear();
   }
+

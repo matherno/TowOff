@@ -13,7 +13,7 @@ TestActor::TestActor(uint id) : GameActor(id)
 void TestActor::onAttached(GameContext* gameContext)
   {
   RenderContext* context = gameContext->getRenderContext();
-  MeshStoragePtr meshStorage = context->createMeshStorage("resources/TropTree1.obj");
+  MeshStoragePtr meshStorage = context->getSharedMeshStorage("resources/TropTree1.obj");
   if(meshStorage)
     {
     RenderableMesh* renderable = new RenderableMesh(context->getNextRenderableID());
@@ -23,7 +23,7 @@ void TestActor::onAttached(GameContext* gameContext)
     context->getRenderableSet()->addRenderable(RenderablePtr(renderable));
     }
 
-  MeshStoragePtr meshStorage2 = context->createMeshStorage("resources/TropTree2.obj");
+  MeshStoragePtr meshStorage2 = context->getSharedMeshStorage("resources/TropTree2.obj");
   if(meshStorage2)
     {
     RenderableMesh* renderable = new RenderableMesh(context->getNextRenderableID());
@@ -33,7 +33,7 @@ void TestActor::onAttached(GameContext* gameContext)
     context->getRenderableSet()->addRenderable(RenderablePtr(renderable));
     }
 
-  MeshStoragePtr meshStorage3 = context->createMeshStorage("resources/TropTree3.obj");
+  MeshStoragePtr meshStorage3 = context->getSharedMeshStorage("resources/TropTree3.obj");
   if(meshStorage3)
     {
     RenderableMesh* renderable = new RenderableMesh(context->getNextRenderableID());

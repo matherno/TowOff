@@ -18,9 +18,8 @@
 
 bool TOGameContext::initialise()
   {
-  renderConfig.windowName = "TowOff";
   bool success = GameContextImpl::initialise();
-  InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 0, 60), 60, 0, -45));
+  InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 0, 40), 80, 0, -45));
   addInputHandler(inputHandler);
   initSurface(7);
   hudHandler.initialiseUI(this);
@@ -36,6 +35,7 @@ void TOGameContext::cleanUp()
   {
   if (surfaceMesh)
     {
+    hudHandler.cleanUp(this);
     getRenderContext()->getRenderableSet()->removeRenderable(surfaceMesh->getID());
     surfaceMesh->cleanUp(getRenderContext());
     specialEffectsHandler.cleanUp(this);
@@ -402,11 +402,12 @@ void TOGameContext::unfocusTower()
 
 FontPtr TOGameContext::getDefaultFont()
   {
-  return getRenderContext()->createFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS);
+  return getRenderContext()->getSharedFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS);
   }
 
 void TOGameContext::doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour)
   {
   specialEffectsHandler.towerDamageEffect(this, tower, effectColour);
   }
+
 

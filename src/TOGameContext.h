@@ -42,6 +42,7 @@ private:
   std::map<uint, uint> towerRangeFields;
 
 public:
+  TOGameContext(const RenderContextPtr& renderContext) : GameContextImpl(renderContext) {}
   virtual bool initialise() override;
   virtual void cleanUp() override;
   virtual void processInputStage() override;

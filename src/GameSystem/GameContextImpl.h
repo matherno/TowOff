@@ -25,7 +25,6 @@ enum ProcessStage
 
 private:
   InputManagerImpl inputManager;
-  RenderContextImpl renderContext;
   UIManagerImpl uiManager;
   uint nextActorID = 1;
   mathernogl::MappedList<GameActorPtr> actors;
@@ -36,13 +35,11 @@ private:
   ProcessStage stage = stageNone;
   std::set<uint> actorsToRemove;
   bool paused = false;
+  bool shouldEnd = false;
   BoundingBoxManagerImpl boundingBoxManager;
 
-protected:
-  RenderInitConfig renderConfig;
-
 public:
-  GameContextImpl();
+  GameContextImpl(RenderContextPtr renderContext) : GameContext(renderContext) {}
   virtual ~GameContextImpl() override {}
 
   virtual bool initialise() override;
@@ -66,15 +63,15 @@ public:
   virtual void endFrame(float maxFPS) override;
   virtual void setPaused(bool pause) override;
   virtual bool isPaused() const override;
+  virtual void endContext() override { shouldEnd = true; }
+  virtual bool isContextEnded() const override { return shouldEnd; }
 
   virtual Camera* getCamera() override { return &camera; }
   virtual InputManager* getInputManager() override { return &inputManager; }
-  virtual RenderContext* getRenderContext() override { return &renderContext; }
   virtual UIManager* getUIManager() override { return &uiManager; }
   virtual BoundingBoxManager* getBoundingBoxManager() override { return &boundingBoxManager; } ;
   virtual const Camera* getCamera() const override { return &camera; }
   virtual const InputManager* getInputManager() const override { return &inputManager; }
-  virtual const RenderContext* getRenderContext() const override { return &renderContext; }
   virtual const UIManager* getUIManager() const override { return &uiManager; }
   virtual const BoundingBoxManager* getBoundingBoxManager() const override { return &boundingBoxManager; } ;
   virtual FontPtr getDefaultFont() override;

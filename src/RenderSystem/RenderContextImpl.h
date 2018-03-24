@@ -52,11 +52,11 @@ public:
 
   virtual void activateShaderProgram(ShaderProgramPtr shaderProgram) override;
   virtual uint bindTexture(TexturePtr texture) override;
-  virtual ShaderProgramPtr createShaderProgram(const std::vector<mathernogl::Shader>* shaders) override;
-  virtual MeshStoragePtr createMeshStorage(const std::string& objFilePath) override;
+  virtual ShaderProgramPtr getSharedShaderProgram(const std::vector<mathernogl::Shader>* shaders) override;
+  virtual MeshStoragePtr getSharedMeshStorage(const std::string& objFilePath) override;
   virtual MeshStoragePtr createEmptyMeshStorage() override;
-  virtual TexturePtr createTexture(const string& imageFilePath) override;
-  virtual FontPtr createFont(const string& fntFilePath, const string& glyphsFilePath) override;
+  virtual TexturePtr getSharedTexture(const string& imageFilePath) override;
+  virtual FontPtr getSharedFont(const string& fntFilePath, const string& glyphsFilePath) override;
 
   virtual RenderableSetPtr createRenderableSet() override;
 

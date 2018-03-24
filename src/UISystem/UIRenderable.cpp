@@ -16,7 +16,7 @@ UIRenderable::UIRenderable(uint id) : Renderable(id)
 void UIRenderable::initialise(RenderContext* renderContext)
   {
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/UserInterfaceVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/UserInterfaceFS.glsl") };
-  shaderProgram = renderContext->createShaderProgram(&shaders);
+  shaderProgram = renderContext->getSharedShaderProgram(&shaders);
 
   vertBuffer.init();
   vao.init();

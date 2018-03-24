@@ -18,12 +18,12 @@ Tower::Tower(uint id, uint towerType, TowerFunctionalityPtr functionality)
 void Tower::onAttached(GameContext* gameContext)
   {
   RenderContext* renderContext = gameContext->getRenderContext();
-  TexturePtr paletteTexture = renderContext->createTexture(IMAGE_TEXTURE_PALETTE);
+  TexturePtr paletteTexture = renderContext->getSharedTexture(IMAGE_TEXTURE_PALETTE);
 
   //  tower base renderable
   if (!baseModelFile.empty())
     {
-    MeshStoragePtr meshStorage = renderContext->createMeshStorage(baseModelFile);
+    MeshStoragePtr meshStorage = renderContext->getSharedMeshStorage(baseModelFile);
     if (meshStorage)
       {
       RenderableMesh* renderable = new RenderableMesh(renderContext->getNextRenderableID());
@@ -39,7 +39,7 @@ void Tower::onAttached(GameContext* gameContext)
   //  tower turret renderable
   if (!turretModelFile.empty())
     {
-    MeshStoragePtr meshStorage = renderContext->createMeshStorage(turretModelFile);
+    MeshStoragePtr meshStorage = renderContext->getSharedMeshStorage(turretModelFile);
     if (meshStorage)
       {
       RenderableMesh* renderable = new RenderableMesh(renderContext->getNextRenderableID());

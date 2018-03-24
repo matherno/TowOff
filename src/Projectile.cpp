@@ -16,7 +16,7 @@ void Projectile::onAttached(GameContext* gameContext)
     {
     RenderContext* renderContext = gameContext->getRenderContext();
     RenderableMesh* mesh = new RenderableMesh(renderContext->getNextRenderableID());
-    mesh->setMeshStorage(renderContext->createMeshStorage(meshFilePath));
+    mesh->setMeshStorage(renderContext->getSharedMeshStorage(meshFilePath));
     renderable.reset(mesh);
     renderable->initialise(renderContext);
     renderContext->getRenderableSet()->addRenderable(renderable);

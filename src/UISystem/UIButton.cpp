@@ -69,7 +69,8 @@ void UIButton::updateGroup(uint mouseX, uint mouseY)
 
 void UIButton::cleanUp(GameContext* context)
   {
-  group->toggleButtons.remove(getID());
+  if (group)
+    group->toggleButtons.remove(getID());
   UIPanel::cleanUp(context);
   }
 

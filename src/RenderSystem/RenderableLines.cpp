@@ -12,7 +12,7 @@ void RenderableLines::initialise(RenderContext* renderContext)
   using namespace mathernogl;
   clearGLErrors();
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/LinesVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/LinesFS.glsl") };
-  shaderProgram = renderContext->createShaderProgram(&shaders);
+  shaderProgram = renderContext->getSharedShaderProgram(&shaders);
 
   vbo.init();
   vao.init();

@@ -43,7 +43,7 @@ void InstantWeapon::createBeamShot(GameContext* context, const Vector3D& shootPo
   {
   RenderContext* renderContext = context->getRenderContext();
   RenderableMesh* mesh = new RenderableMesh(renderContext->getNextRenderableID());
-  mesh->setMeshStorage(renderContext->createMeshStorage(MESH_BEAM));
+  mesh->setMeshStorage(renderContext->getSharedMeshStorage(MESH_BEAM));
   mesh->initialise(renderContext);
 
   Vector3D shootToTarget = targetPos - shootPos;

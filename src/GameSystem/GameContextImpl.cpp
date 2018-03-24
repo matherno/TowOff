@@ -4,30 +4,14 @@
 
 #include "GameContextImpl.h"
 
-GameContextImpl::GameContextImpl()
-  {
-  renderConfig.windowName = "Testing";
-  renderConfig.windowWidth = 1800;
-  renderConfig.windowHeight = 900;
-  renderConfig.antiAliasing = true;
-  }
-
 bool GameContextImpl::initialise()
   {
   stage = stageInit;
-  if (!renderContext.initialise(&renderConfig))
-    {
-    mathernogl::logError("Failed to initialise render system!");
-    return false;
-    }
-
-  inputManager.initialise(renderContext.getWindow());
+  inputManager.initialise(getRenderContext()->getWindow());
   boundingBoxManager.initialise();
   addInputHandler(InputHandlerPtr(new BBInputHandler(inputManager.getNextHandlerID())), true);
   uiManager.initialise(this);
-
   gameTime = 0;
-
   stage = stageNone;
   return true;
   }
@@ -39,7 +23,6 @@ void GameContextImpl::cleanUp()
     actor->onDetached(this);
   actors.clear();
   actorsToRemove.clear();
-  renderContext.cleanUp();
   boundingBoxManager.cleanUp();
   uiManager.cleanUp(this);
   stage = stageNone;
@@ -109,12 +92,12 @@ void GameContextImpl::processDrawStage()
   stage = stageRender;
   if (!camera.isValid())
     {
-    renderContext.setWorldToCamera(*camera.getWorldToCamera()->getTransformMatrix());
-    renderContext.setCameraToClip(*camera.getCameraToClip()->getTransformMatrix());
+    getRenderContext()->setWorldToCamera(*camera.getWorldToCamera()->getTransformMatrix());
+    getRenderContext()->setCameraToClip(*camera.getCameraToClip()->getTransformMatrix());
     camera.setValid(true);
     }
 
-  renderContext.render();
+  getRenderContext()->render();
   stage = stageNone;
   }
 

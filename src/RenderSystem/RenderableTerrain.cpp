@@ -21,7 +21,7 @@ RenderableTerrain::RenderableTerrain(uint id, std::shared_ptr<HeightMap>& height
 void RenderableTerrain::initialise(RenderContext* renderContext)
   {
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/MeshVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/MeshFS.glsl") };
-  shaderProgram = renderContext->createShaderProgram(&shaders);
+  shaderProgram = renderContext->getSharedShaderProgram(&shaders);
   setDepthTest(true);
 
   meshStorage = renderContext->createEmptyMeshStorage();
@@ -44,7 +44,7 @@ void RenderableTerrain::initialise(RenderContext* renderContext)
 
 void RenderableTerrain::cleanUp(RenderContext* renderContext)
   {
-  shaderProgram->cleanUp();
+  meshStorage->cleanUp();
   }
 
 void RenderableTerrain::render(RenderContext* renderContext)

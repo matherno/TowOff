@@ -122,7 +122,7 @@ void UnderConstructTower::createRenderables(GameContext* gameContext)
   //  tower base renderable
   if (!baseModelFile.empty())
     {
-    MeshStoragePtr meshStorage = context->createMeshStorage(baseModelFile);
+    MeshStoragePtr meshStorage = context->getSharedMeshStorage(baseModelFile);
     if (meshStorage)
       {
       towerBase = createTowerMesh(meshStorage, context);
@@ -134,7 +134,7 @@ void UnderConstructTower::createRenderables(GameContext* gameContext)
   //  tower turret renderable
   if (!turretModelFile.empty())
     {
-    MeshStoragePtr meshStorage = context->createMeshStorage(turretModelFile);
+    MeshStoragePtr meshStorage = context->getSharedMeshStorage(turretModelFile);
     if (meshStorage)
       {
       towerTurret = createTowerMesh(meshStorage, context);

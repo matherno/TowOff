@@ -41,6 +41,7 @@ private:
 public:
   void initialiseUI(GameContext* context);
   void updateUI(GameContext* context);
+  void cleanUp(GameContext* context);
   void deselectTowerType();
 
 protected:

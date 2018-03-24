@@ -12,7 +12,7 @@ void RenderableLineStrips::initialise(RenderContext* renderContext)
   using namespace mathernogl;
   clearGLErrors();
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/LineStripVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/LineStripFS.glsl") };
-  shaderProgram = renderContext->createShaderProgram(&shaders);
+  shaderProgram = renderContext->getSharedShaderProgram(&shaders);
 
   vbo.init();
   vao.init();

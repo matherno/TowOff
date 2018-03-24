@@ -84,6 +84,12 @@ void TOInputHandler::refreshRotationMatrix()
 
 bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
   {
+  if (key == KEY_ESC)
+    {
+    gameContext->endContext();
+    return false;
+    }
+
   switch(getCharFromKeyCode(key))
     {
     case 'P':

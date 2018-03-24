@@ -20,7 +20,7 @@ void RenderableParticles::initialise(RenderContext* renderContext)
     vao.linkBufferAsFloats(particlesBuffer, 0,                 sizeof(float), 3, 0, false);       // positions
     vao.linkBufferAsFloats(particlesBuffer, sizeof(float) * 3, sizeof(float) * 3, 1, 1, false);   // fade values
     std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/ParticlesVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/ParticlesFS.glsl") };
-    shaderProgram = renderContext->createShaderProgram(&shaders);
+    shaderProgram = renderContext->getSharedShaderProgram(&shaders);
     }
   else
     {
@@ -34,7 +34,7 @@ void RenderableParticles::initialise(RenderContext* renderContext)
     vao.unbind();
     vertexBuffer.cleanUp();
     std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/ParticleQuadsVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/ParticleQuadsFS.glsl") };
-    shaderProgram = renderContext->createShaderProgram(&shaders);
+    shaderProgram = renderContext->getSharedShaderProgram(&shaders);
     }
 
   glEnable(GL_PROGRAM_POINT_SIZE);
