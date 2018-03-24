@@ -7,14 +7,14 @@
 #include "TOGameContext.h"
 #include "TowerFactory.h"
 
-TOInputHandler::TOInputHandler(uint id, const Vector3D& position, float zoomOffset, float yaw, float pitch)
-  : InputHandler(id), position(position), zoomOffset(zoomOffset), yaw(yaw), pitch(pitch)
+TOInputHandler::TOInputHandler(uint id, const Vector3D& focalPosition, float zoomOffset, float rotation, float pitch)
+  : InputHandler(id), focalPosition(focalPosition), zoomOffset(zoomOffset), rotation(rotation), pitch(pitch)
   {
   }
 
 void TOInputHandler::refreshCamera(Camera* camera) const
   {
-  *camera->getWorldToCamera() = mathernogl::matrixTranslate(position * -1) * rotationMatrix * mathernogl::matrixTranslate(0, 0, -zoomOffset);
+  *camera->getWorldToCamera() = mathernogl::matrixTranslate(focalPosition * -1) * rotationMatrix * mathernogl::matrixTranslate(0, 0, -zoomOffset);
   camera->setValid(false);
   }
 
@@ -36,7 +36,7 @@ bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
   {
   char character = getCharFromKeyCode(key);
   Vector3D translation(0);
-  float rotation = 0;
+  float rotationDelta = 0;
   float speed = panSpeed * gameContext->getDeltaTime() * 0.001f;
   float rotateSpeed = yawSpeed * gameContext->getDeltaTime() * 0.001f;
 
@@ -55,22 +55,22 @@ bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
       translation.set(speed, 0, 0);
       break;
     case 'Q':
-      rotation = rotateSpeed;
+      rotationDelta = rotateSpeed;
       break;
     case 'E':
-      rotation = -rotateSpeed;
+      rotationDelta = -rotateSpeed;
       break;
     }
 
-  if (translation.magnitude() > 0 || rotation != 0)
+  if (translation.magnitude() > 0 || rotationDelta != 0)
     {
-    if (rotation != 0)
+    if (rotationDelta != 0)
       {
-      yaw += rotation;
+      rotation += rotationDelta;
       refreshRotationMatrix();
       }
-    translation *= mathernogl::matrixYaw(yaw);
-    position += translation;
+    translation *= mathernogl::matrixYaw(rotation);
+    focalPosition += translation;
     refreshCamera(gameContext->getCamera());
     return true;
     }
@@ -79,7 +79,7 @@ bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
 
 void TOInputHandler::refreshRotationMatrix()
   {
-  rotationMatrix = mathernogl::matrixYaw(-yaw) * mathernogl::matrixPitch(-pitch);
+  rotationMatrix = mathernogl::matrixYaw(-rotation) * mathernogl::matrixPitch(-pitch);
   }
 
 bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)

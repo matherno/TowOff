@@ -20,7 +20,7 @@ bool TOGameContext::initialise()
   {
   renderConfig.windowName = "TowOff";
   bool success = GameContextImpl::initialise();
-  InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 70, 60), -20, 0, -45));
+  InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 0, 60), 60, 0, -45));
   addInputHandler(inputHandler);
   initSurface(7);
   hudHandler.initialiseUI(this);

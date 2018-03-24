@@ -9,13 +9,13 @@
 class TOInputHandler : public InputHandler
   {
 private:
-  Vector3D position;
+  Vector3D focalPosition;
   float panSpeed = 50;
   float yawSpeed = 90;
   float zoomSpeed = 8;
-  float minZoom = -60;
-  float maxZoom = 50;
-  float yaw;
+  float minZoom = 30;
+  float maxZoom = 200;
+  float rotation;
   float pitch;
   Matrix4 rotationMatrix;
   float zoomOffset;
@@ -23,11 +23,11 @@ private:
   uint activePlayer = 0;
 
 public:
-  TOInputHandler(uint id, const Vector3D& position, float zoomOffset = 0, float yaw = 0, float pitch = -45);
+  TOInputHandler(uint id, const Vector3D& focalPosition, float zoomOffset = 0, float rotation = 0, float pitch = -45);
 
-  Vector3D getPosition() const { return position; }
+  Vector3D getFocalPosition() const { return focalPosition; }
   float getPitch() const { return pitch; };
-  float getYaw() const { return yaw; };
+  float getRotation() const { return rotation; };
   void getZoomOffset(float zoomOffset) { this->zoomOffset = zoomOffset; }
   void setPanSpeed(float speed) { panSpeed = speed; }
   void setYawSpeed(float speed) { yawSpeed = speed; }
