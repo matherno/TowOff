@@ -1,5 +1,3 @@
-Rudimentaryed by matt on 24/03/18.
-//
 
 #include <UISystem/UIPanel.h>
 #include <UISystem/UIButton.h>
