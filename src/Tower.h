@@ -2,6 +2,7 @@
 
 #include <GameSystem/GameSystem.h>
 #include <BoundingBox.h>
+#include "TOGameSaveLoad.h"
 
 /*
 *   
@@ -24,7 +25,7 @@ public:
     };
 
 protected:
-  uint towerType;
+  const uint towerType;
   TowerFunctionalityPtr functionality;
   RenderablePtr towerBase;
   RenderablePtr towerTurret;
@@ -42,6 +43,7 @@ protected:
   string baseModelFile, turretModelFile = "";
   Vector3D targetOffset;
   Vector3D connectOffset;
+  double turretRotation = 0;
 
 public:
   Tower(uint id, uint towerType, TowerFunctionalityPtr functionality);
@@ -89,8 +91,13 @@ public:
   float getConnectRadius() const { return connectRadius; }
   void setTurretRotation(const Vector3D& targetPos);
   const Transform* getTurretRotation() const;
+  void setTurretYRotation(double yRotation);
+  double getTurretYRotation() const;
   RenderablePtr getBaseMeshRenderable() { return towerBase; }
   RenderablePtr getTurretMeshRenderable() { return towerTurret; }
+
+  void getTowerState(TowerState* state);
+  void setTowerState(const TowerState* state);
   };
 
 typedef std::shared_ptr<Tower> TowerPtr;
@@ -124,5 +131,7 @@ public:
   virtual void onAttached(Tower* tower, GameContext* gameContext) {};
   virtual void onUpdate(Tower* tower, GameContext* gameContext) {};
   virtual void onDetached(Tower* tower, GameContext* gameContext) {};
+  virtual void onGetTowerState(TowerState* state) {};
+  virtual void onSetTowerState(const TowerState* state) {};
   };
 typedef std::unique_ptr<TowerFunctionality> TowerFunctionalityPtr;

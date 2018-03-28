@@ -19,15 +19,20 @@
 bool TOGameContext::initialise()
   {
   bool success = GameContextImpl::initialise();
-  InputHandlerPtr inputHandler(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 0, 40), 80, 0, -45));
-  addInputHandler(inputHandler);
-  initSurface(7);
+  if (loadedGameState)
+    toInputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), loadedGameState->cameraFocalPos, loadedGameState->cameraZoomFactor, loadedGameState->cameraRotation, -45));
+  else
+    toInputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 0, 40), 80, 0, -45));
+  addInputHandler(toInputHandler);
+
+  initSurface();
   hudHandler.initialiseUI(this);
   specialEffectsHandler.initialise(this);
   connectionManager.reset(new ConnectionManager(getNextActorID()));
   addActor(connectionManager);
   rangeFieldManager.reset(new RangeFieldManager(getNextActorID()));
   addActor(rangeFieldManager);
+  addInitialTowers();
   return success;
   }
 
@@ -152,6 +157,19 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position, bo
   return tower;
   }
 
+void TOGameContext::addInitialTowers()
+  {
+  if (loadedGameState)
+    {
+    TowerPtr tower;
+    for (TowerState& state : loadedGameState->towers)
+      {
+      tower = createTower(state.type, state.position, state.underConstruction);
+      tower->setTowerState(&state);
+      }
+    }
+  }
+
 Vector3D TOGameContext::getPlayerColour(uint num) const
   {
   switch (num)
@@ -165,22 +183,31 @@ Vector3D TOGameContext::getPlayerColour(uint num) const
     }
   }
 
-void TOGameContext::initSurface(uint size)
+void TOGameContext::initSurface()
   {
   RenderContext* renderContext = getRenderContext();
-  std::shared_ptr<HeightMap> heightMap(new HeightMap());
-  HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.75);
+  std::shared_ptr<HeightMap> heightMap;
+  uint size = 7;
 
-  for (float& height : heightMap->heights)
+  if (loadedGameState)
     {
-    if (height > 0)
-      height = LAND_HEIGHT;
-    else
-      height = WATER_FLOOR_HEIGHT;
+    heightMap = loadedGameState->terrainHeightMap;
+    }
+  else
+    {
+    heightMap.reset(new HeightMap());
+    HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.75);
+    for (float& height : heightMap->heights)
+      {
+      if (height > 0)
+        height = LAND_HEIGHT;
+      else
+        height = WATER_FLOOR_HEIGHT;
+      }
     }
 
   const float cellSize = 1;
-  const uint numCells = (uint)pow(2, (int)size);
+  const uint numCells = heightMap->width - 1;
   const float translation = (float)numCells*cellSize*-0.5f;
   surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize));
   surfaceMesh->setMultiColour(Vector3D(0.2, 0.4, 0.2), Vector3D(0.1, 0.3, 0.0));
@@ -410,4 +437,17 @@ void TOGameContext::doTowerDamageEffect(const Tower* tower, const Vector3D& effe
   specialEffectsHandler.towerDamageEffect(this, tower, effectColour);
   }
 
+void TOGameContext::getGameState(TOGameState* state)
+  {
+  state->cameraFocalPos = toInputHandler->getFocalPosition();
+  state->cameraRotation = toInputHandler->getRotation();
+  state->cameraZoomFactor = toInputHandler->getZoomOffset();
+  state->terrainHeightMap = surfaceMesh->getHeightMap();
+  for (TowerPtr tower : *towers.getList())
+    {
+    TowerState towerState;
+    tower->getTowerState(&towerState);
+    state->towers.push_back(towerState);
+    }
+  }
 

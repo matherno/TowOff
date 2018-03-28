@@ -32,4 +32,5 @@ public:
   void setMultiColour(const Vector3D& baseColour1, const Vector3D& baseColour2);
 
   float getHeightAt(const Vector3D& worldPos) const;
+  std::shared_ptr<HeightMap> getHeightMap() const { return heightMap; }
   };

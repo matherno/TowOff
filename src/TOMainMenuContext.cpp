@@ -27,8 +27,8 @@ bool TOMainMenuContext::initialise()
   //  LOAD
   menuButtons.emplace_back(IMAGE_MAINMENU_LOAD, [this](uint mouseX, uint mouseY)
     {
-//    selectedOption = optionQuit;
-//    endContext();
+    selectedOption = optionLoad;
+    endContext();
     return true;
     });
 

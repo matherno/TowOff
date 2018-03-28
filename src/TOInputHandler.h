@@ -28,9 +28,10 @@ public:
   Vector3D getFocalPosition() const { return focalPosition; }
   float getPitch() const { return pitch; };
   float getRotation() const { return rotation; };
-  void getZoomOffset(float zoomOffset) { this->zoomOffset = zoomOffset; }
+  float getZoomOffset() { return zoomOffset; }
   void setPanSpeed(float speed) { panSpeed = speed; }
   void setYawSpeed(float speed) { yawSpeed = speed; }
+  void setZoomOffset(float zoomOffset) { this->zoomOffset = zoomOffset; }
   void setZoomSpeed(float speed) { zoomSpeed = speed; }
   void setZoomLimits(float min, float max) { minZoom = min; maxZoom = max; }
   void refreshCamera(Camera* camera) const;

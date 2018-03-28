@@ -96,6 +96,12 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
       paused = !paused;
       gameContext->setPaused(paused);
       return true;
+    case 'T':
+      TOGameState state;
+      TOGameContext::cast(gameContext)->getGameState(&state);
+      string filePath = "Default.tos";
+      TOGameSaveLoad::saveGame(&state, filePath);
+      return true;
     }
   return false;
   }

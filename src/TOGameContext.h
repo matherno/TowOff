@@ -15,6 +15,7 @@ class TOGameContext;
 #include "ConnectionManager.h"
 #include "RangeFieldManager.h"
 #include "SpecialEffectsHandler.h"
+#include "TOGameSaveLoad.h"
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
@@ -23,6 +24,7 @@ class TOGameContext;
 class TOGameContext : public GameContextImpl
   {
 private:
+  std::shared_ptr<TOGameState> loadedGameState;
   std::vector<PlayerPtr> players;
   TowerList towers;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
@@ -31,6 +33,7 @@ private:
   std::shared_ptr<ConnectionManager> connectionManager;
   std::shared_ptr<RangeFieldManager> rangeFieldManager;
   TowerPtr focusedTower = nullptr;
+  std::shared_ptr<TOInputHandler> toInputHandler;
 
   //  maps combat towers to the networks (via relay towers) that they are within range of
   std::map<uint, std::set<uint>> combatTowerNetworks;
@@ -42,7 +45,7 @@ private:
   std::map<uint, uint> towerRangeFields;
 
 public:
-  TOGameContext(const RenderContextPtr& renderContext) : GameContextImpl(renderContext) {}
+  TOGameContext(const RenderContextPtr& renderContext, std::shared_ptr<TOGameState> loadedGameState = nullptr) : GameContextImpl(renderContext), loadedGameState(loadedGameState) {}
   virtual bool initialise() override;
   virtual void cleanUp() override;
   virtual void processInputStage() override;
@@ -65,6 +68,7 @@ public:
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);
   TowerPtr createTower(uint towerType, const Vector3D& position, bool underConstruction);
+  void addInitialTowers();
 
   //  retrieves a tower in the same network as tower of towerID
   //  findClosest => returns the closest
@@ -90,8 +94,9 @@ public:
   void focusTower(uint towerID);
   void unfocusTower();
   TowerPtr getFocusedTower() { return focusedTower; }
-
   void doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour = Vector3D(0.9, 0, 0));
+
+  void getGameState(TOGameState* state);
 
   inline static TOGameContext* cast(GameContext* context)
     {
@@ -101,6 +106,6 @@ public:
     }
 
 protected:
-  void initSurface(uint size);
+  void initSurface();
   void rebuildCombatTowerNetworksMap();
   };

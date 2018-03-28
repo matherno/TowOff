@@ -8,7 +8,7 @@ struct HeightMap
   {
   std::vector<float> heights;
   uint width;
-  float getHeight(uint col, uint row){ return heights[col + row * width]; }
+  float getHeight(uint col, uint row) const { return heights.at(col + row * width); }
   };
 
 class HeightMapFactory

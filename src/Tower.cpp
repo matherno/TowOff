@@ -143,12 +143,32 @@ void Tower::setTurretRotation(const Vector3D& targetPos)
     Vector3D targetDirection = targetPos - position;
     targetDirection.y = 0;
     targetDirection.makeUniform();
-
     double angleBetween = mathernogl::ccwAngleBetween(Vector2D(0, -1), Vector2D(targetDirection.x, targetDirection.z));
+    setTurretYRotation(angleBetween);
+    }
+  }
+
+const Transform* Tower::getTurretRotation() const
+  {
+  if (towerTurret)
+    return towerTurret->getTransform();
+  return nullptr;
+  }
+
+void Tower::setTurretYRotation(double yRotation)
+  {
+  if (towerTurret)
+    {
+    turretRotation = yRotation;
     towerTurret->getTransform()->setIdentityMatrix();
-    towerTurret->getTransform()->rotate(0, 1, 0, angleBetween);
+    towerTurret->getTransform()->rotate(0, 1, 0, yRotation);
     towerTurret->getTransform()->translate(position);
     }
+  }
+
+double Tower::getTurretYRotation() const
+  {
+  return turretRotation;
   }
 
 Tower::TowerFunction Tower::getFunction() const
@@ -157,13 +177,6 @@ Tower::TowerFunction Tower::getFunction() const
     return functionality->function;
   else
     return Tower::none;
-  }
-
-const Transform* Tower::getTurretRotation() const
-  {
-  if (towerTurret)
-    return towerTurret->getTransform();
-  return nullptr;
   }
 
 uint Tower::takeEnergy(uint amount, bool allOrNothing)
@@ -186,4 +199,29 @@ uint Tower::storeEnergy(uint amount)
   storedEnergy += amount;
   return amount;
   }
+
+void Tower::getTowerState(TowerState* state)
+  {
+  state->type = towerType;
+  state->position = position;
+  state->rotation = turretRotation;
+  state->health = (uint)std::max(healthPoints, 0);
+  state->energy = storedEnergy;
+  state->playerNum = playerNum;
+  state->underConstruction = isUnderConstruction();
+  if(functionality)
+    functionality->onGetTowerState(state);
+  }
+
+void Tower::setTowerState(const TowerState* state)
+  {
+  setPosition(state->position);
+  setTurretYRotation(state->rotation);
+  healthPoints = std::min((int)state->health, maxHealthPoints);
+  storedEnergy = std::min(state->energy, maxEnergy);
+  playerNum = state->playerNum;
+  if(functionality)
+    functionality->onSetTowerState(state);
+  }
+
 

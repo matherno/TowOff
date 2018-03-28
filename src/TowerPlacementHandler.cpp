@@ -78,7 +78,7 @@ bool TowerPlacementHandler::onMouseReleased(GameContext* gameContext, uint butto
       {
       const TowerType* towerType = TowerFactory::getTowerType(towerTypeID);
       bool needsConstruction = towerType->name != "Home Base" && towerType->name != "Enemy Tower";
-#if 1
+#if 0
       needsConstruction = false;    // for testing
 #endif
       TowerPtr tower = toGameContext->createTower(towerTypeID, towerHighlightPos, needsConstruction);

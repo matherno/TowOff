@@ -31,6 +31,15 @@ TOMainMenuContext::Option doMainMenu(RenderContextPtr renderContext)
   return outcome;
   }
 
+std::shared_ptr<TOGameState> loadGame()
+  {
+  std::shared_ptr<TOGameState> state(new TOGameState());
+  string filePath = "Default.tos";
+  if (!TOGameSaveLoad::loadGame(state.get(), filePath))
+    return nullptr;
+  return state;
+  }
+
 int main()
   {
   RenderInitConfig renderConfig;
@@ -46,23 +55,31 @@ int main()
     return 0;
     }
 
-  TOMainMenuContext::Option mainMenuOutcome = doMainMenu(renderContext);
-
-  while (mainMenuOutcome != TOMainMenuContext::optionNone && mainMenuOutcome != TOMainMenuContext::optionQuit && renderContext->isWindowOpen())
+  TOMainMenuContext::Option mainMenuOutcome;
+  while ((mainMenuOutcome = doMainMenu(renderContext)) != TOMainMenuContext::optionQuit && renderContext->isWindowOpen())
     {
-    TOGameContext gameContext(renderContext);
-    gameContext.initialise();
-    while (!gameContext.isContextEnded() && renderContext->isWindowOpen())
+    std::shared_ptr<TOGameState> loadedState;
+    if (mainMenuOutcome == TOMainMenuContext::optionLoad)
       {
-      gameContext.startFrame();
-      gameContext.processInputStage();
-      gameContext.processUpdateStage();
-      gameContext.processDrawStage();
-      gameContext.endFrame(60);
+      loadedState = loadGame();
+      if (!loadedState)
+        continue;
       }
-    gameContext.cleanUp();
 
-    mainMenuOutcome = doMainMenu(renderContext);
+    if (mainMenuOutcome == TOMainMenuContext::optionNew || mainMenuOutcome == TOMainMenuContext::optionLoad)
+      {
+      TOGameContext gameContext(renderContext, loadedState);
+      gameContext.initialise();
+      while (!gameContext.isContextEnded() && renderContext->isWindowOpen())
+        {
+        gameContext.startFrame();
+        gameContext.processInputStage();
+        gameContext.processUpdateStage();
+        gameContext.processDrawStage();
+        gameContext.endFrame(60);
+        }
+      gameContext.cleanUp();
+      }
     }
 
   renderContext->cleanUp();
