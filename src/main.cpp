@@ -14,32 +14,6 @@
 #include "TOGameContext.h"
 #include "TOMainMenuContext.h"
 
-TOMainMenuContext::Option doMainMenu(RenderContextPtr renderContext)
-  {
-  TOMainMenuContext mainMenuContext(renderContext);
-  mainMenuContext.initialise();
-  while(!mainMenuContext.isContextEnded() && renderContext->isWindowOpen())
-    {
-    mainMenuContext.startFrame();
-    mainMenuContext.processInputStage();
-    mainMenuContext.processUpdateStage();
-    mainMenuContext.processDrawStage();
-    mainMenuContext.endFrame(30);
-    }
-  TOMainMenuContext::Option outcome = mainMenuContext.getSelectedOption();
-  mainMenuContext.cleanUp();
-  return outcome;
-  }
-
-std::shared_ptr<TOGameState> loadGame()
-  {
-  std::shared_ptr<TOGameState> state(new TOGameState());
-  string filePath = "Default.tos";
-  if (!TOGameSaveLoad::loadGame(state.get(), filePath))
-    return nullptr;
-  return state;
-  }
-
 int main()
   {
   RenderInitConfig renderConfig;
@@ -55,19 +29,24 @@ int main()
     return 0;
     }
 
-  TOMainMenuContext::Option mainMenuOutcome;
-  while ((mainMenuOutcome = doMainMenu(renderContext)) != TOMainMenuContext::optionQuit && renderContext->isWindowOpen())
+  TOMainMenuContext::MainMenuOutcome mainMenuOutcome;
+  while (renderContext->isWindowOpen())
     {
+    mainMenuOutcome = TOMainMenuContext::doMainMenu(renderContext);
+    if (mainMenuOutcome.isQuitGame())
+      break;
+
     std::shared_ptr<TOGameState> loadedState;
-    if (mainMenuOutcome == TOMainMenuContext::optionLoad)
+    if (mainMenuOutcome.isLoadGame())
       {
-      loadedState = loadGame();
+      loadedState = mainMenuOutcome.loadedState;
       if (!loadedState)
         continue;
       }
 
-    if (mainMenuOutcome == TOMainMenuContext::optionNew || mainMenuOutcome == TOMainMenuContext::optionLoad)
+    if (mainMenuOutcome.isNewGame() || mainMenuOutcome.isLoadGame())
       {
+      mathernogl::logInfo("Starting game...");
       TOGameContext gameContext(renderContext, loadedState);
       gameContext.initialise();
       while (!gameContext.isContextEnded() && renderContext->isWindowOpen())
@@ -83,6 +62,6 @@ int main()
     }
 
   renderContext->cleanUp();
-
+  mathernogl::logInfo("Quiting...");
   return 0;
   }

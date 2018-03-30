@@ -97,16 +97,23 @@ void InputManagerImpl::processInput(GameContext* gameContext)
   inputSource.clearEvents();
   }
 
+bool shouldFire(GameContext* gameContext, InputHandlerPtr& handler)
+  {
+  if (gameContext->getUIManager()->isModalModeActive())
+    return handler->isUIInputHandler();
+  return true;
+  }
+
 void InputManagerImpl::fireMousePressedEvents(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onMousePressed(gameContext, button, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMousePressed(gameContext, button, mouseX, mouseY))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onMousePressed(gameContext, button, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMousePressed(gameContext, button, mouseX, mouseY))
       return;
     }
   }
@@ -115,12 +122,12 @@ void InputManagerImpl::fireMouseHeldEvents(GameContext* gameContext, uint button
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onMouseHeld(gameContext, button, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseHeld(gameContext, button, mouseX, mouseY))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onMouseHeld(gameContext, button, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseHeld(gameContext, button, mouseX, mouseY))
       return;
     }
   }
@@ -129,12 +136,12 @@ void InputManagerImpl::fireMouseReleasedEvents(GameContext* gameContext, uint bu
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onMouseReleased(gameContext, button, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseReleased(gameContext, button, mouseX, mouseY))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onMouseReleased(gameContext, button, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseReleased(gameContext, button, mouseX, mouseY))
       return;
     }
   }
@@ -143,12 +150,12 @@ void InputManagerImpl::fireMouseScrollEvents(GameContext* gameContext, double sc
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onMouseScroll(gameContext, scrollOffset, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseScroll(gameContext, scrollOffset, mouseX, mouseY))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onMouseScroll(gameContext, scrollOffset, mouseX, mouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseScroll(gameContext, scrollOffset, mouseX, mouseY))
       return;
     }
   }
@@ -157,12 +164,12 @@ void InputManagerImpl::fireMouseMoveEvents(GameContext* gameContext, uint mouseX
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onMouseMove(gameContext, mouseX, mouseY, prevMouseX, prevMouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseMove(gameContext, mouseX, mouseY, prevMouseX, prevMouseY))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onMouseMove(gameContext, mouseX, mouseY, prevMouseX, prevMouseY))
+    if (shouldFire(gameContext, handler) && handler->onMouseMove(gameContext, mouseX, mouseY, prevMouseX, prevMouseY))
       return;
     }
   }
@@ -171,12 +178,12 @@ void InputManagerImpl::fireKeyPressedEvents(GameContext* gameContext, uint key)
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onKeyPressed(gameContext, key))
+    if (shouldFire(gameContext, handler) && handler->onKeyPressed(gameContext, key))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onKeyPressed(gameContext, key))
+    if (shouldFire(gameContext, handler) && handler->onKeyPressed(gameContext, key))
       return;
     }
   }
@@ -185,12 +192,12 @@ void InputManagerImpl::fireKeyHeldEvents(GameContext* gameContext, uint key)
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onKeyHeld(gameContext, key))
+    if (shouldFire(gameContext, handler) && handler->onKeyHeld(gameContext, key))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onKeyHeld(gameContext, key))
+    if (shouldFire(gameContext, handler) && handler->onKeyHeld(gameContext, key))
       return;
     }
   }
@@ -199,12 +206,12 @@ void InputManagerImpl::fireKeyReleasedEvents(GameContext* gameContext, uint key)
   {
   for (InputHandlerPtr& handler : *priorityHandlers.getList())
     {
-    if (handler->onKeyReleased(gameContext, key))
+    if (shouldFire(gameContext, handler) && handler->onKeyReleased(gameContext, key))
       return;
     }
   for (InputHandlerPtr& handler : *handlers.getList())
     {
-    if (handler->onKeyReleased(gameContext, key))
+    if (shouldFire(gameContext, handler) && handler->onKeyReleased(gameContext, key))
       return;
     }
   }

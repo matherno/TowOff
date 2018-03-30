@@ -6,6 +6,7 @@
 #include "TOInputHandler.h"
 #include "TOGameContext.h"
 #include "TowerFactory.h"
+#include "SaveLoadDlg.h"
 
 TOInputHandler::TOInputHandler(uint id, const Vector3D& focalPosition, float zoomOffset, float rotation, float pitch)
   : InputHandler(id), focalPosition(focalPosition), zoomOffset(zoomOffset), rotation(rotation), pitch(pitch)
@@ -97,10 +98,7 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
       gameContext->setPaused(paused);
       return true;
     case 'T':
-      TOGameState state;
-      TOGameContext::cast(gameContext)->getGameState(&state);
-      string filePath = "Default.tos";
-      TOGameSaveLoad::saveGame(&state, filePath);
+      showSaveDialog(gameContext);
       return true;
     }
   return false;
@@ -126,4 +124,30 @@ bool TOInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset
   zoomOffset = mathernogl::clampf(zoomOffset, minZoom, maxZoom);
   refreshCamera(gameContext->getCamera());
   return true;
+  }
+
+void TOInputHandler::showSaveDialog(GameContext* gameContext)
+  {
+  UIManager* uiManager = gameContext->getUIManager();
+  std::shared_ptr<SaveLoadDlg> saveLoadDlg(new SaveLoadDlg(uiManager->getNextComponentID(), SaveLoadDlg::modeSave));
+  uiManager->addComponent(saveLoadDlg);
+  uiManager->enableModalMode(saveLoadDlg);
+
+  //  On saving to a file
+  uint id = saveLoadDlg->getID();
+  saveLoadDlg->setSaveGameStateCallback([id, gameContext, uiManager]()
+                                          {
+                                          std::shared_ptr<TOGameState> state(new TOGameState());
+                                          TOGameContext::cast(gameContext)->getGameState(state.get());
+                                          uiManager->removeComponent(id);
+                                          uiManager->disableModalMode();
+                                          return state;
+                                          });
+
+  //  On cancelled loading
+  saveLoadDlg->setCancelledCallback([uiManager, id]()
+                                      {
+                                      uiManager->removeComponent(id);
+                                      uiManager->disableModalMode();
+                                      });
   }

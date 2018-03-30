@@ -88,6 +88,7 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
   FontWord fontWord;
   uint currentWordLength = 0;
   uint numLines = 1;
+  uint maxLineLength = 0;
   for (const char& character : text)
     {
     uint ascii = (uint)character;
@@ -99,6 +100,7 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
       currentWordLength += fontChar->cursorAdvance * textScaling;
       if (cursor->x + currentWordLength > textBounds.x && cursor->x != 0)
         {
+        maxLineLength = (uint)std::max((float)maxLineLength, cursor->x);
         cursor->x = 0;
         cursor->y += lineHeight;
         ++numLines;
@@ -120,6 +122,7 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
 
     if (character == '\n')
       {
+      maxLineLength = (uint)std::max((float)maxLineLength, cursor->x);
       cursor->x = 0;
       cursor->y += lineHeight;
       ++numLines;
@@ -132,13 +135,22 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
 
   if (!fontWord.empty())
     buildWord(context, fontWord, cursor, textScaling);
+  maxLineLength = (uint)std::max((float)maxLineLength, cursor->x);
 
-  if (centreAlign)
+  if (centreAlignVert)
     {
     const uint paragraphHeight = numLines * lineHeight;
     const uint textShift = (uint)((textBounds.y - paragraphHeight) * 0.5f);
     for (UIComponentPtr comp : characterComponents)
       comp->setOffset(comp->getOffset() + Vector2D(0, textShift));
+    }
+
+  if (centreAlignHoriz)
+    {
+    //  not the proper way of doing it, should be aligning line by line (works for single line text)
+    const uint textShift = (uint)((textBounds.x - maxLineLength) * 0.5f);
+    for (UIComponentPtr comp : characterComponents)
+      comp->setOffset(comp->getOffset() + Vector2D(textShift, 0));
     }
   }
 

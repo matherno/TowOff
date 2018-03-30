@@ -34,6 +34,7 @@ void UIPanel::cleanUp(GameContext* context)
   for (UIComponentPtr& child : *children.getList())
     child->cleanUp(context);
   children.clear();
+  mouseClickCallback = nullptr;   //  the callback function object may contain a reference to this (circular reference)
   isValid = false;
   }
 
@@ -121,6 +122,11 @@ void UIPanel::addChild(UIComponentPtr component)
 void UIPanel::removeChild(uint id)
   {
   childrenToRemove.push_back(id);
+  }
+
+UIComponentPtr UIPanel::getChild(uint id)
+  {
+  return children.get(id);
   }
 
 void UIPanel::refreshPendingComponents(GameContext* context)

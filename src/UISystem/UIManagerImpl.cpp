@@ -39,6 +39,11 @@ void UIManagerImpl::cleanUp(GameContext* context)
   rootComponent->cleanUp(context);
   }
 
+UIComponentPtr UIManagerImpl::getComponent(uint id)
+  {
+  return rootComponent->getChild(id);
+  }
+
 uint UIManagerImpl::getNextComponentID()
   {
   return nextComponentID++;
@@ -46,6 +51,8 @@ uint UIManagerImpl::getNextComponentID()
 
 bool UIManagerImpl::mouseClick(GameContext* context, uint mouseX, uint mouseY)
   {
+  if (modalComponent)
+    return modalComponent->mouseClick(context, mouseX, mouseY);
   return rootComponent->mouseClick(context, mouseX, mouseY);
   }
 
@@ -53,3 +60,19 @@ bool UIManagerImpl::hitTest(uint mouseX, uint mouseY)
   {
   return rootComponent->hitTest(mouseX, mouseY, true);
   }
+
+void UIManagerImpl::enableModalMode(UIComponentPtr modalComponent)
+  {
+  this->modalComponent = modalComponent;
+  }
+
+void UIManagerImpl::disableModalMode()
+  {
+  modalComponent.reset();
+  }
+
+bool UIManagerImpl::isModalModeActive() const
+  {
+  return (bool)modalComponent;
+  }
+

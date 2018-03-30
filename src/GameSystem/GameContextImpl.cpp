@@ -76,15 +76,15 @@ void GameContextImpl::processInputStage()
 
 void GameContextImpl::processUpdateStage()
   {
-  if (!paused)
+  stage = stageUpdate;
+  if (!paused && !getUIManager()->isModalModeActive())
     {
-    stage = stageUpdate;
     for (GameActorPtr actor : *actors.getList())
       actor->onUpdate(this);
-    uiManager.update(this);
-    stage = stageNone;
-    removePendingActors();
     }
+  uiManager.update(this);
+  stage = stageNone;
+  removePendingActors();
   }
 
 void GameContextImpl::processDrawStage()

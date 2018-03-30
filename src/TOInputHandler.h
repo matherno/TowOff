@@ -47,4 +47,5 @@ public:
 
 protected:
   void refreshRotationMatrix();
+  void showSaveDialog(GameContext* gameContext);
   };

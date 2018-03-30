@@ -43,6 +43,7 @@ public:
   virtual void setVerticalAlignment(Alignment alignment) = 0;
   virtual void addChild(UIComponentPtr component) = 0;
   virtual void removeChild(uint id) = 0;
+  virtual UIComponentPtr getChild(uint id) = 0;
   virtual void setVisible(bool visible, bool recurseChildren = false) = 0;
   virtual bool isVisible() const = 0;
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
@@ -56,7 +57,11 @@ class UIManager
 public:
   virtual void addComponent(UIComponentPtr component) = 0;
   virtual void removeComponent(uint id) = 0;
+  virtual UIComponentPtr getComponent(uint id) = 0;
   virtual uint getNextComponentID() = 0;
+  virtual void enableModalMode(UIComponentPtr modalComponent) = 0;
+  virtual void disableModalMode() = 0;
+  virtual bool isModalModeActive() const = 0;
   virtual bool initialise(GameContext* context) = 0;
   virtual void update(GameContext* context) = 0;
   virtual void cleanUp(GameContext* context) = 0;

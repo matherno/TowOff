@@ -16,7 +16,8 @@ private:
   Vector3D fontColour;
   int spaceWidth = -1;   // -1 => use fonts space width definition
   bool background = true;
-  bool centreAlign = false;
+  bool centreAlignVert = false;
+  bool centreAlignHoriz = false;
 
 public:
   UIText(uint id, FontPtr font = nullptr);      // will use default font if one not given
@@ -24,7 +25,7 @@ public:
   void setFontSize(uint textSize) { this->textSize = std::max(textSize, 1u); }
   void setFontColour (const Vector3D& colour) { fontColour = colour; }
   void setSpaceWidth (uint width) { spaceWidth = width; }
-  void setTextCentreAligned(bool align) { centreAlign = align; }
+  void setTextCentreAligned(bool vertical, bool horizontal) { centreAlignVert = vertical; centreAlignHoriz = horizontal; }
   void showBackground(bool show) { background = show; }
 
   virtual void initialise(GameContext* context) override;

@@ -4,26 +4,33 @@
 
 #include "UIButton.h"
 
+#define BUTTON_PRESS_TIME 100
+
 UIButton::UIButton(uint id, bool toggle) : UIPanel(id), toggle(toggle)
   {}
 
 void UIButton::initialise(GameContext* context)
   {
   UIPanel::initialise(context);
-  buttonImageComponent.reset(new UIPanel(context->getUIManager()->getNextComponentID()));
-  addChild(buttonImageComponent);
+  buttonInnerComponent.reset(new UIText(context->getUIManager()->getNextComponentID()));
+  addChild(buttonInnerComponent);
+  pressTimer.setTimeOut(BUTTON_PRESS_TIME);
   }
 
 void UIButton::refresh(GameContext* context, const Vector2D& parentPos, const Vector2D& parentSize)
   {
-  //todo implement non toggle button
-  buttonImageComponent->setHorizontalAlignment(Alignment::alignmentCentre);
-  buttonImageComponent->setVerticalAlignment(Alignment::alignmentCentre);
-  buttonImageComponent->setHeightMatchParent(true);
-  buttonImageComponent->setWidthMatchParent(true);
-  buttonImageComponent->setPadding(highlightWidth, highlightWidth);
-  buttonImageComponent->setTexture(buttonTexture);
-  buttonImageComponent->setMouseClickCallback([this](uint mouseX, uint mouseY)
+  buttonInnerComponent->setHorizontalAlignment(Alignment::alignmentCentre);
+  buttonInnerComponent->setVerticalAlignment(Alignment::alignmentCentre);
+  buttonInnerComponent->setHeightMatchParent(true);
+  buttonInnerComponent->setWidthMatchParent(true);
+  buttonInnerComponent->setPadding(highlightWidth, highlightWidth);
+  buttonInnerComponent->setTexture(buttonTexture);
+  buttonInnerComponent->setColour(buttonColour);
+  buttonInnerComponent->setText(text);
+  buttonInnerComponent->setFontSize(textSize);
+  buttonInnerComponent->setFontColour(textColour);
+  buttonInnerComponent->setTextCentreAligned(true, true);
+  buttonInnerComponent->setMouseClickCallback([this](uint mouseX, uint mouseY)
                                                 {
                                                 return onButtonClick(mouseX, mouseY);
                                                 });
@@ -32,7 +39,8 @@ void UIButton::refresh(GameContext* context, const Vector2D& parentPos, const Ve
 
 bool UIButton::onButtonClick(uint mouseX, uint mouseY)
   {
-  pressed = !pressed;
+  pressed = toggle ? !pressed : true;
+  pressTimer.reset();
   setButtonHighlightColour(pressedColour, unpressedColour);
   if (pressed)
     updateGroup(mouseX, mouseY);
@@ -92,4 +100,14 @@ void UIButton::setGroup(UIToggleButtonGroupPtr group)
   ASSERT(toggle, "Must be toggle button to be added to a toggle button group!");
   this->group = group;
   group->toggleButtons.add(this, getID());
+  }
+
+void UIButton::onUpdate(GameContext* context)
+  {
+  UIPanel::onUpdate(context);
+  if (!toggle && pressed && pressTimer.incrementTimer(context->getDeltaTime()))
+    {
+    pressed = false;
+    setButtonHighlightColour(pressedColour, unpressedColour);
+    }
   }

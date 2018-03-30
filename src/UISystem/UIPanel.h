@@ -48,6 +48,7 @@ public:
   virtual void invalidate() override;
   virtual void addChild(UIComponentPtr component) override;
   virtual void removeChild(uint id) override;
+  virtual UIComponentPtr getChild(uint id) override;
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) override;
 

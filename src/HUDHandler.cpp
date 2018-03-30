@@ -41,7 +41,7 @@ void TowerFocusPanel::initialise(GameContext* context)
   healthText->setFontSize(statsTextSize);
   healthText->setFontColour(Vector3D(0));
   healthText->showBackground(false);
-  healthText->setTextCentreAligned(true);
+  healthText->setTextCentreAligned(true, false);
   addChild(healthText);
 
   energyBar.reset(new UIProgressBar(uiManager->getNextComponentID()));
@@ -57,7 +57,7 @@ void TowerFocusPanel::initialise(GameContext* context)
   energyText->setFontSize(statsTextSize);
   energyText->setFontColour(Vector3D(0));
   energyText->showBackground(false);
-  energyText->setTextCentreAligned(true);
+  energyText->setTextCentreAligned(true, false);
   addChild(energyText);
 
   FontPtr nameFont = context->getRenderContext()->getSharedFont(FONT_UNISPACE_FNT, FONT_UNISPACE_GLYPHS);

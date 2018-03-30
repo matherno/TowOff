@@ -51,6 +51,7 @@ public:
   virtual bool onKeyPressed(GameContext* gameContext, uint key) { return false; }
   virtual bool onKeyHeld(GameContext* gameContext, uint key) { return false; }
   virtual bool onKeyReleased(GameContext* gameContext, uint key) { return false; }
+  virtual bool isUIInputHandler() const { return false; }
   };
 typedef std::shared_ptr<InputHandler> InputHandlerPtr;
 

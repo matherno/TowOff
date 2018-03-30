@@ -5,6 +5,7 @@
 
 typedef mathernogl::InputHandler InputSource;
 
+
 class InputManagerImpl : public InputManager
   {
 private:
