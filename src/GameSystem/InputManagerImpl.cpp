@@ -64,6 +64,8 @@ void InputManagerImpl::processInput(GameContext* gameContext)
       fireKeyHeldEvents(gameContext, (uint) event.key);
     else if (event.action == mathernogl::INPUT_RELEASED)
       fireKeyReleasedEvents(gameContext, (uint) event.key);
+    else if (event.action == mathernogl::INPUT_REPEATED)
+      fireKeyRepeatedEvents(gameContext, (uint) event.key);
     }
 
   Vector2D mouse = inputSource.getMousePos();
@@ -198,6 +200,20 @@ void InputManagerImpl::fireKeyHeldEvents(GameContext* gameContext, uint key)
   for (InputHandlerPtr& handler : *handlers.getList())
     {
     if (shouldFire(gameContext, handler) && handler->onKeyHeld(gameContext, key))
+      return;
+    }
+  }
+
+void InputManagerImpl::fireKeyRepeatedEvents(GameContext* gameContext, uint key)
+  {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (shouldFire(gameContext, handler) && handler->onKeyRepeated(gameContext, key))
+      return;
+    }
+  for (InputHandlerPtr& handler : *handlers.getList())
+    {
+    if (shouldFire(gameContext, handler) && handler->onKeyRepeated(gameContext, key))
       return;
     }
   }

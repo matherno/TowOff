@@ -18,4 +18,7 @@ public:
   virtual bool onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY) override;
   virtual bool onMouseScroll(GameContext* gameContext, double scrollOffset, uint mouseX, uint mouseY) override;
   virtual bool isUIInputHandler() const override { return true; }
+
+  virtual bool onKeyPressed(GameContext* gameContext, uint key) override;
+  virtual bool onKeyRepeated(GameContext* gameContext, uint key) override;
   };

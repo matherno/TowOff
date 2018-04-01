@@ -43,13 +43,16 @@ public:
   virtual void setVerticalAlignment(Alignment alignment) = 0;
   virtual void addChild(UIComponentPtr component) = 0;
   virtual void removeChild(uint id) = 0;
-  virtual UIComponentPtr getChild(uint id) = 0;
+  virtual UIComponentPtr getChild(uint id, bool recurseChildren = false) = 0;
   virtual void setVisible(bool visible, bool recurseChildren = false) = 0;
   virtual bool isVisible() const = 0;
-  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
+  virtual uint mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;      // returns the id of the component that was clicked
+  virtual bool keyPress(GameContext* context, uint key) = 0;
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) = 0;
   virtual void setMouseClickCallback(OnMouseClickCallback func) = 0;
   virtual void setPadding(float horizPadding, float vertPadding) = 0;     // padding only used when matching parent size
+  virtual void onGainFocus(GameContext* context) = 0;
+  virtual void onLossFocus(GameContext* context) = 0;
   };
 
 class UIManager
@@ -57,7 +60,7 @@ class UIManager
 public:
   virtual void addComponent(UIComponentPtr component) = 0;
   virtual void removeComponent(uint id) = 0;
-  virtual UIComponentPtr getComponent(uint id) = 0;
+  virtual UIComponentPtr getComponent(uint id, bool recurseChildren = false) = 0;
   virtual uint getNextComponentID() = 0;
   virtual void enableModalMode(UIComponentPtr modalComponent) = 0;
   virtual void disableModalMode() = 0;
@@ -66,5 +69,7 @@ public:
   virtual void update(GameContext* context) = 0;
   virtual void cleanUp(GameContext* context) = 0;
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
+  virtual bool keyPress(GameContext* context, uint key) = 0;
   virtual bool hitTest(uint mouseX, uint mouseY) = 0;
+  virtual void lossFocus(GameContext* context) = 0;
   };

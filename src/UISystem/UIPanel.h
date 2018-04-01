@@ -48,8 +48,11 @@ public:
   virtual void invalidate() override;
   virtual void addChild(UIComponentPtr component) override;
   virtual void removeChild(uint id) override;
-  virtual UIComponentPtr getChild(uint id) override;
-  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
+  virtual UIComponentPtr getChild(uint id, bool recurseChildren = false) override;
+  virtual uint mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
+  virtual bool keyPress(GameContext* context, uint key) override { return false; }
+  virtual void onGainFocus(GameContext* context) override {}
+  virtual void onLossFocus(GameContext* context) override {}
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) override;
 
   virtual void setColour(const Vector3D& colour) { this->colour = colour; }

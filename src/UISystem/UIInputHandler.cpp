@@ -26,7 +26,11 @@ bool UIInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
       gameContext->getUIManager()->mouseClick(gameContext, mouseX, mouseY);
     return true;
     }
-  return false;
+  else
+    {
+    gameContext->getUIManager()->lossFocus(gameContext);
+    return false;
+    }
   }
 
 bool UIInputHandler::onMouseHeld(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
@@ -42,4 +46,14 @@ bool UIInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint
 bool UIInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset, uint mouseX, uint mouseY)
   {
   return gameContext->getUIManager()->hitTest(mouseX, mouseY);
+  }
+
+bool UIInputHandler::onKeyPressed(GameContext* gameContext, uint key)
+  {
+  return gameContext->getUIManager()->keyPress(gameContext, key);
+  }
+
+bool UIInputHandler::onKeyRepeated(GameContext* gameContext, uint key)
+  {
+  return gameContext->getUIManager()->keyPress(gameContext, key);
   }

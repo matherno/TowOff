@@ -2,6 +2,7 @@
 
 #include <UISystem/UIPanel.h>
 #include <UISystem/UIList.h>
+#include <UISystem/UIEditText.h>
 #include "TOGameSaveLoad.h"
 
 /*
@@ -24,6 +25,7 @@ public:
 private:
   const Mode mode;
   std::shared_ptr<UIList> listComponent;
+  std::shared_ptr<UIEditText> saveNameTextComp;
   std::map<uint, string> saveFiles;
   OnSavingFunc onSavingFunc;
   OnLoadingFunc onLoadingFunc;
@@ -42,6 +44,8 @@ protected:
   void onDeletePressed();
   void onLoadPressed();
   void onSavePressed();
+  void onSaveNewPressed();
   void onCancelPressed();
   string getSelectedFilePath();
+  string getNewSaveFilePath();
   };

@@ -33,5 +33,6 @@ public:
   void fireMouseMoveEvents(GameContext* gameContext, uint mouseX, uint mouseY, uint prevMouseX, uint prevMouseY);
   void fireKeyPressedEvents(GameContext* gameContext, uint key);
   void fireKeyHeldEvents(GameContext* gameContext, uint key);
+  void fireKeyRepeatedEvents(GameContext* gameContext, uint key);
   void fireKeyReleasedEvents(GameContext* gameContext, uint key);
   };

@@ -124,9 +124,21 @@ void UIPanel::removeChild(uint id)
   childrenToRemove.push_back(id);
   }
 
-UIComponentPtr UIPanel::getChild(uint id)
+UIComponentPtr UIPanel::getChild(uint id, bool recurseChildren)
   {
-  return children.get(id);
+  if (children.contains(id))
+    return children.get(id);
+
+  if (recurseChildren)
+    {
+    for (UIComponentPtr child : *children.getList())
+      {
+      if(UIComponentPtr comp = child->getChild(id, true))
+        return comp;
+      }
+    }
+
+  return nullptr;
   }
 
 void UIPanel::refreshPendingComponents(GameContext* context)
@@ -174,16 +186,21 @@ void UIPanel::setVisible(bool visible, bool recurseChildren)
     }
   }
 
-bool UIPanel::mouseClick(GameContext* context, uint mouseX, uint mouseY)
+uint UIPanel::mouseClick(GameContext* context, uint mouseX, uint mouseY)
   {
   for (UIComponentPtr comp : *children.getList())
     {
-    if (comp->mouseClick(context, mouseX, mouseY))
-      return true;
+    uint id = comp->mouseClick(context, mouseX, mouseY);
+    if (id != 0)
+      return id;
     }
+
   if (mouseClickCallback && hitTest(mouseX, mouseY, false))
-    return mouseClickCallback(mouseX, mouseY);
-  return false;
+    {
+    if (mouseClickCallback(mouseX, mouseY))
+      return getID();
+    }
+  return 0;
   }
 
 bool UIPanel::hitTest(uint mouseX, uint mouseY, bool testChildren)

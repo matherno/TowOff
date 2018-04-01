@@ -25,7 +25,8 @@ void UIText::initialise(GameContext* context)
   if (!font)
     font = context->getDefaultFont();
   UIPanel::initialise(context);
-  setVisible(true, false);
+  caretComponent.reset(new UIPanel(context->getUIManager()->getNextComponentID()));
+  addChild(caretComponent);
   }
 
 void UIText::setText(string text)
@@ -35,18 +36,19 @@ void UIText::setText(string text)
 
 void UIText::refresh(GameContext* context, const Vector2D& parentPos, const Vector2D& parentSize)
   {
+  for (UIComponentPtr comp : characterComponents)
+    removeChild(comp->getID());
+  characterComponents.clear();
   UIPanel::refresh(context, parentPos, parentSize);
 
+  ASSERT(font, "Don't have a font to use for this text!");
   if (font)
     {
-    for (UIComponentPtr comp : characterComponents)
-      removeChild(comp->getID());
-    characterComponents.clear();
-
-    // cursor pos is aligned with the top of such text line
     Vector2D cursor = Vector2D(0, 0);
     float textScaling = (float)textSize / (float)font->fontDefinition->getLineHeight();
     buildText(context, &cursor, textScaling);
+    caretComponent->setVisible(caretVisible, true);
+    caretComponent->refresh(context, getCurrentScreenPos(), getCurrentScreenSize());
     }
   }
 
@@ -55,7 +57,7 @@ void UIText::buildCharacter(GameContext* context, FontCharPtr fontCharacter, Vec
   UIPanel* component = new UIPanel(context->getUIManager()->getNextComponentID());
   component->setHorizontalAlignment(alignmentStart);
   component->setVerticalAlignment(alignmentStart);
-  component->setOffset(*cursor + fontCharacter->offset * textScaling);
+  component->setOffset(Vector2D(textPadding, 0) + *cursor + fontCharacter->offset * textScaling);
   component->setSize(fontCharacter->size * textScaling);
   component->setColour(fontColour);
   component->setTexture(font->fontGlyphsPage, true);
@@ -75,7 +77,8 @@ void UIText::buildWord(GameContext* context, const FontWord& fontWord, Vector2D*
 
 void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling)
   {
-  const Vector2D textBounds = getCurrentScreenSize();
+  Vector2D textBounds = getCurrentScreenSize();
+  textBounds.x -= textPadding * 2;
   const uint lineHeight = (uint)(font->fontDefinition->getLineHeight() * textScaling);
 
   uint spaceAdvance = 10;
@@ -89,8 +92,12 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
   uint currentWordLength = 0;
   uint numLines = 1;
   uint maxLineLength = 0;
+  uint numChars = 0;
   for (const char& character : text)
     {
+    /*
+     * if this is a non-whitespace character, add it to the word
+     */
     uint ascii = (uint)character;
     if (isValidNonWhiteSpaceCharacter(ascii))
       {
@@ -100,6 +107,9 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
       currentWordLength += fontChar->cursorAdvance * textScaling;
       if (cursor->x + currentWordLength > textBounds.x && cursor->x != 0)
         {
+        if (!multiLine)
+          break;
+
         maxLineLength = (uint)std::max((float)maxLineLength, cursor->x);
         cursor->x = 0;
         cursor->y += lineHeight;
@@ -108,9 +118,15 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
       continue;
       }
 
+    /*
+     * must have reached whitespace, so build the word that we've been accumulating
+     */
     if (cursor->y + lineHeight <= textBounds.y)
       {
+      if (caretPos >= numChars && caretPos < numChars + fontWord.size())
+        setupCaretInWord(*cursor, fontWord, caretPos - numChars, textScaling);
       buildWord(context, fontWord, cursor, textScaling);
+      numChars += fontWord.size();
       fontWord.clear();
       currentWordLength = 0;
       }
@@ -120,7 +136,10 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
       break;
       }
 
-    if (character == '\n')
+    /*
+     * special whitespace characters to act upon
+     */
+    if (multiLine && character == '\n')
       {
       maxLineLength = (uint)std::max((float)maxLineLength, cursor->x);
       cursor->x = 0;
@@ -129,28 +148,53 @@ void UIText::buildText(GameContext* context, Vector2D* cursor, float textScaling
       }
     else if (character == ' ')
       {
+      if (caretPos == numChars)
+        setupCaret(*cursor);
       cursor->x += spaceAdvance;
+      ++numChars;
       }
     }
 
+  /*
+   * if we have a word that's not built at this stage, make sure it's built
+   */
   if (!fontWord.empty())
+    {
+    if (caretPos >= numChars && caretPos < numChars + fontWord.size())
+      setupCaretInWord(*cursor, fontWord, caretPos - numChars, textScaling);
     buildWord(context, fontWord, cursor, textScaling);
+    numChars += fontWord.size();
+    }
   maxLineLength = (uint)std::max((float)maxLineLength, cursor->x);
 
+  /*
+   * put caret at the end of the text if required
+   */
+  if (caretPos >= numChars || caretPos < 0)
+    setupCaret(*cursor);
+
+  /*
+   * do vertical alignment adjustment
+   */
   if (centreAlignVert)
     {
     const uint paragraphHeight = numLines * lineHeight;
     const uint textShift = (uint)((textBounds.y - paragraphHeight) * 0.5f);
     for (UIComponentPtr comp : characterComponents)
       comp->setOffset(comp->getOffset() + Vector2D(0, textShift));
+    caretComponent->setOffset(caretComponent->getOffset() + Vector2D(0, textShift));
     }
 
+  /*
+   * do horizontal alignment adjustment
+   */
   if (centreAlignHoriz)
     {
     //  not the proper way of doing it, should be aligning line by line (works for single line text)
     const uint textShift = (uint)((textBounds.x - maxLineLength) * 0.5f);
     for (UIComponentPtr comp : characterComponents)
       comp->setOffset(comp->getOffset() + Vector2D(textShift, 0));
+    caretComponent->setOffset(caretComponent->getOffset() + Vector2D(textShift, 0));
     }
   }
 
@@ -166,5 +210,32 @@ void UIText::setVisible(bool visible, bool recurseChildren)
   {
   UIPanel::setVisible(visible, recurseChildren);
   if (visible)
+    {
     UIPanel::setVisible(background, false);
+    caretComponent->setVisible(caretVisible, true);
+    }
+  }
+
+void UIText::setupCaretInWord(const Vector2D& wordPosition, const FontWord& word, int wordCaretPos, float textScaling)
+  {
+  Vector2D caretCursorPos = wordPosition;
+  for (int character = 0; character < wordCaretPos; ++character)
+    caretCursorPos.x += word[character]->cursorAdvance * textScaling;
+  setupCaret(caretCursorPos);
+  }
+
+void UIText::setupCaret(const Vector2D& cursorPos)
+  {
+  caretComponent->setSize(Vector2D(2, textSize));
+  caretComponent->setOffset(Vector2D(textPadding, 0) + cursorPos);
+  caretComponent->setColour(fontColour);
+  caretComponent->setVisible(caretVisible, true);
+  }
+
+int UIText::getCaretPos() const
+  {
+  int pos = caretPos;
+  if (pos < 0)
+    pos = (int)text.size();
+  return pos;
   }

@@ -50,6 +50,7 @@ public:
   virtual bool onMouseMove(GameContext* gameContext, uint mouseX, uint mouseY, uint prevMouseX, uint prevMouseY) { return false; }
   virtual bool onKeyPressed(GameContext* gameContext, uint key) { return false; }
   virtual bool onKeyHeld(GameContext* gameContext, uint key) { return false; }
+  virtual bool onKeyRepeated(GameContext* gameContext, uint key) { return false; }
   virtual bool onKeyReleased(GameContext* gameContext, uint key) { return false; }
   virtual bool isUIInputHandler() const { return false; }
   };

@@ -39,9 +39,9 @@ void UIManagerImpl::cleanUp(GameContext* context)
   rootComponent->cleanUp(context);
   }
 
-UIComponentPtr UIManagerImpl::getComponent(uint id)
+UIComponentPtr UIManagerImpl::getComponent(uint id, bool recurseChildren)
   {
-  return rootComponent->getChild(id);
+  return rootComponent->getChild(id, recurseChildren);
   }
 
 uint UIManagerImpl::getNextComponentID()
@@ -51,9 +51,45 @@ uint UIManagerImpl::getNextComponentID()
 
 bool UIManagerImpl::mouseClick(GameContext* context, uint mouseX, uint mouseY)
   {
+  uint componentClicked = 0;
   if (modalComponent)
-    return modalComponent->mouseClick(context, mouseX, mouseY);
-  return rootComponent->mouseClick(context, mouseX, mouseY);
+    componentClicked = modalComponent->mouseClick(context, mouseX, mouseY);
+  else
+    componentClicked = rootComponent->mouseClick(context, mouseX, mouseY);
+  if (componentClicked == 0)
+    {
+    lossFocus(context);
+    return false;
+    }
+
+  if (UIComponentPtr newFocusComponent = getComponent(componentClicked, true))
+    {
+    bool changingFocus = !focusedComponent || focusedComponent->getID() != newFocusComponent->getID();
+    if (changingFocus)
+      {
+      lossFocus(context);
+      focusedComponent = newFocusComponent;
+      focusedComponent->onGainFocus(context);
+      }
+    }
+
+  return true;
+  }
+
+bool UIManagerImpl::keyPress(GameContext* context, uint key)
+  {
+  if (focusedComponent)
+    return focusedComponent->keyPress(context, key);
+  return false;
+  }
+
+void UIManagerImpl::lossFocus(GameContext* context)
+  {
+  if (focusedComponent)
+    {
+    focusedComponent->onLossFocus(context);
+    focusedComponent.reset();
+    }
   }
 
 bool UIManagerImpl::hitTest(uint mouseX, uint mouseY)
