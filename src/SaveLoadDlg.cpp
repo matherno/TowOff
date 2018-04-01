@@ -43,7 +43,7 @@ void SaveLoadDlg::initialise(GameContext* context)
   list->setPadding(5, 5);
   list->setColour(Vector3D(0.4, 0.3, 0.2));
   for (auto pair : saveFiles)
-    list->addItem(pair.first, pair.second);
+    list->addItem(pair.first, mathernogl::removeFileExtension(pair.second));
   list->setItemHeight(45);
   list->setItemGap(0);
   list->setItemColour(Vector3D(0.4, 0.3, 0.2));
@@ -84,7 +84,7 @@ void SaveLoadDlg::initialise(GameContext* context)
 void SaveLoadDlg::getSavedFiles(std::list<string>* files)
   {
   std::list<string> dirFiles;
-  mathernogl::getFilesInDirectory(SAVES_DIRECTORY, &dirFiles);
+  mathernogl::getFilesInDirectory(SAVES_DIRECTORY, &dirFiles, "tos");
   for (string file : dirFiles)
     {
     files->push_back(file);
