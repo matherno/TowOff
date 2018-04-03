@@ -54,6 +54,7 @@ public:
   virtual void onGainFocus(GameContext* context) override {}
   virtual void onLossFocus(GameContext* context) override {}
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) override;
+  virtual void onEscapePressed(GameContext* context) override {};
 
   virtual void setColour(const Vector3D& colour) { this->colour = colour; }
   virtual void setTexture(TexturePtr texture, bool alphaTexture = false) { this->texture = texture; this->alphaTexture = alphaTexture; }

@@ -29,7 +29,6 @@ public:
 
 private:
   MainMenuOutcome currentOutcome;
-  std::list<uint> menuBtnIDs;
 
 public:
   TOMainMenuContext(const RenderContextPtr& renderContext);

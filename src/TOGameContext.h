@@ -16,6 +16,7 @@ class TOGameContext;
 #include "RangeFieldManager.h"
 #include "SpecialEffectsHandler.h"
 #include "TOGameSaveLoad.h"
+#include "PauseMenuHandler.h"
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
@@ -34,6 +35,7 @@ private:
   std::shared_ptr<RangeFieldManager> rangeFieldManager;
   TowerPtr focusedTower = nullptr;
   std::shared_ptr<TOInputHandler> toInputHandler;
+  std::shared_ptr<PauseMenuHandler> pauseMenuHandler;
 
   //  maps combat towers to the networks (via relay towers) that they are within range of
   std::map<uint, std::set<uint>> combatTowerNetworks;
@@ -61,6 +63,7 @@ public:
   uint getActivePlayer() const;
   void setActivePlayer(uint player);
   HUDHandler* getHUDHandler(){ return &hudHandler; }
+  void displayPauseMenu();
 
   TowerPtr getTower(uint id);
   TowerList* getTowers() { return &towers; }

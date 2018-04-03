@@ -209,3 +209,9 @@ string SaveLoadDlg::getNewSaveFilePath()
     }
   return filePath;
   }
+
+void SaveLoadDlg::onEscapePressed(GameContext* context)
+  {
+  if (onCancelledFunc)
+    onCancelledFunc();
+  }

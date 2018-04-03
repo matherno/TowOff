@@ -2,6 +2,7 @@
 // Created by matt on 27/12/17.
 //
 
+#include <GameSystem/InputCodes.h>
 #include "UIManagerImpl.h"
 #include "UIPanel.h"
 #include "UIInputHandler.h"
@@ -52,8 +53,8 @@ uint UIManagerImpl::getNextComponentID()
 bool UIManagerImpl::mouseClick(GameContext* context, uint mouseX, uint mouseY)
   {
   uint componentClicked = 0;
-  if (modalComponent)
-    componentClicked = modalComponent->mouseClick(context, mouseX, mouseY);
+  if (isModalModeActive())
+    componentClicked = (*modalComponents.begin())->mouseClick(context, mouseX, mouseY);
   else
     componentClicked = rootComponent->mouseClick(context, mouseX, mouseY);
   if (componentClicked == 0)
@@ -78,6 +79,12 @@ bool UIManagerImpl::mouseClick(GameContext* context, uint mouseX, uint mouseY)
 
 bool UIManagerImpl::keyPress(GameContext* context, uint key)
   {
+  if (key == KEY_ESC && isModalModeActive())
+    {
+    (*modalComponents.begin())->onEscapePressed(context);
+    return true;
+    }
+
   if (focusedComponent)
     return focusedComponent->keyPress(context, key);
   return false;
@@ -97,18 +104,18 @@ bool UIManagerImpl::hitTest(uint mouseX, uint mouseY)
   return rootComponent->hitTest(mouseX, mouseY, true);
   }
 
-void UIManagerImpl::enableModalMode(UIComponentPtr modalComponent)
+void UIManagerImpl::pushModalComponent(UIComponentPtr modalComponent)
   {
-  this->modalComponent = modalComponent;
+  modalComponents.push_front(modalComponent);
   }
 
-void UIManagerImpl::disableModalMode()
+void UIManagerImpl::popModalComponent()
   {
-  modalComponent.reset();
+  modalComponents.pop_front();
   }
 
 bool UIManagerImpl::isModalModeActive() const
   {
-  return (bool)modalComponent;
+  return !modalComponents.empty();
   }
 

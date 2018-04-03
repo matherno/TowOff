@@ -53,6 +53,7 @@ public:
   virtual void setPadding(float horizPadding, float vertPadding) = 0;     // padding only used when matching parent size
   virtual void onGainFocus(GameContext* context) = 0;
   virtual void onLossFocus(GameContext* context) = 0;
+  virtual void onEscapePressed(GameContext* context) = 0;     //  modal component will have this function called when escape is pressed
   };
 
 class UIManager
@@ -62,8 +63,8 @@ public:
   virtual void removeComponent(uint id) = 0;
   virtual UIComponentPtr getComponent(uint id, bool recurseChildren = false) = 0;
   virtual uint getNextComponentID() = 0;
-  virtual void enableModalMode(UIComponentPtr modalComponent) = 0;
-  virtual void disableModalMode() = 0;
+  virtual void pushModalComponent(UIComponentPtr modalComponent) = 0;
+  virtual void popModalComponent() = 0;
   virtual bool isModalModeActive() const = 0;
   virtual bool initialise(GameContext* context) = 0;
   virtual void update(GameContext* context) = 0;

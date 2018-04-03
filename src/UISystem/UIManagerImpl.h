@@ -11,7 +11,7 @@ class UIManagerImpl : public UIManager
 private:
   uint nextComponentID = 1;
   UIComponentPtr rootComponent;
-  UIComponentPtr modalComponent;
+  std::list<UIComponentPtr> modalComponents;
   UIComponentPtr focusedComponent;
 
 public:
@@ -19,8 +19,8 @@ public:
   virtual void removeComponent(uint id) override;
   virtual UIComponentPtr getComponent(uint id, bool recurseChildren = false) override;
   virtual uint getNextComponentID() override;
-  virtual void enableModalMode(UIComponentPtr modalComponent) override;
-  virtual void disableModalMode() override;
+  virtual void pushModalComponent(UIComponentPtr modalComponent) override;
+  virtual void popModalComponent() override;
   virtual bool isModalModeActive() const override;
   virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
   virtual bool keyPress(GameContext* context, uint key) override;

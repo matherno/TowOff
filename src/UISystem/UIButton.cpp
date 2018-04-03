@@ -4,7 +4,7 @@
 
 #include "UIButton.h"
 
-#define BUTTON_PRESS_TIME 100
+#define BUTTON_PRESS_TIME 150
 
 UIButton::UIButton(uint id, bool toggle) : UIPanel(id), toggle(toggle)
   {}

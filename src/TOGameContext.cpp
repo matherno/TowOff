@@ -32,6 +32,8 @@ bool TOGameContext::initialise()
   addActor(connectionManager);
   rangeFieldManager.reset(new RangeFieldManager(getNextActorID()));
   addActor(rangeFieldManager);
+  pauseMenuHandler.reset(new PauseMenuHandler(getNextActorID()));
+  addActor(pauseMenuHandler);
   addInitialTowers();
   return success;
   }
@@ -449,5 +451,10 @@ void TOGameContext::getGameState(TOGameState* state)
     tower->getTowerState(&towerState);
     state->towers.push_back(towerState);
     }
+  }
+
+void TOGameContext::displayPauseMenu()
+  {
+  pauseMenuHandler->displayMenu(this);
   }
 

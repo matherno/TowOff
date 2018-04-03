@@ -42,7 +42,6 @@ bool TOMainMenuContext::initialise()
     });
 
   //  load all the buttons
-  menuBtnIDs.clear();
   const Vector2D buttonSize(200, 100);
   const Vector3D colour(0.3, 0.3, 0.3);
   const Vector3D pressColour(0.2, 0.3, 0.5);
@@ -58,7 +57,6 @@ bool TOMainMenuContext::initialise()
     button->setOffset(Vector2D(0, buttonYOffset));
     button->setMouseClickCallback(menuOption.second);
     getUIManager()->addComponent(UIComponentPtr(button));
-    menuBtnIDs.push_back(button->getID());
     buttonYOffset += buttonPadding + buttonSize.y;
     }
   return result;
@@ -91,7 +89,7 @@ void TOMainMenuContext::showLoadDlg()
   {
   std::shared_ptr<SaveLoadDlg> saveLoadDlg(new SaveLoadDlg(getUIManager()->getNextComponentID(), SaveLoadDlg::modeLoad));
   getUIManager()->addComponent(saveLoadDlg);
-  getUIManager()->enableModalMode(saveLoadDlg);
+  getUIManager()->pushModalComponent(saveLoadDlg);
 
   //  On loaded from a file
   saveLoadDlg->setLoadGameStateCallback([this](std::shared_ptr<TOGameState> state)
@@ -106,6 +104,6 @@ void TOMainMenuContext::showLoadDlg()
   saveLoadDlg->setCancelledCallback([this, id]()
       {
       getUIManager()->removeComponent(id);
-      getUIManager()->disableModalMode();
+                                      getUIManager()->popModalComponent();
       });
   }
