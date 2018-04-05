@@ -56,10 +56,10 @@ bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
       translation.set(speed, 0, 0);
       break;
     case 'Q':
-      rotationDelta = rotateSpeed;
+      rotationDelta = -rotateSpeed;
       break;
     case 'E':
-      rotationDelta = -rotateSpeed;
+      rotationDelta = rotateSpeed;
       break;
     }
 
