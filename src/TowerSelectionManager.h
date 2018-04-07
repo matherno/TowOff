@@ -22,11 +22,12 @@ public:
   TowerSelectionManager(uint id);
 
   //  returns true if at least one tower was selected
-  bool onWorldClick(GameContext* gameContext, uint mouseX, uint mouseY);
+  bool onWorldClick(GameContext* gameContext, uint mouseX, uint mouseY, bool isCtrlClick);
 
   void deselectAll(GameContext* gameContext);
   void deselectTower(GameContext* gameContext, uint id);
   void selectTower(GameContext* gameContext, TowerPtr tower);
+  bool isTowerSelected(uint towerID) const;
   TowerPtr getFirstSelectedTower();
 
   virtual void onAttached(GameContext* gameContext) override;

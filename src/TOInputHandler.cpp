@@ -104,7 +104,10 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
   if (button == MOUSE_LEFT)
-    return TOGameContext::cast(gameContext)->getSelectionManager()->onWorldClick(gameContext, mouseX, mouseY);
+    {
+    bool isCtrlDown = gameContext->getInputManager()->isKeyDown(KEY_LCTRL);
+    return TOGameContext::cast(gameContext)->getSelectionManager()->onWorldClick(gameContext, mouseX, mouseY, isCtrlDown);
+    }
   return false;
   }
 

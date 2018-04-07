@@ -32,17 +32,24 @@ void TowerSelectionManager::onDetached(GameContext* gameContext)
   deselectAll(gameContext);
   }
 
-bool TowerSelectionManager::onWorldClick(GameContext* gameContext, uint mouseX, uint mouseY)
+bool TowerSelectionManager::onWorldClick(GameContext* gameContext, uint mouseX, uint mouseY, bool isCtrlClick)
   {
-  deselectAll(gameContext);
+  if (!isCtrlClick)
+    deselectAll(gameContext);
 
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   if (gameContext->getBoundingBoxManager()->boundingBoxPicked())
     {
     uint pickedTowerID = (uint)gameContext->getBoundingBoxManager()->getPickedBoundingBoxMeta();
-    TowerPtr pickedTower = toGameContext->getTower(pickedTowerID);
-    if (pickedTower)
-      selectTower(gameContext, pickedTower);
+    if (!isTowerSelected(pickedTowerID))
+      {
+      if (TowerPtr pickedTower = toGameContext->getTower(pickedTowerID))
+        selectTower(gameContext, pickedTower);
+      }
+    else if (isCtrlClick)
+      {
+      deselectTower(gameContext, pickedTowerID);
+      }
     return true;
     }
   return false;
@@ -83,6 +90,11 @@ void TowerSelectionManager::selectTower(GameContext* gameContext, TowerPtr tower
     uint boxID = selectionBoxRenderables->addBox(boundingBox->getLowerBound(), boundingBox->getUpperBound());
     towerSelectionBoxesMap[tower->getID()] = boxID;
     }
+  }
+
+bool TowerSelectionManager::isTowerSelected(uint towerID) const
+  {
+  return selectedTowers.contains(towerID);
   }
 
 TowerPtr TowerSelectionManager::getFirstSelectedTower()
