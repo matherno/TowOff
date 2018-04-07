@@ -224,7 +224,7 @@ void HUDHandler::endTowerPlacingMode(GameContext* gameContext)
 
 void HUDHandler::startTowerPlacingMode(GameContext* gameContext, uint towerTypeID)
   {
-  TOGameContext::cast(gameContext)->unfocusTower();
+  TOGameContext::cast(gameContext)->getSelectionManager()->deselectAll(gameContext);
 
   if (placementHandler)
     {

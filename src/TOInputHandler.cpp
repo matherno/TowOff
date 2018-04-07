@@ -103,15 +103,8 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 
 bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
-  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
-  if (gameContext->getBoundingBoxManager()->boundingBoxPicked())
-    {
-    uint pickedTowerID = (uint)gameContext->getBoundingBoxManager()->getPickedBoundingBoxMeta();
-    toGameContext->focusTower(pickedTowerID);
-    return true;
-    }
-
-  toGameContext->unfocusTower();
+  if (button == MOUSE_LEFT)
+    return TOGameContext::cast(gameContext)->getSelectionManager()->onWorldClick(gameContext, mouseX, mouseY);
   return false;
   }
 

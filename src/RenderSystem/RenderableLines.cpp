@@ -36,7 +36,7 @@ void RenderableLines::render(RenderContext* renderContext)
   clearGLErrors();
   setDepthTest(true);
   setAlphaBlending(true);
-  glLineWidth(2);
+  glLineWidth(lineWidth);
   renderContext->activateShaderProgram(shaderProgram);
   vao.bind();
   glDrawArrays(GL_LINES, 0, lines.count() * 2);

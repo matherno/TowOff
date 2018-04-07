@@ -17,6 +17,7 @@ class TOGameContext;
 #include "SpecialEffectsHandler.h"
 #include "TOGameSaveLoad.h"
 #include "PauseMenuHandler.h"
+#include "TowerSelectionManager.h"
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
@@ -33,7 +34,7 @@ private:
   SpecialEffectsHandler specialEffectsHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
   std::shared_ptr<RangeFieldManager> rangeFieldManager;
-  TowerPtr focusedTower = nullptr;
+  std::shared_ptr<TowerSelectionManager> selectionManager;
   std::shared_ptr<TOInputHandler> toInputHandler;
   std::shared_ptr<PauseMenuHandler> pauseMenuHandler;
 
@@ -60,9 +61,8 @@ public:
   Player* createPlayer();
   int numPlayers() const { return (int)players.size(); }
   Vector3D getPlayerColour(uint num) const;
-  uint getActivePlayer() const;
-  void setActivePlayer(uint player);
   HUDHandler* getHUDHandler(){ return &hudHandler; }
+  TowerSelectionManager* getSelectionManager(){ return selectionManager.get(); }
   void displayPauseMenu();
 
   TowerPtr getTower(uint id);
@@ -72,6 +72,7 @@ public:
   void removeTower(uint id);
   TowerPtr createTower(uint towerType, const Vector3D& position, bool underConstruction);
   void addInitialTowers();
+  BoundingBoxPtr getTowerCombinedBoundingBox(uint towerID);
 
   //  retrieves a tower in the same network as tower of towerID
   //  findClosest => returns the closest
@@ -89,14 +90,11 @@ public:
   bool isPositionLand(const Vector3D& position) const;
 
   void displayTowerRangeField(Tower* tower);
-  void hideTowerRangeField(Tower* tower);
+  void hideTowerRangeField(uint towerID);
   void displayAllRangeFields();
   void hideAllRangeFields();
 
-  void focusTower(TowerPtr tower);
-  void focusTower(uint towerID);
-  void unfocusTower();
-  TowerPtr getFocusedTower() { return focusedTower; }
+  TowerPtr getFocusedTower();
   void doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour = Vector3D(0.9, 0, 0));
 
   void getGameState(TOGameState* state);

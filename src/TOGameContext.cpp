@@ -34,6 +34,9 @@ bool TOGameContext::initialise()
   addActor(rangeFieldManager);
   pauseMenuHandler.reset(new PauseMenuHandler(getNextActorID()));
   addActor(pauseMenuHandler);
+  selectionManager.reset(new TowerSelectionManager(getNextActorID()));
+  addActor(selectionManager);
+
   addInitialTowers();
   return success;
   }
@@ -115,8 +118,7 @@ TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower, bool onlyEnemies)
 
 void TOGameContext::removeTower(uint id)
   {
-  if (focusedTower && focusedTower->getID() == id)
-    unfocusTower();
+  selectionManager->deselectTower(this, id);
 
   TowerPtr tower = getTower(id);
   towers.remove(id);
@@ -377,17 +379,17 @@ void TOGameContext::displayTowerRangeField(Tower* tower)
   float radius = TowerFactory::getTowerRange(tower->getTowerType());
   if (radius > 0)
     {
-    hideTowerRangeField(tower);
+    hideTowerRangeField(tower->getID());
     towerRangeFields[tower->getID()] = rangeFieldManager->createRangeField(tower->getPosition() + Vector3D(0, 0.02, 0), radius, Vector3D(0.1, 0.5, 0.5));
     }
   }
 
-void TOGameContext::hideTowerRangeField(Tower* tower)
+void TOGameContext::hideTowerRangeField(uint towerID)
   {
-  if (towerRangeFields.count(tower->getID()) > 0)
+  if (towerRangeFields.count(towerID) > 0)
     {
-    rangeFieldManager->removeRangeField(towerRangeFields[tower->getID()]);
-    towerRangeFields.erase(tower->getID());
+    rangeFieldManager->removeRangeField(towerRangeFields[towerID]);
+    towerRangeFields.erase(towerID);
     }
   }
 
@@ -405,28 +407,6 @@ void TOGameContext::hideAllRangeFields()
   for (auto pair : towerRangeFields)
     rangeFieldManager->removeRangeField(pair.second);
   towerRangeFields.clear();
-  }
-
-void TOGameContext::focusTower(TowerPtr tower)
-  {
-  unfocusTower();
-  displayTowerRangeField(tower.get());
-  focusedTower = tower;
-  }
-
-void TOGameContext::focusTower(uint towerID)
-  {
-  if (TowerPtr tower = getTower(towerID))
-    focusTower(tower);
-  }
-
-void TOGameContext::unfocusTower()
-  {
-  if (focusedTower)
-    {
-    hideTowerRangeField(focusedTower.get());
-    focusedTower = nullptr;
-    }
   }
 
 FontPtr TOGameContext::getDefaultFont()
@@ -458,3 +438,25 @@ void TOGameContext::displayPauseMenu()
   pauseMenuHandler->displayMenu(this);
   }
 
+TowerPtr TOGameContext::getFocusedTower()
+  {
+  return selectionManager->getFirstSelectedTower();
+  }
+
+/*
+ *  creates a new bounding box as a combination of all the towers bounding boxes, and returns it
+ */
+BoundingBoxPtr TOGameContext::getTowerCombinedBoundingBox(uint towerID)
+  {
+  if(towerBoundingBoxes.count(towerID) > 0 && towerBoundingBoxes[towerID].size() > 0)
+    {
+    BoundingBoxPtr combinedBox(new BoundingBox());
+    for (uint boxID : towerBoundingBoxes[towerID])
+      {
+      if (BoundingBoxPtr box = getBoundingBoxManager()->getBoundingBox(boxID))
+        combinedBox->addBoundingBox(box);
+      }
+    return combinedBox;
+    }
+  return nullptr;
+  }
