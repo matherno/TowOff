@@ -380,6 +380,11 @@ const std::set<uint>* TOGameContext::combatTowerGetNetworksInRange(uint towerID)
   return nullptr;
   }
 
+bool TOGameContext::isPositionOnMap(const Vector3D& pos) const
+  {
+  return surfaceMesh->getHeightAt(pos) != TERRAIN_OUT_OF_BOUNDS;
+  }
+
 void TOGameContext::displayTowerRangeField(Tower* tower)
   {
   float radius = TowerFactory::getTowerRange(tower->getTowerType());

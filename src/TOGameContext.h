@@ -86,6 +86,7 @@ public:
   void transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const;
   const std::set<uint>* combatTowerGetNetworksInRange(uint towerID) const;
   long timeBetweenEnergyTransfers() const { return 1000; };
+  bool isPositionOnMap(const Vector3D& pos) const;
 
   Vector3D terrainHitTest(uint cursorX, uint cursorY, bool* isLand = nullptr) const;
   bool isPositionLand(const Vector3D& position) const;

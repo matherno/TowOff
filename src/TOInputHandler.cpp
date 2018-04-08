@@ -71,8 +71,12 @@ bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
       refreshRotationMatrix();
       }
     translation *= mathernogl::matrixYaw(rotation);
-    focalPosition += translation;
-    refreshCamera(gameContext->getCamera());
+    Vector3D newFocalPosition = focalPosition + translation;
+    if (TOGameContext::cast(gameContext)->isPositionOnMap(newFocalPosition))
+      {
+      focalPosition = newFocalPosition;
+      refreshCamera(gameContext->getCamera());
+      }
     return true;
     }
   return false;
