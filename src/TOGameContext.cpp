@@ -161,6 +161,12 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position, bo
   return tower;
   }
 
+void TOGameContext::forEachTower(std::function<void(TowerPtr tower)> func)
+  {
+  for (TowerPtr tower : *towers.getList())
+    func(tower);
+  }
+
 void TOGameContext::addInitialTowers()
   {
   if (loadedGameState)
@@ -460,3 +466,4 @@ BoundingBoxPtr TOGameContext::getTowerCombinedBoundingBox(uint towerID)
     }
   return nullptr;
   }
+

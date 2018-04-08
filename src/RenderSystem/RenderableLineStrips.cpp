@@ -4,23 +4,28 @@
 
 #include "RenderableLineStrips.h"
 
-RenderableLineStrips::RenderableLineStrips(uint id) : Renderable(id)
+RenderableLineStrips::RenderableLineStrips(uint id, bool screenSpace) : Renderable(id), inScreenSpace(screenSpace)
   {}
 
 void RenderableLineStrips::initialise(RenderContext* renderContext)
   {
   using namespace mathernogl;
   clearGLErrors();
-  std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/LineStripVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/LineStripFS.glsl") };
+
+  std::vector<Shader> shaders;
+  if (inScreenSpace)
+    shaders = { Shader(GL_VERTEX_SHADER, "shaders/ScreenLineStripVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/ScreenLineStripFS.glsl") };
+  else
+    shaders = { Shader(GL_VERTEX_SHADER, "shaders/LineStripVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/LineStripFS.glsl") };
   shaderProgram = renderContext->getSharedShaderProgram(&shaders);
 
   vbo.init();
   vao.init();
   vao.bind();
   vao.linkBufferAsFloats(vbo, 3, 0, false);
-
   glEnable(GL_PROGRAM_POINT_SIZE);
   ASSERT_NO_GL_ERROR()
+  screenSize = renderContext->getWindow()->getSize();
   }
 
 void RenderableLineStrips::cleanUp(RenderContext* renderContext)
@@ -57,7 +62,21 @@ void RenderableLineStrips::startLineStrip(const Vector3D& colour, float alpha)
 
 void RenderableLineStrips::addPoint(const Vector3D& point)
   {
-  pendingLineStrip.points.push_back(point);
+  if (inScreenSpace)
+    {
+    Vector3D screenPoint = point;
+    screenPoint.x /= screenSize.x;
+    screenPoint.y /= screenSize.y;
+    screenPoint *= 2;
+    screenPoint -= 1;
+    screenPoint.y *= -1;
+    screenPoint.z = -1;
+    pendingLineStrip.points.push_back(screenPoint);
+    }
+  else
+    {
+    pendingLineStrip.points.push_back(point);
+    }
   }
 
 uint RenderableLineStrips::finishLineStrip()

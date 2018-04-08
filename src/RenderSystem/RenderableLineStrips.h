@@ -16,6 +16,7 @@ private:
     float alpha;
     };
 
+  const bool inScreenSpace;
   ShaderProgramPtr shaderProgram;
   mathernogl::VertexArray vao;
   mathernogl::GPUBufferStatic vbo;
@@ -24,9 +25,11 @@ private:
   bool rebuildDisabled = false;
   LineStrip pendingLineStrip;
   uint lineWidth = 2;
+  Vector2D screenSize;
 
 public:
-  RenderableLineStrips(uint id);
+  //  screenSpace => the line strips are defined in screen pixel space, with (0, 0) being the top left
+  RenderableLineStrips(uint id, bool screenSpace = false);
 
   virtual void initialise(RenderContext* renderContext) override;
   virtual void cleanUp(RenderContext* renderContext) override;

@@ -188,3 +188,9 @@ bool BBInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
   gameContext->getBoundingBoxManager()->performMousePicking(gameContext, mouseX, mouseY);
   return false;
   }
+
+bool BBInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+  {
+  gameContext->getBoundingBoxManager()->performMousePicking(gameContext, mouseX, mouseY);
+  return false;
+  }

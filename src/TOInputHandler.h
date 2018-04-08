@@ -44,6 +44,8 @@ public:
   virtual void onDetached(GameContext* gameContext) override;
   virtual bool onKeyHeld(GameContext* gameContext, uint key) override;
   virtual bool onMouseScroll(GameContext* gameContext, double scrollOffset, uint mouseX, uint mouseY) override;
+  virtual bool onMouseHeld(GameContext* gameContext, uint button, uint mouseX, uint mouseY) override;
+  virtual bool onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY) override;
 
 protected:
   void refreshRotationMatrix();

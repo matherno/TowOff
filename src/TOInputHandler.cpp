@@ -103,10 +103,35 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 
 bool TOInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
+  return false;
+  }
+
+bool TOInputHandler::onMouseHeld(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+  {
   if (button == MOUSE_LEFT)
     {
+    TowerSelectionManager* selectionManager = TOGameContext::cast(gameContext)->getSelectionManager();
+    if (!selectionManager->isMouseDragging())
+      selectionManager->onStartMouseDrag(gameContext, mouseX, mouseY);
+    else
+      selectionManager->onUpdateMouseDrag(gameContext, mouseX, mouseY);
+    return true;
+    }
+  return false;
+  }
+
+bool TOInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
+  {
+  if (button == MOUSE_LEFT)
+    {
+    TowerSelectionManager* selectionManager = TOGameContext::cast(gameContext)->getSelectionManager();
     bool isCtrlDown = gameContext->getInputManager()->isKeyDown(KEY_LCTRL);
-    return TOGameContext::cast(gameContext)->getSelectionManager()->onWorldClick(gameContext, mouseX, mouseY, isCtrlDown);
+    if (selectionManager->isMouseDragging())
+      {
+      if(selectionManager->onFinishMouseDrag(gameContext, mouseX, mouseY, isCtrlDown))
+        return true;
+      }
+    return selectionManager->onWorldClick(gameContext, mouseX, mouseY, isCtrlDown);
     }
   return false;
   }

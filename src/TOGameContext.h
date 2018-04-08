@@ -66,7 +66,8 @@ public:
   void displayPauseMenu();
 
   TowerPtr getTower(uint id);
-  TowerList* getTowers() { return &towers; }
+  const TowerList* getTowers() const { return &towers; }
+  void forEachTower(std::function<void(TowerPtr tower)> func);
   TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);
