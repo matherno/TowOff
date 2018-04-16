@@ -69,6 +69,13 @@ struct RenderInitConfig
   bool antiAliasing = false;
   };
 
+struct TextureOptions
+  {
+  mathernogl::TextureFiltering filtering = mathernogl::LINEAR;
+  mathernogl::TextureWrapping wrapping = mathernogl::REPEAT;
+  bool generateMipMaps = false;
+  };
+
 /*
 *   RenderContext, main rendering manager
 */
@@ -80,7 +87,8 @@ public:
   RenderContext() {}
   virtual ~RenderContext() {}
   virtual bool initialise(const RenderInitConfig* initConfig) = 0;
-  virtual bool cleanUp() = 0;
+  virtual bool cleanUp() = 0;         // cleanup should clean up everything (including clearing caches)
+  virtual void clearCaches() = 0;
   virtual uint getNextRenderableID() = 0;
   virtual RenderableSetPtr getRenderableSet() = 0;
   virtual void setWorldToCamera(const Matrix4& transform) = 0;
@@ -94,7 +102,8 @@ public:
   virtual ShaderProgramPtr getSharedShaderProgram(const std::vector<mathernogl::Shader>* shaders) = 0;
   virtual MeshStoragePtr getSharedMeshStorage(const string& objFilePath) = 0;
   virtual MeshStoragePtr createEmptyMeshStorage() = 0;
-  virtual TexturePtr getSharedTexture(const string& imageFilePath) = 0;
+  virtual TexturePtr getSharedTexture(const string& imageFilePath, TextureOptions options = TextureOptions()) = 0;
+  virtual TexturePtr createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options = TextureOptions()) = 0;
   virtual RenderableSetPtr createRenderableSet() = 0;
   virtual FontPtr getSharedFont(const string& fntFilePath, const string& glyphsFilePath) = 0;
   virtual void pushTransform(const Transform* transform) = 0;

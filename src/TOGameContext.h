@@ -18,6 +18,8 @@ class TOGameContext;
 #include "TOGameSaveLoad.h"
 #include "PauseMenuHandler.h"
 #include "TowerSelectionManager.h"
+#include "FogOfWarRenderable.h"
+#include "FogOfWarHandler.h"
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
@@ -30,6 +32,7 @@ private:
   std::vector<PlayerPtr> players;
   TowerList towers;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
+  std::shared_ptr<RenderableTerrain> waterMesh;
   HUDHandler hudHandler;
   SpecialEffectsHandler specialEffectsHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
@@ -37,6 +40,7 @@ private:
   std::shared_ptr<TowerSelectionManager> selectionManager;
   std::shared_ptr<TOInputHandler> toInputHandler;
   std::shared_ptr<PauseMenuHandler> pauseMenuHandler;
+  std::shared_ptr<FogOfWarHandler> fogOfWarHandler;
 
   //  maps combat towers to the networks (via relay towers) that they are within range of
   std::map<uint, std::set<uint>> combatTowerNetworks;
@@ -64,6 +68,7 @@ public:
   HUDHandler* getHUDHandler(){ return &hudHandler; }
   TowerSelectionManager* getSelectionManager(){ return selectionManager.get(); }
   void displayPauseMenu();
+  Vector3D getCameraFocalPosition() const;
 
   TowerPtr getTower(uint id);
   const TowerList* getTowers() const { return &towers; }
@@ -87,6 +92,7 @@ public:
   const std::set<uint>* combatTowerGetNetworksInRange(uint towerID) const;
   long timeBetweenEnergyTransfers() const { return 1000; };
   bool isPositionOnMap(const Vector3D& pos) const;
+  float getMapWidth() const;
 
   Vector3D terrainHitTest(uint cursorX, uint cursorY, bool* isLand = nullptr) const;
   bool isPositionLand(const Vector3D& position) const;

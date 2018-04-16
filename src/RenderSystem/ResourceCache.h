@@ -1,7 +1,6 @@
 #pragma once
 
 #include <set>
-#include <Shader.h>
 #include "RenderSystem.h"
 
 /*

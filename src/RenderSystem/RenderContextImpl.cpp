@@ -28,6 +28,13 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
 
 bool RenderContextImpl::cleanUp()
   {
+  clearCaches();
+  window->close();
+  return true;
+  }
+
+void RenderContextImpl::clearCaches()
+  {
   resourceCache.forEachShaderProgram([](ShaderProgramPtr shaderProgram)
     {
     shaderProgram->cleanUp();
@@ -41,9 +48,7 @@ bool RenderContextImpl::cleanUp()
     texture->cleanUp();
     });
   resourceCache.clearAll();
-  window->close();
   texIDsToBoundLocals.clear();
-  return true;
   }
 
 uint RenderContextImpl::getNextRenderableID()
@@ -194,15 +199,20 @@ const Matrix4* RenderContextImpl::getCameraToClip() const
   return &cameraToClipTransform;
   }
 
-TexturePtr RenderContextImpl::getSharedTexture(const string& imageFilePath)
+TexturePtr RenderContextImpl::getSharedTexture(const string& imageFilePath, TextureOptions options)
   {
   if (TexturePtr texture = resourceCache.getTexture(imageFilePath))
     return texture;
 
-  TexturePtr texture = TexturePtr(createTextureFromFile(imageFilePath, false));
+  TexturePtr texture = TexturePtr(createTextureFromFile(imageFilePath, options.generateMipMaps, options.filtering, options.wrapping));
   resourceCache.addTexture(texture, imageFilePath);
   logInfo("Created texture: " + std::to_string(texture->glTexID) + ", '" + imageFilePath + "'");
   return texture;
+  }
+
+TexturePtr RenderContextImpl::createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options)
+  {
+  return TexturePtr(mathernogl::createEmptyTexture(width, height, options.filtering, options.wrapping, bytesPerPixel));
   }
 
 FontPtr RenderContextImpl::getSharedFont(const string& fntFilePath, const string& glyphsFilePath)

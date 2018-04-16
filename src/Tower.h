@@ -40,6 +40,7 @@ protected:
   uint maxEnergy = 500;
   float hitRadius = 5;
   float connectRadius = 10;
+  float visibilityRadius = 30;
   string baseModelFile, turretModelFile = "";
   Vector3D targetOffset;
   Vector3D connectOffset;
@@ -89,6 +90,8 @@ public:
   bool isAlive() { return healthPoints > 0; }
   void setConnectRadius(float radius) { connectRadius = radius; }
   float getConnectRadius() const { return connectRadius; }
+  void setVisibilityRadius(float radius) { visibilityRadius = radius; }
+  float getVisibilityRadius() const { return visibilityRadius; }
   void setTurretRotation(const Vector3D& targetPos);
   const Transform* getTurretRotation() const;
   void setTurretYRotation(double yRotation);

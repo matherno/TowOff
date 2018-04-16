@@ -36,6 +36,8 @@ bool TOGameContext::initialise()
   addActor(pauseMenuHandler);
   selectionManager.reset(new TowerSelectionManager(getNextActorID()));
   addActor(selectionManager);
+  fogOfWarHandler.reset(new FogOfWarHandler(getNextActorID(), 52));
+  addActor(fogOfWarHandler);
 
   addInitialTowers();
   return success;
@@ -45,12 +47,17 @@ void TOGameContext::cleanUp()
   {
   if (surfaceMesh)
     {
-    hudHandler.cleanUp(this);
     getRenderContext()->getRenderableSet()->removeRenderable(surfaceMesh->getID());
+    getRenderContext()->getRenderableSet()->removeRenderable(waterMesh->getID());
     surfaceMesh->cleanUp(getRenderContext());
+    waterMesh->cleanUp(getRenderContext());
+
+    hudHandler.cleanUp(this);
     specialEffectsHandler.cleanUp(this);
     removeActor(connectionManager->getID());
     removeActor(rangeFieldManager->getID());
+    removeActor(pauseMenuHandler->getID());
+    removeActor(fogOfWarHandler->getID());
     }
   GameContextImpl::cleanUp();
   }
@@ -124,6 +131,7 @@ void TOGameContext::removeTower(uint id)
   towers.remove(id);
   removeActor(id);
   connectionManager->removeTower(id);
+  fogOfWarHandler->refreshFOW(this);
   if (towerBoundingBoxes.count(id) > 0)
     {
     for (uint boxID : towerBoundingBoxes[id])
@@ -150,6 +158,7 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position, bo
     connectionManager->addTower(tower);
   if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
     rebuildCombatTowerNetworksMap();
+  fogOfWarHandler->refreshFOW(this);
 
   std::list<BoundingBoxPtr> boundingBoxes;
   TowerFactory::createTowerBoundingBoxes(towerType, position, &boundingBoxes);
@@ -226,7 +235,6 @@ void TOGameContext::initSurface()
   surfaceMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(surfaceMesh);
 
-  std::shared_ptr<RenderableTerrain> waterMesh;
   waterMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize));
   waterMesh->setSingleColour(Vector3D(0.2, 0.2, 0.5));
   waterMesh->getTransform()->translate(Vector3D(translation, WATER_HEIGHT, translation));
@@ -385,6 +393,11 @@ bool TOGameContext::isPositionOnMap(const Vector3D& pos) const
   return surfaceMesh->getHeightAt(pos) != TERRAIN_OUT_OF_BOUNDS;
   }
 
+float TOGameContext::getMapWidth() const
+  {
+  return surfaceMesh->getCellSize() * (surfaceMesh->getHeightMap()->width - 1);
+  }
+
 void TOGameContext::displayTowerRangeField(Tower* tower)
   {
   float radius = TowerFactory::getTowerRange(tower->getTowerType());
@@ -471,4 +484,10 @@ BoundingBoxPtr TOGameContext::getTowerCombinedBoundingBox(uint towerID)
     }
   return nullptr;
   }
+
+Vector3D TOGameContext::getCameraFocalPosition() const
+  {
+  return toInputHandler->getFocalPosition();
+  }
+
 

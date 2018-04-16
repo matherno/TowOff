@@ -37,6 +37,7 @@ private:
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;
   virtual bool cleanUp() override;
+  virtual void clearCaches() override;
   virtual mathernogl::Window* getWindow() override;
   virtual const mathernogl::Window* getWindow() const override;
 
@@ -55,7 +56,8 @@ public:
   virtual ShaderProgramPtr getSharedShaderProgram(const std::vector<mathernogl::Shader>* shaders) override;
   virtual MeshStoragePtr getSharedMeshStorage(const std::string& objFilePath) override;
   virtual MeshStoragePtr createEmptyMeshStorage() override;
-  virtual TexturePtr getSharedTexture(const string& imageFilePath) override;
+  virtual TexturePtr getSharedTexture(const string& imageFilePath, TextureOptions options = TextureOptions()) override;
+  virtual TexturePtr createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options = TextureOptions()) override;
   virtual FontPtr getSharedFont(const string& fntFilePath, const string& glyphsFilePath) override;
 
   virtual RenderableSetPtr createRenderableSet() override;

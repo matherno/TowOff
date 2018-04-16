@@ -58,6 +58,7 @@ int main()
         gameContext.endFrame(60);
         }
       gameContext.cleanUp();
+      renderContext->clearCaches();
       }
     }
 

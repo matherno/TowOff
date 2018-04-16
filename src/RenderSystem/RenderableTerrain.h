@@ -31,6 +31,7 @@ public:
   void setSingleColour(const Vector3D& colour);
   void setMultiColour(const Vector3D& baseColour1, const Vector3D& baseColour2);
 
+  float getCellSize() const { return cellSize; }
   float getHeightAt(const Vector3D& worldPos) const;
   std::shared_ptr<HeightMap> getHeightMap() const { return heightMap; }
   };
