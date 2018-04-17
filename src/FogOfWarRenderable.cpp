@@ -13,7 +13,6 @@ void FogOfWarRenderable::initialise(RenderContext* renderContext)
   {
   using namespace mathernogl;
   clearGLErrors();
-  renderContext->registerDrawStage(DRAW_STAGE_FOGOFWAR);
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/FOVTextureVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/FOVTextureFS.glsl") };
   shaderProgram = renderContext->getSharedShaderProgram(&shaders);
 

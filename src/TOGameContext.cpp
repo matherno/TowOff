@@ -19,6 +19,8 @@
 bool TOGameContext::initialise()
   {
   bool success = GameContextImpl::initialise();
+  getRenderContext()->registerDrawStage(DRAW_STAGE_FOGOFWAR);
+
   if (loadedGameState)
     toInputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), loadedGameState->cameraFocalPos, loadedGameState->cameraZoomFactor, loadedGameState->cameraRotation, -45));
   else
