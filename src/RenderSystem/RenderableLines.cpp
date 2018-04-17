@@ -4,7 +4,7 @@
 
 #include "RenderableLines.h"
 
-RenderableLines::RenderableLines(uint id) : Renderable(id)
+RenderableLines::RenderableLines(uint id, int drawStage) : Renderable(id, drawStage)
   {}
 
 void RenderableLines::initialise(RenderContext* renderContext)

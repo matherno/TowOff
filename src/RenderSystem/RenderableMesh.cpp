@@ -6,7 +6,7 @@
 
 using namespace mathernogl;
 
-RenderableMesh::RenderableMesh(uint id) : Renderable(id)
+RenderableMesh::RenderableMesh(uint id, int drawStage) : Renderable(id, drawStage)
   {
   drawStyle = MESH_DRAW_STYLE_SINGLE_COLOUR;
   }

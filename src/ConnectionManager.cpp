@@ -14,7 +14,7 @@ ConnectionManager::ConnectionManager(uint id) : GameActor(id)
 
 void ConnectionManager::onAttached(GameContext* gameContext)
   {
-  beamsRenderable.reset(new RenderableLines(gameContext->getRenderContext()->getNextRenderableID()));
+  beamsRenderable.reset(new RenderableLines(gameContext->getRenderContext()->getNextRenderableID(), DRAW_STAGE_TRANSPARENT));
   beamsRenderable->initialise(gameContext->getRenderContext());
   gameContext->getRenderContext()->getRenderableSet()->addRenderable(beamsRenderable);
   }

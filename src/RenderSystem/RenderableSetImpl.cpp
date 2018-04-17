@@ -20,18 +20,22 @@ void RenderableSetImpl::render(RenderContext* renderContext)
   {
   const Vector4D* clipPlane = getClippingPlane();
   bool usingParentClipPlane = clipPlane->x != 0 || clipPlane->y != 0 || clipPlane->z != 0;
+  const int activeDrawStage = renderContext->getActiveDrawStage();
 
   for (RenderablePtr renderable : *renderables.getList())
     {
-    if (!usingParentClipPlane)
-      renderContext->setClippingPlane(*renderable->getClippingPlane());
+    if (renderable->getDrawStage() == DRAW_STAGE_ALL || renderable->getDrawStage() == activeDrawStage)
+      {
+      if (!usingParentClipPlane)
+        renderContext->setClippingPlane(*renderable->getClippingPlane());
 
-    renderContext->pushTransform(renderable->getTransform());
-    renderable->render(renderContext);
-    renderContext->popTransform();
+      renderContext->pushTransform(renderable->getTransform());
+      renderable->render(renderContext);
+      renderContext->popTransform();
 
-    if (!usingParentClipPlane)
-      renderContext->disableClippingPlane();
+      if (!usingParentClipPlane)
+        renderContext->disableClippingPlane();
+      }
     }
   }
 

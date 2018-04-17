@@ -2,16 +2,18 @@
 // Created by matt on 8/04/18.
 //
 
-#include "FogOfWarRenderable.h"
 #include "Resources.h"
+#include "FogOfWarRenderable.h"
+#include "TOGameContext.h"
 
-FogOfWarRenderable::FogOfWarRenderable(uint id, float fogQuadWidth) : Renderable(id), fogQuadWidth(fogQuadWidth)
+FogOfWarRenderable::FogOfWarRenderable(uint id, float fogQuadWidth) : Renderable(id, DRAW_STAGE_FOGOFWAR), fogQuadWidth(fogQuadWidth)
   {}
 
 void FogOfWarRenderable::initialise(RenderContext* renderContext)
   {
   using namespace mathernogl;
   clearGLErrors();
+  renderContext->registerDrawStage(DRAW_STAGE_FOGOFWAR);
   std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/FOVTextureVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/FOVTextureFS.glsl") };
   shaderProgram = renderContext->getSharedShaderProgram(&shaders);
 

@@ -4,7 +4,7 @@
 
 #include "RenderableLineBoxes.h"
 
-RenderableLineBoxes::RenderableLineBoxes(uint id) : Renderable(id)
+RenderableLineBoxes::RenderableLineBoxes(uint id, int drawStage) : Renderable(id, drawStage)
   {}
 
 void RenderableLineBoxes::initialise(RenderContext* renderContext)

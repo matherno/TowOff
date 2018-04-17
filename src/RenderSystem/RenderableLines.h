@@ -26,7 +26,7 @@ private:
   float lineWidth = 2;
 
 public:
-  RenderableLines(uint id);
+  RenderableLines(uint id, int drawStage = DRAW_STAGE_OPAQUE);
 
   virtual void initialise(RenderContext* renderContext) override;
   virtual void cleanUp(RenderContext* renderContext) override;

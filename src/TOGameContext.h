@@ -21,6 +21,8 @@ class TOGameContext;
 #include "FogOfWarRenderable.h"
 #include "FogOfWarHandler.h"
 
+#define DRAW_STAGE_FOGOFWAR   (DRAW_STAGE_TRANSPARENT + 1)
+
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game
 */

@@ -65,7 +65,7 @@ bool TowerSelectionManager::onWorldClick(GameContext* gameContext, uint mouseX, 
 void TowerSelectionManager::onStartMouseDrag(GameContext* gameContext, uint mouseX, uint mouseY)
   {
   isSelectionDragging = true;
-  dragSelectionRect.reset(new RenderableLineStrips(gameContext->getRenderContext()->getNextRenderableID(), true));
+  dragSelectionRect.reset(new RenderableLineStrips(gameContext->getRenderContext()->getNextRenderableID(), true, DRAW_STAGE_OVERLAY));
   dragSelectionRect->initialise(gameContext->getRenderContext());
   dragSelectionRect->setLineWidth(selectionRectLineWidth);
   gameContext->getRenderContext()->getRenderableSet()->addRenderable(dragSelectionRect);

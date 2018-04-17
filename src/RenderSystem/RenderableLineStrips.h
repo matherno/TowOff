@@ -29,7 +29,7 @@ private:
 
 public:
   //  screenSpace => the line strips are defined in screen pixel space, with (0, 0) being the top left
-  RenderableLineStrips(uint id, bool screenSpace = false);
+  RenderableLineStrips(uint id, bool screenSpace = false, int drawStage = DRAW_STAGE_OPAQUE);
 
   virtual void initialise(RenderContext* renderContext) override;
   virtual void cleanUp(RenderContext* renderContext) override;

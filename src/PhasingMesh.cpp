@@ -4,7 +4,7 @@
 
 #include "PhasingMesh.h"
 
-PhasingMesh::PhasingMesh(uint id) : RenderableMesh(id)
+PhasingMesh::PhasingMesh(uint id, bool isOverlay) : RenderableMesh(id, isOverlay ? DRAW_STAGE_OVERLAY : DRAW_STAGE_OPAQUE)
   {}
 
 void PhasingMesh::initialise(RenderContext* renderContext)

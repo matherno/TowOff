@@ -18,7 +18,7 @@ private:
   float lineWidth = 2;
 
 public:
-  RenderableLineBoxes(uint id);
+  RenderableLineBoxes(uint id, int drawStage = DRAW_STAGE_OPAQUE);
 
   uint addBox(const Vector3D& min, const Vector3D& max);
   void removeBox(uint id);

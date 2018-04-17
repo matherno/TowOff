@@ -10,7 +10,7 @@ using namespace mathernogl;
 #define UI_DRAW_STYLE_TEXTURE        2
 #define UI_DRAW_STYLE_ALPHA_TEXTURE  3
 
-UIRenderable::UIRenderable(uint id) : Renderable(id)
+UIRenderable::UIRenderable(uint id) : Renderable(id, DRAW_STAGE_UI)
   {}
 
 void UIRenderable::initialise(RenderContext* renderContext)

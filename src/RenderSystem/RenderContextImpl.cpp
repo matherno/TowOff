@@ -19,6 +19,7 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
     {
     window->setClearColour(0, 0, 0);
     renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
+    registerStandardDrawStages();
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxNumTextureLocations);
     ASSERT_NO_GL_ERROR();
     return true;
@@ -28,12 +29,12 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
 
 bool RenderContextImpl::cleanUp()
   {
-  clearCaches();
+  reset();
   window->close();
   return true;
   }
 
-void RenderContextImpl::clearCaches()
+void RenderContextImpl::reset()
   {
   resourceCache.forEachShaderProgram([](ShaderProgramPtr shaderProgram)
     {
@@ -49,6 +50,8 @@ void RenderContextImpl::clearCaches()
     });
   resourceCache.clearAll();
   texIDsToBoundLocals.clear();
+  drawStages.clear();
+  registerStandardDrawStages();
   }
 
 uint RenderContextImpl::getNextRenderableID()
@@ -71,15 +74,20 @@ void RenderContextImpl::render()
   if (!isRendering)
     {
     isRendering = true;
-    transformStack.clear();
-    boundShaderID = 0;
     window->clear();
-    pushTransform(renderableSet->getTransform());
-    setClippingPlane(*renderableSet->getClippingPlane());
-    renderableSet->render(this);
-    disableClippingPlane();
-    popTransform();
+    boundShaderID = 0;
+    for (int stage : drawStages)
+      {
+      activeDrawStage = stage;
+      transformStack.clear();
+      pushTransform(renderableSet->getTransform());
+      setClippingPlane(*renderableSet->getClippingPlane());
+      renderableSet->render(this);
+      disableClippingPlane();
+      popTransform();
+      }
     window->update();
+    activeDrawStage = DRAW_STAGE_NONE;
     isRendering = false;
     }
   }
@@ -283,4 +291,22 @@ void RenderContextImpl::disableClippingPlane()
 bool RenderContextImpl::isClippingEnabled()
   {
   return (clipPlane.x != 0 || clipPlane.y != 0 || clipPlane.z != 0);
+  }
+
+bool RenderContextImpl::registerDrawStage(int drawStage)
+  {
+  if (drawStages.count(drawStage) == 0)
+    {
+    drawStages.insert(drawStage);
+    return true;
+    }
+  return false;
+  }
+
+void RenderContextImpl::registerStandardDrawStages()
+  {
+  registerDrawStage(DRAW_STAGE_OPAQUE);
+  registerDrawStage(DRAW_STAGE_TRANSPARENT);
+  registerDrawStage(DRAW_STAGE_OVERLAY);
+  registerDrawStage(DRAW_STAGE_UI);
   }

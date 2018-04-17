@@ -33,11 +33,13 @@ private:
   uint boundShaderID = 0;
   ResourceCache resourceCache;
   int maxNumTextureLocations = 48;
+  std::set<int> drawStages;
+  int activeDrawStage = DRAW_STAGE_NONE;
 
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;
   virtual bool cleanUp() override;
-  virtual void clearCaches() override;
+  virtual void reset() override;
   virtual mathernogl::Window* getWindow() override;
   virtual const mathernogl::Window* getWindow() const override;
 
@@ -69,4 +71,9 @@ public:
   virtual void setClippingPlane(const Vector4D& plane) override;
   virtual void disableClippingPlane() override;
   virtual bool isClippingEnabled() override;
+  virtual bool registerDrawStage(int drawStage) override;
+  virtual int getActiveDrawStage() const override { return activeDrawStage; }
+
+protected:
+  void registerStandardDrawStages();
   };

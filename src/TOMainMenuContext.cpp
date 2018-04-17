@@ -82,7 +82,7 @@ TOMainMenuContext::MainMenuOutcome TOMainMenuContext::doMainMenu(RenderContextPt
     }
   TOMainMenuContext::MainMenuOutcome outcome = mainMenuContext.getSelectedOption();
   mainMenuContext.cleanUp();
-  renderContext->clearCaches();
+  renderContext->reset();
   return outcome;
   }
 

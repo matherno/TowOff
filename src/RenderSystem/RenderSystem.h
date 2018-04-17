@@ -15,17 +15,30 @@ typedef mathernogl::Transform Transform;
 typedef std::string string;
 
 /*
+ *  Rendering is done in stages, each renderable has a draw stage that its render() function gets called in
+ *  Stages are performed in numerical order
+ *  Draw stage "DRAW_STAGE_ALL" means that the given renderable will have its render() function called in every stage
+ */
+#define DRAW_STAGE_NONE           -1
+#define DRAW_STAGE_ALL             0
+#define DRAW_STAGE_OPAQUE         10
+#define DRAW_STAGE_TRANSPARENT    20
+#define DRAW_STAGE_OVERLAY        30
+#define DRAW_STAGE_UI             40
+
+/*
 *   Renderable, represents an object or primitive that may be rendered
 */
 class RenderContext;
 class Renderable {
 private:
   const uint id;
+  const int drawStage;
   mathernogl::Transform transform;
   Vector4D clipPlane = Vector4D(0);
 
 public:
-  Renderable(uint id) : id(id) {}
+  Renderable(uint id, int drawStage = DRAW_STAGE_OPAQUE) : id(id), drawStage(drawStage) {}
   virtual ~Renderable() {}
 
   virtual uint getID() const { return id; }
@@ -37,6 +50,7 @@ public:
   virtual const Vector4D* getClippingPlane() const { return &clipPlane; }
   virtual void setTransform(const Transform& transform) { this->transform = transform; }
   virtual void setClippingPlane(const Vector4D& plane) { this->clipPlane = plane; }
+  virtual int getDrawStage() const { return drawStage; }
   };
 typedef std::shared_ptr<Renderable> RenderablePtr;
 
@@ -47,7 +61,7 @@ typedef std::shared_ptr<Renderable> RenderablePtr;
 class RenderableSet : public Renderable
   {
 public:
-  RenderableSet(uint id) : Renderable(id) {}
+  RenderableSet(uint id) : Renderable(id, DRAW_STAGE_ALL) {}
   virtual ~RenderableSet() {}
   virtual void addRenderable(RenderablePtr renderable) = 0;
   virtual void removeRenderable(int id) = 0;
@@ -87,8 +101,8 @@ public:
   RenderContext() {}
   virtual ~RenderContext() {}
   virtual bool initialise(const RenderInitConfig* initConfig) = 0;
-  virtual bool cleanUp() = 0;         // cleanup should clean up everything (including clearing caches)
-  virtual void clearCaches() = 0;
+  virtual bool cleanUp() = 0;
+  virtual void reset() = 0;     //  should clear all caches and stored state, but leave the window open
   virtual uint getNextRenderableID() = 0;
   virtual RenderableSetPtr getRenderableSet() = 0;
   virtual void setWorldToCamera(const Matrix4& transform) = 0;
@@ -114,5 +128,7 @@ public:
   virtual void setClippingPlane(const Vector4D& plane) = 0;
   virtual void disableClippingPlane() = 0;
   virtual bool isClippingEnabled() = 0;
+  virtual bool registerDrawStage(int drawStage) = 0;    // returns false if the stage already exists
+  virtual int getActiveDrawStage() const = 0;
   };
 typedef std::shared_ptr<RenderContext> RenderContextPtr;

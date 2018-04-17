@@ -4,7 +4,7 @@
 
 #include "RenderableLineStrips.h"
 
-RenderableLineStrips::RenderableLineStrips(uint id, bool screenSpace) : Renderable(id), inScreenSpace(screenSpace)
+RenderableLineStrips::RenderableLineStrips(uint id, bool screenSpace, int drawStage) : Renderable(id, drawStage), inScreenSpace(screenSpace)
   {}
 
 void RenderableLineStrips::initialise(RenderContext* renderContext)
