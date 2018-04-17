@@ -27,6 +27,8 @@ class TOGameContext;
 *   Sub-class of Game Context to capture the central state of the TowOff game
 */
 
+typedef mathernogl::MappedList<std::pair<Vector3D, float>> VisibilityMarkersList;
+
 class TOGameContext : public GameContextImpl
   {
 private:
@@ -43,6 +45,8 @@ private:
   std::shared_ptr<TOInputHandler> toInputHandler;
   std::shared_ptr<PauseMenuHandler> pauseMenuHandler;
   std::shared_ptr<FogOfWarHandler> fogOfWarHandler;
+  VisibilityMarkersList visibilityMarkers;
+  uint nextVisibilityMarkerID = 1;
 
   //  maps combat towers to the networks (via relay towers) that they are within range of
   std::map<uint, std::set<uint>> combatTowerNetworks;
@@ -95,6 +99,9 @@ public:
   long timeBetweenEnergyTransfers() const { return 1000; };
   bool isPositionOnMap(const Vector3D& pos) const;
   float getMapWidth() const;
+  uint addVisibilityMarker(const Vector3D& position, float radius);
+  void removeVisibilityMarker(uint id);
+  const VisibilityMarkersList* getVisibilityMarkers() const { return &visibilityMarkers; }
 
   Vector3D terrainHitTest(uint cursorX, uint cursorY, bool* isLand = nullptr) const;
   bool isPositionLand(const Vector3D& position) const;

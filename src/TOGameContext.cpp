@@ -42,6 +42,8 @@ bool TOGameContext::initialise()
   addActor(fogOfWarHandler);
 
   addInitialTowers();
+  if (towers.count() == 0)    // just for now, so that we have some map visible when we start with nothing
+    addVisibilityMarker(Vector3D(0, 0, 0), 30);
   return success;
   }
 
@@ -490,6 +492,21 @@ BoundingBoxPtr TOGameContext::getTowerCombinedBoundingBox(uint towerID)
 Vector3D TOGameContext::getCameraFocalPosition() const
   {
   return toInputHandler->getFocalPosition();
+  }
+
+uint TOGameContext::addVisibilityMarker(const Vector3D& position, float radius)
+  {
+  uint id = nextVisibilityMarkerID++;
+  visibilityMarkers.add(std::make_pair(position, radius), id);
+  if (fogOfWarHandler)
+    fogOfWarHandler->refreshFOW(this);
+  return id;
+  }
+
+void TOGameContext::removeVisibilityMarker(uint id)
+  {
+  if (visibilityMarkers.contains(id))
+    visibilityMarkers.remove(id);
   }
 
 

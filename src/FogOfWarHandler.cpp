@@ -71,21 +71,45 @@ void FogOfWarHandler::refreshFOW(GameContext* gameContext)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   float visibility = 0;
+  auto ProcessVisibilityRadius = [fadeDistance, &visibility, &worldPos](const Vector3D& position, float radius)
+    {
+    const float fadeStart = radius - fadeDistance;
+    const float towerVisibility = ((float)worldPos.distanceToPoint(position) - fadeStart) / fadeDistance;
+    visibility += mathernogl::clampf(1 - towerVisibility, 0, 1);
+    };
+
+  //  go through all the visibility markers
+  for (const std::pair<Vector3D, float>& posAndRadius : *toGameContext->getVisibilityMarkers()->getList())
+    {
+    ProcessVisibilityRadius(posAndRadius.first, posAndRadius.second);
+    if (visibility > 1)
+      return 1;
+    }
+
+  //  go through all the constructed towers
   for (const TowerPtr& tower : *toGameContext->getTowers()->getList())
     {
-    if (tower->isUnderConstruction())
-      continue;
-
-    const float fadeStart = tower->getVisibilityRadius() - fadeDistance;
-    const float towerVisibility = ((float)worldPos.distanceToPoint(tower->getPosition()) - fadeStart) / fadeDistance;
-    visibility += mathernogl::clampf(1 - towerVisibility, 0, 1);
+    if (!tower->isUnderConstruction())
+      ProcessVisibilityRadius(tower->getPosition(), tower->getVisibilityRadius());
+    if (visibility > 1)
+      return 1;
     }
+
   return mathernogl::clampf(visibility, 0, 1);
   }
 
 /*static*/ bool FogOfWarHandler::isVisibleAtPosition(GameContext* gameContext, const Vector3D& worldPos)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+
+  //  go through all the visibility markers
+  for (const std::pair<Vector3D, float>& posAndRadius : *toGameContext->getVisibilityMarkers()->getList())
+    {
+    if (worldPos.distanceToPoint(posAndRadius.first) <= posAndRadius.second)
+      return true;
+    }
+
+  //  go through all the constructed towers
   for (const TowerPtr& tower : *toGameContext->getTowers()->getList())
     {
     if (tower->isUnderConstruction())
@@ -93,5 +117,6 @@ void FogOfWarHandler::refreshFOW(GameContext* gameContext)
     if (worldPos.distanceToPoint(tower->getPosition()) <= tower->getVisibilityRadius())
       return true;
     }
+
   return false;
   }
