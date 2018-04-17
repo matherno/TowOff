@@ -74,7 +74,7 @@ bool TowerPlacementHandler::onMouseReleased(GameContext* gameContext, uint butto
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   if (button == MOUSE_LEFT)
     {
-    if (isPositionValid)
+    if (isHighlightPosValid)
       {
       const TowerType* towerType = TowerFactory::getTowerType(towerTypeID);
       bool needsConstruction = towerType->name != "Home Base" && towerType->name != "Enemy Tower";
@@ -111,9 +111,11 @@ bool TowerPlacementHandler::onMouseMove(GameContext* gameContext, uint mouseX, u
   Vector3D terrainPos = toGameContext->terrainHitTest(mouseX, mouseY, &isLand);
   towerHighlight->getTransform()->translate(terrainPos - towerHighlightPos);
   towerHighlightPos = terrainPos;
-  if (isPositionValid != isLand)
+
+  bool isNewPosValid = isLand && FogOfWarHandler::isVisibleAtPosition(gameContext, towerHighlightPos);
+  if (isHighlightPosValid != isNewPosValid)
     {
-    isPositionValid = isLand;
+    isHighlightPosValid = isNewPosValid;
     setupHighlightColour();
     }
   setupConnectionHighlights(gameContext);
@@ -133,7 +135,7 @@ bool TowerPlacementHandler::onMouseHeld(GameContext* gameContext, uint button, u
 
 void TowerPlacementHandler::setupHighlightColour()
   {
-  Vector3D colour = isPositionValid ? highlightColourValid : highlightColourInvalid;
+  Vector3D colour = isHighlightPosValid ? highlightColourValid : highlightColourInvalid;
   towerHighlight->forEachChild([colour](RenderablePtr child)
                                  {
                                  RenderableMesh* mesh = dynamic_cast<RenderableMesh*>(child.get());

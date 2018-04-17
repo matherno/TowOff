@@ -59,7 +59,7 @@ void FogOfWarHandler::refreshFOW(GameContext* gameContext)
         worldPos -= toGameContext->getMapWidth() * 0.5;
         worldPos.z *= -1;
         worldPos.y = 0;
-        float visibility = getVisibilityAt(gameContext, worldPos, fadeDistance);
+        float visibility = getVisibilityAtPosition(gameContext, worldPos, fadeDistance);
         visibilityTexture->bytes.get()[bpp * (col + row * width)] = mathernogl::byte(255.0 * visibility);
         }
       }
@@ -67,7 +67,7 @@ void FogOfWarHandler::refreshFOW(GameContext* gameContext)
     }
   }
 
-/*static*/ float FogOfWarHandler::getVisibilityAt(GameContext* gameContext, const Vector3D& worldPos, float fadeDistance)
+/*static*/ float FogOfWarHandler::getVisibilityAtPosition(GameContext* gameContext, const Vector3D& worldPos, float fadeDistance)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   float visibility = 0;
@@ -81,4 +81,17 @@ void FogOfWarHandler::refreshFOW(GameContext* gameContext)
     visibility += mathernogl::clampf(1 - towerVisibility, 0, 1);
     }
   return mathernogl::clampf(visibility, 0, 1);
+  }
+
+/*static*/ bool FogOfWarHandler::isVisibleAtPosition(GameContext* gameContext, const Vector3D& worldPos)
+  {
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  for (const TowerPtr& tower : *toGameContext->getTowers()->getList())
+    {
+    if (tower->isUnderConstruction())
+      continue;
+    if (worldPos.distanceToPoint(tower->getPosition()) <= tower->getVisibilityRadius())
+      return true;
+    }
+  return false;
   }

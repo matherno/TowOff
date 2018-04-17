@@ -16,7 +16,7 @@ private:
   std::shared_ptr<RenderableLines> towerConnectionHighlights;
   std::shared_ptr<RenderableLineStrips> towerRangeHighlight;
   Vector3D towerHighlightPos;
-  bool isPositionValid = false;
+  bool isHighlightPosValid = false;
   CallbackFunc endHandlerCallback;
   Vector3D highlightColourValid = Vector3D(0.1, 0.5, 0.1);
   Vector3D highlightColourInvalid = Vector3D(0.5, 0.1, 0.1);
