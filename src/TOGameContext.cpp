@@ -24,7 +24,7 @@ bool TOGameContext::initialise()
   if (loadedGameState)
     toInputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), loadedGameState->cameraFocalPos, loadedGameState->cameraZoomFactor, loadedGameState->cameraRotation, -45));
   else
-    toInputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 0, 40), 80, 0, -45));
+    toInputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), Vector3D(0, 0, 10), 80, 0, -45));
   addInputHandler(toInputHandler);
 
   initSurface();
