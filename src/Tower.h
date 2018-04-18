@@ -68,7 +68,7 @@ public:
   Vector3D getPosition() const { return position; }
   Vector3D getTargetPosition() const { return targetPosition; }
   Vector3D getConnectPosition() const { return connectPosition; }
-  Vector3D getHitRadius() const { return hitRadius; }
+  float getHitRadius() const { return hitRadius; }
   int getHealthPoints() const { return healthPoints; }
   int getMaxHealthPoints() const { return maxHealthPoints; }
   float getHealthFactor() const { return (float)healthPoints / (float)maxHealthPoints; }
@@ -87,6 +87,7 @@ public:
   void setTargetOffset(const Vector3D& offset);
   void setConnectOffset(const Vector3D& offset);
   void setMaxHealthPoints(int max);
+  void setHitRadius(float radius) { hitRadius = radius; }
   bool isAlive() { return healthPoints > 0; }
   void setConnectRadius(float radius) { connectRadius = radius; }
   float getConnectRadius() const { return connectRadius; }

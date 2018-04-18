@@ -15,6 +15,7 @@ struct TowerType
   string turretMeshFilePath;
   Vector3D connectOffset;
   float connectRadius;
+  float hitRadius;
   };
 
 class TowerFactory

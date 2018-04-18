@@ -112,7 +112,9 @@ bool TowerPlacementHandler::onMouseMove(GameContext* gameContext, uint mouseX, u
   towerHighlight->getTransform()->translate(terrainPos - towerHighlightPos);
   towerHighlightPos = terrainPos;
 
-  bool isNewPosValid = isLand && FogOfWarHandler::isVisibleAtPosition(gameContext, towerHighlightPos);
+  bool isNewPosValid = isLand;
+  isNewPosValid = isNewPosValid && FogOfWarHandler::isVisibleAtPosition(gameContext, towerHighlightPos);
+  isNewPosValid = isNewPosValid && !isHighlightTowerColliding(gameContext, towerHighlightPos);
   if (isHighlightPosValid != isNewPosValid)
     {
     isHighlightPosValid = isNewPosValid;
@@ -180,4 +182,16 @@ void TowerPlacementHandler::setupRangeHighlight(GameContext* gameContext)
 
   towerRangeHighlight->enableRebuild();
   towerRangeHighlight->rebuildBuffer();
+  }
+
+bool TowerPlacementHandler::isHighlightTowerColliding(GameContext* gameContext, const Vector3D& towerHighlightPosition) const
+  {
+  const float towerHighlightHitRadius = TowerFactory::getTowerType(towerTypeID)->hitRadius;
+  for (const TowerPtr tower : *TOGameContext::cast(gameContext)->getTowers()->getList())
+    {
+    const float minDistance = tower->getHitRadius() + towerHighlightHitRadius;
+    if (towerHighlightPosition.distanceToPoint(tower->getPosition()) <= minDistance)
+      return true;    // highlight tower collides with an existing tower
+    }
+  return false;
   }

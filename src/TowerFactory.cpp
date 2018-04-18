@@ -18,12 +18,12 @@
 
 const std::map<uint, TowerType> towerTypes =
   {
-  //{   id,     TowerType{     name,              icon image file,        base mesh file,           turret mesh file,           connect offset,        connect radius}},
-  {TOWER_HOMEBASE, TowerType{"Home Base",       IMAGE_ICON_HOME_BASE,    MESH_HOME_BASE,           "",                        Vector3D(-0.61, 5.12, 0.61),  10}},
-  {TOWER_BASIC,    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10}},
-  {TOWER_PYLON,    TowerType{"Pylon",           IMAGE_ICON_PYLON,        MESH_PYLON,               "",                        Vector3D(0, 4.02, 0),         20}},
-  {TOWER_MINER,    TowerType{"Miner",           IMAGE_ICON_MINER,        MESH_MINER_BASE,          MESH_MINER_TURRET,         Vector3D(0, 2.61, 0),         10}},
-  {TOWER_ENEMY,    TowerType{"Enemy Tower",     IMAGE_ICON_ENEMY_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10}},
+  //{   id,     TowerType{     name,              icon image file,        base mesh file,           turret mesh file,           connect offset,        connect radius,  hit radius}},
+  {TOWER_HOMEBASE, TowerType{"Home Base",       IMAGE_ICON_HOME_BASE,    MESH_HOME_BASE,           "",                        Vector3D(-0.61, 5.12, 0.61),  10,             2.7}},
+  {TOWER_BASIC,    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10,             0.9}},
+  {TOWER_PYLON,    TowerType{"Pylon",           IMAGE_ICON_PYLON,        MESH_PYLON,               "",                        Vector3D(0, 4.02, 0),         20,             1.5}},
+  {TOWER_MINER,    TowerType{"Miner",           IMAGE_ICON_MINER,        MESH_MINER_BASE,          MESH_MINER_TURRET,         Vector3D(0, 2.61, 0),         10,             1.7}},
+  {TOWER_ENEMY,    TowerType{"Enemy Tower",     IMAGE_ICON_ENEMY_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10,             0.8}},
   };
 
 const std::map<uint, TowerType>* TowerFactory::getTowerTypeMap()
@@ -73,6 +73,7 @@ void setCommonTowerParameters(TowerPtr tower, uint towerType)
   tower->setConnectOffset(type->connectOffset);
   tower->setConnectRadius(type->connectRadius);
   tower->setTargetOffset(Vector3D(0, 0.5, 0));
+  tower->setHitRadius(type->hitRadius);
   }
 
 TowerPtr TowerFactory::createUnderConstructTower(uint towerType, uint id, const Vector3D& position)

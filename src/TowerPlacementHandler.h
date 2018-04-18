@@ -38,4 +38,5 @@ private:
   void setupHighlightColour ();
   void setupConnectionHighlights (GameContext* gameContext);
   void setupRangeHighlight (GameContext* gameContext);
+  bool isHighlightTowerColliding(GameContext* gameContext, const Vector3D& towerHighlightPosition) const;
   };
