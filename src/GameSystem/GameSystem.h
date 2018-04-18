@@ -43,6 +43,7 @@ public:
   uint getID() { return id; }
   virtual void onAttached(GameContext* gameContext) = 0;
   virtual void onDetached(GameContext* gameContext) = 0;
+  virtual void onUpdate(GameContext* gameContext) {};
   virtual bool onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY) { return false; }
   virtual bool onMouseHeld(GameContext* gameContext, uint button, uint mouseX, uint mouseY) { return false; }
   virtual bool onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY) { return false; }
@@ -69,6 +70,7 @@ public:
   virtual uint getNextHandlerID() = 0;
   virtual bool containsHandler(uint id) const = 0;
   virtual bool isKeyDown(uint key) const = 0;
+  virtual Vector2D getMousePos() const = 0;
 protected:
   virtual void addHandler(InputHandlerPtr handler) = 0;
   virtual void addPriorityHandler(InputHandlerPtr handler) = 0;

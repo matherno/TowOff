@@ -13,6 +13,7 @@ private:
   float panSpeed = 50;
   float yawSpeed = 90;
   float zoomSpeed = 8;
+  float mousePanSpeed = 50;
   float minZoom = 30;
   float maxZoom = 100;
   float rotation;
@@ -39,6 +40,7 @@ public:
   uint getActivePlayer() const { return activePlayer; }
 
   virtual void onAttached(GameContext* gameContext) override;
+  virtual void onUpdate(GameContext* gameContext) override;
   virtual bool onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY) override;
   virtual bool onKeyPressed(GameContext* gameContext, uint key) override;
   virtual void onDetached(GameContext* gameContext) override;
@@ -49,4 +51,5 @@ public:
 
 protected:
   void refreshRotationMatrix();
+  void performMouseCameraMovement(GameContext* gameContext);
   };

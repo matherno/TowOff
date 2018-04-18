@@ -96,6 +96,9 @@ void InputManagerImpl::processInput(GameContext* gameContext)
   if (scrollWheelOffset != 0)
     fireMouseScrollEvents(gameContext, scrollWheelOffset, mouseX, mouseY);
 
+  //  fire all update events
+  fireUpdateEvents(gameContext);
+
   inputSource.clearEvents();
   }
 
@@ -104,6 +107,20 @@ bool shouldFire(GameContext* gameContext, InputHandlerPtr& handler)
   if (gameContext->getUIManager()->isModalModeActive())
     return handler->isUIInputHandler();
   return true;
+  }
+
+void InputManagerImpl::fireUpdateEvents(GameContext* gameContext)
+  {
+  for (InputHandlerPtr& handler : *priorityHandlers.getList())
+    {
+    if (shouldFire(gameContext, handler))
+      handler->onUpdate(gameContext);
+    }
+  for (InputHandlerPtr& handler : *handlers.getList())
+    {
+    if (shouldFire(gameContext, handler))
+      handler->onUpdate(gameContext);
+    }
   }
 
 void InputManagerImpl::fireMousePressedEvents(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
@@ -230,4 +247,9 @@ void InputManagerImpl::fireKeyReleasedEvents(GameContext* gameContext, uint key)
     if (shouldFire(gameContext, handler) && handler->onKeyReleased(gameContext, key))
       return;
     }
+  }
+
+Vector2D InputManagerImpl::getMousePos() const
+  {
+  return inputSource.getMousePos();
   }

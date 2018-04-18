@@ -33,6 +33,11 @@ void TOInputHandler::onDetached(GameContext* gameContext)
 
   }
 
+void TOInputHandler::onUpdate(GameContext* gameContext)
+  {
+  performMouseCameraMovement(gameContext);
+  }
+
 bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
   {
   char character = getCharFromKeyCode(key);
@@ -146,4 +151,34 @@ bool TOInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset
   zoomOffset = mathernogl::clampf(zoomOffset, minZoom, maxZoom);
   refreshCamera(gameContext->getCamera());
   return true;
+  }
+
+void TOInputHandler::performMouseCameraMovement(GameContext* gameContext)
+  {
+  const uint edgeCamMoveWidth = 10;
+  const Vector2D screenSize = gameContext->getRenderContext()->getWindow()->getSize();
+  const Vector2D mousePos = gameContext->getInputManager()->getMousePos();
+
+  Vector3D camTranslation;
+  if (mousePos.x < edgeCamMoveWidth)
+    camTranslation.x -= 1;
+  else if (mousePos.x > (screenSize.x - edgeCamMoveWidth))
+    camTranslation.x += 1;
+  if (mousePos.y < edgeCamMoveWidth)
+    camTranslation.z -= 1;
+  else if (mousePos.y > (screenSize.y - edgeCamMoveWidth))
+    camTranslation.z += 1;
+
+  if (camTranslation.magnitude() > 0)
+    {
+    camTranslation.makeUniform();
+    camTranslation *= mousePanSpeed * gameContext->getDeltaTime() * 0.001f;
+    camTranslation *= mathernogl::matrixYaw(rotation);
+    Vector3D newFocalPosition = focalPosition + camTranslation;
+    if (TOGameContext::cast(gameContext)->isPositionOnMap(newFocalPosition))
+      {
+      focalPosition = newFocalPosition;
+      refreshCamera(gameContext->getCamera());
+      }
+    }
   }
