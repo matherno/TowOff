@@ -16,11 +16,15 @@
 
 int main()
   {
+  std::shared_ptr<TOSettings> settings(new TOSettings());
+  settings->initialise();
+
   RenderInitConfig renderConfig;
   renderConfig.windowName = "TowOff";
-  renderConfig.windowWidth = 1800;
-  renderConfig.windowHeight = 900;
-  renderConfig.antiAliasing = true;
+  renderConfig.windowWidth = (uint)mathernogl::clampi(settings->getWindowWidth(), 800, 2560);
+  renderConfig.windowHeight = (uint)mathernogl::clampi(settings->getWindowHeight(), 600, 2440);
+  renderConfig.antiAliasing = settings->useAntiAliasing();
+  renderConfig.fullscreen = settings->useFullscreen();
 
   RenderContextPtr renderContext(new RenderContextImpl());
   if (!renderContext->initialise(&renderConfig))
@@ -47,7 +51,7 @@ int main()
     if (mainMenuOutcome.isNewGame() || mainMenuOutcome.isLoadGame())
       {
       mathernogl::logInfo("Starting game...");
-      TOGameContext gameContext(renderContext, loadedState);
+      TOGameContext gameContext(renderContext, settings, loadedState);
       gameContext.initialise();
       while (!gameContext.isContextEnded() && renderContext->isWindowOpen())
         {

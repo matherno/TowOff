@@ -20,6 +20,7 @@ class TOGameContext;
 #include "TowerSelectionManager.h"
 #include "FogOfWarRenderable.h"
 #include "FogOfWarHandler.h"
+#include "TOSettings.h"
 
 #define DRAW_STAGE_FOGOFWAR   (DRAW_STAGE_TRANSPARENT + 1)
 
@@ -39,6 +40,7 @@ private:
   std::shared_ptr<RenderableTerrain> waterMesh;
   HUDHandler hudHandler;
   SpecialEffectsHandler specialEffectsHandler;
+  std::shared_ptr<TOSettings> settingsHandler;
   std::shared_ptr<ConnectionManager> connectionManager;
   std::shared_ptr<RangeFieldManager> rangeFieldManager;
   std::shared_ptr<TowerSelectionManager> selectionManager;
@@ -58,7 +60,8 @@ private:
   std::map<uint, uint> towerRangeFields;
 
 public:
-  TOGameContext(const RenderContextPtr& renderContext, std::shared_ptr<TOGameState> loadedGameState = nullptr) : GameContextImpl(renderContext), loadedGameState(loadedGameState) {}
+  TOGameContext(const RenderContextPtr& renderContext, std::shared_ptr<TOSettings> settings, std::shared_ptr<TOGameState> loadedGameState = nullptr)
+    : GameContextImpl(renderContext), settingsHandler(settings), loadedGameState(loadedGameState) {}
   virtual bool initialise() override;
   virtual void cleanUp() override;
   virtual void processInputStage() override;
@@ -73,6 +76,7 @@ public:
   Vector3D getPlayerColour(uint num) const;
   HUDHandler* getHUDHandler(){ return &hudHandler; }
   TowerSelectionManager* getSelectionManager(){ return selectionManager.get(); }
+  TOSettings* getSettings(){ return settingsHandler.get(); }
   void displayPauseMenu();
   Vector3D getCameraFocalPosition() const;
 

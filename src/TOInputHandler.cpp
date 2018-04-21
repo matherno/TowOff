@@ -40,11 +40,12 @@ void TOInputHandler::onUpdate(GameContext* gameContext)
 
 bool TOInputHandler::onKeyHeld(GameContext* gameContext, uint key)
   {
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   char character = getCharFromKeyCode(key);
   Vector3D translation(0);
   float rotationDelta = 0;
-  float speed = panSpeed * gameContext->getDeltaTime() * 0.001f;
-  float rotateSpeed = yawSpeed * gameContext->getDeltaTime() * 0.001f;
+  float speed = panSpeed * gameContext->getDeltaTime() * toGameContext->getSettings()->getCameraPanSpeed() * 0.001f;
+  float rotateSpeed = yawSpeed * gameContext->getDeltaTime() * toGameContext->getSettings()->getCameraRotSpeed() * 0.001f;
 
   switch(character)
     {
@@ -155,6 +156,10 @@ bool TOInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset
 
 void TOInputHandler::performMouseCameraMovement(GameContext* gameContext)
   {
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  if (!toGameContext->getSettings()->enableScreenEdgePan())
+    return;
+
   const uint edgeCamMoveWidth = 10;
   const Vector2D screenSize = gameContext->getRenderContext()->getWindow()->getSize();
   const Vector2D mousePos = gameContext->getInputManager()->getMousePos();
@@ -172,7 +177,7 @@ void TOInputHandler::performMouseCameraMovement(GameContext* gameContext)
   if (camTranslation.magnitude() > 0)
     {
     camTranslation.makeUniform();
-    camTranslation *= mousePanSpeed * gameContext->getDeltaTime() * 0.001f;
+    camTranslation *= mousePanSpeed * gameContext->getDeltaTime() * toGameContext->getSettings()->getCameraPanSpeed() * 0.001f;
     camTranslation *= mathernogl::matrixYaw(rotation);
     Vector3D newFocalPosition = focalPosition + camTranslation;
     if (TOGameContext::cast(gameContext)->isPositionOnMap(newFocalPosition))
