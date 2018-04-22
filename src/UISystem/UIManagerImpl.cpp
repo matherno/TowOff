@@ -54,13 +54,15 @@ uint UIManagerImpl::getNextComponentID()
   return nextComponentID++;
   }
 
-bool UIManagerImpl::mouseClick(GameContext* context, uint mouseX, uint mouseY)
+bool UIManagerImpl::mouseClick(GameContext* context, uint mouseX, uint mouseY, bool dblClick)
   {
   uint componentClicked = 0;
-  if (isModalModeActive())
-    componentClicked = (*modalComponents.begin())->mouseClick(context, mouseX, mouseY);
+  UIComponentPtr componentToClick = isModalModeActive() ? (*modalComponents.begin()) : rootComponent;
+  if (dblClick)
+    componentClicked = componentToClick->mouseDblClick(context, mouseX, mouseY);
   else
-    componentClicked = rootComponent->mouseClick(context, mouseX, mouseY);
+    componentClicked = componentToClick->mouseClick(context, mouseX, mouseY);
+
   if (componentClicked == 0)
     {
     lossFocus(context);

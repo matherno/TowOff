@@ -5,6 +5,8 @@
 #include <GameSystem/InputCodes.h>
 #include "UIInputHandler.h"
 
+#define DOUBLE_CLICK_TOLERANCE 200
+
 UIInputHandler::UIInputHandler(uint id) : InputHandler(id)
   {}
 
@@ -23,7 +25,20 @@ bool UIInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
   if (gameContext->getUIManager()->hitTest(mouseX, mouseY))
     {
     if (button == MOUSE_LEFT)
-      gameContext->getUIManager()->mouseClick(gameContext, mouseX, mouseY);
+      {
+      if (gameContext->getGameTime() - timeLastClicked < DOUBLE_CLICK_TOLERANCE)
+        {
+        //  double click
+        timeLastClicked = -20000;
+        gameContext->getUIManager()->mouseClick(gameContext, mouseX, mouseY, true);
+        }
+      else
+        {
+        //  normal click
+        timeLastClicked = gameContext->getGameTime();
+        gameContext->getUIManager()->mouseClick(gameContext, mouseX, mouseY, false);
+        }
+      }
     return true;
     }
   else

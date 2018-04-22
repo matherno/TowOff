@@ -15,6 +15,7 @@ class UIList : public UIPanel
 private:
   mathernogl::MappedList<IDAndText> listItems;
   ItemSelectedFunc itemSelectedCallback;
+  ItemSelectedFunc itemDblClickCallback;
   UIToggleButtonGroupPtr listItemsToggleGroup;
   std::list<uint> itemComponentIDs;
   int selectedItem = -1;
@@ -37,6 +38,7 @@ public:
   bool getSelectedItem(uint* id);
 
   void setItemSelectedCallback(ItemSelectedFunc func){ itemSelectedCallback = func; }
+  void setItemDblClickedCallback(ItemSelectedFunc func){ itemDblClickCallback = func; }
   void setItemHeight(uint height) { itemHeight = height; }
   void setItemGap(uint gap) { itemGap = gap; }
   void setItemColour(const Vector3D& colour) { itemColour = colour; }

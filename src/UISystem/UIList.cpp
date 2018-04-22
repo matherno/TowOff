@@ -58,6 +58,13 @@ void UIList::refresh(GameContext* context, const Vector2D& parentPos, const Vect
             selectedItem = -1;
           return true;
           });
+    listItemButton->setMouseDblClickCallback([this, idAndText](uint mouseX, uint mouseY)
+          {
+          selectedItem = idAndText.first;
+          if (itemDblClickCallback)
+            itemDblClickCallback(idAndText.first);
+          return true;
+          });
     addChild(listItemButton);
     itemComponentIDs.push_back(listItemButton->getID());
     buttonOffset += itemHeight + itemGap;

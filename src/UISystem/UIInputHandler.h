@@ -8,6 +8,9 @@
 
 class UIInputHandler : public InputHandler
   {
+private:
+  long timeLastClicked = -20000;
+
 public:
   UIInputHandler(uint id);
 

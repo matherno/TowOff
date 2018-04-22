@@ -47,9 +47,11 @@ public:
   virtual void setVisible(bool visible, bool recurseChildren = false) = 0;
   virtual bool isVisible() const = 0;
   virtual uint mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;      // returns the id of the component that was clicked
+  virtual uint mouseDblClick(GameContext* context, uint mouseX, uint mouseY) = 0;      // returns the id of the component that was double clicked
   virtual bool keyPress(GameContext* context, uint key) = 0;
   virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) = 0;
   virtual void setMouseClickCallback(OnMouseClickCallback func) = 0;
+  virtual void setMouseDblClickCallback(OnMouseClickCallback func) = 0;
   virtual void setPadding(float horizPadding, float vertPadding) = 0;     // padding only used when matching parent size
   virtual void onGainFocus(GameContext* context) = 0;
   virtual void onLossFocus(GameContext* context) = 0;
@@ -70,7 +72,7 @@ public:
   virtual bool initialise(GameContext* context) = 0;
   virtual void update(GameContext* context) = 0;
   virtual void cleanUp(GameContext* context) = 0;
-  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) = 0;
+  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY, bool dblClick) = 0;
   virtual bool keyPress(GameContext* context, uint key) = 0;
   virtual bool hitTest(uint mouseX, uint mouseY) = 0;
   virtual void lossFocus(GameContext* context) = 0;

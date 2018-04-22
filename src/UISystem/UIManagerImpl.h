@@ -22,7 +22,7 @@ public:
   virtual void pushModalComponent(UIComponentPtr modalComponent) override;
   virtual void popModalComponent() override;
   virtual bool isModalModeActive() const override;
-  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
+  virtual bool mouseClick(GameContext* context, uint mouseX, uint mouseY, bool dblClick) override;
   virtual bool keyPress(GameContext* context, uint key) override;
   virtual bool initialise(GameContext* context) override;
   virtual void update(GameContext* context) override;

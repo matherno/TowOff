@@ -32,6 +32,7 @@ private:
   Vector2D currentScreenPos, currentScreenSize;
   bool visible = true;
   OnMouseClickCallback mouseClickCallback;
+  OnMouseClickCallback mouseDblClickCallback;
   OnRefreshCallback onRefreshCallback;
 
 protected:
@@ -50,6 +51,7 @@ public:
   virtual void removeChild(uint id) override;
   virtual UIComponentPtr getChild(uint id, bool recurseChildren = false) override;
   virtual uint mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
+  virtual uint mouseDblClick(GameContext* context, uint mouseX, uint mouseY) override;
   virtual bool keyPress(GameContext* context, uint key) override { return false; }
   virtual void onGainFocus(GameContext* context) override {}
   virtual void onLossFocus(GameContext* context) override {}
@@ -71,6 +73,7 @@ public:
   virtual void setVisible(bool visible, bool recurseChildren = false) override;
   virtual bool isVisible() const override { return visible; }
   virtual void setMouseClickCallback(OnMouseClickCallback func) override { mouseClickCallback = func; }
+  virtual void setMouseDblClickCallback(OnMouseClickCallback func) override { mouseDblClickCallback = func; }
   virtual void setPadding(float horizPadding, float vertPadding) override;
   virtual void setRenderDepth(float* depth, float depthIncrement) override;
 

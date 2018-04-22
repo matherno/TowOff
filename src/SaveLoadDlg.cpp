@@ -51,9 +51,13 @@ void SaveLoadDlg::initialise(GameContext* context)
   list->setItemColour(Vector3D(0.4, 0.3, 0.2));
   list->setItemSelectColour(Vector3D(0.3, 0.5, 0.2));
   list->setItemTextColour(Vector3D(0.1));
-  list->setItemSelectedCallback([this](uint id)
-                                  {
-                                  });
+  list->setItemDblClickedCallback([this](uint id)
+    {
+    if(mode == modeSave)
+      onSavePressed();
+    else
+      onLoadPressed();
+    });
   listComponent.reset(list);
   listBG->addChild(listComponent);
 

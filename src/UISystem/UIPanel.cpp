@@ -203,6 +203,23 @@ uint UIPanel::mouseClick(GameContext* context, uint mouseX, uint mouseY)
   return 0;
   }
 
+uint UIPanel::mouseDblClick(GameContext* context, uint mouseX, uint mouseY)
+  {
+  for (UIComponentPtr comp : *children.getList())
+    {
+    uint id = comp->mouseDblClick(context, mouseX, mouseY);
+    if (id != 0)
+      return id;
+    }
+
+  if (mouseDblClickCallback && hitTest(mouseX, mouseY, false))
+    {
+    if (mouseDblClickCallback(mouseX, mouseY))
+      return getID();
+    }
+  return 0;
+  }
+
 bool UIPanel::hitTest(uint mouseX, uint mouseY, bool testChildren)
   {
   if (visible && mouseX >= currentScreenPos.x && mouseX <= currentScreenPos.x + currentScreenSize.x)
