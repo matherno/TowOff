@@ -54,6 +54,7 @@ public:
   virtual void onGainFocus(GameContext* context) = 0;
   virtual void onLossFocus(GameContext* context) = 0;
   virtual void onEscapePressed(GameContext* context) = 0;     //  modal component will have this function called when escape is pressed
+  virtual void setRenderDepth(float* depth, float depthIncrement) = 0;   // this render depth will be (depth), its childrens will be (depth + depthIncrement)
   };
 
 class UIManager

@@ -227,3 +227,16 @@ void UIPanel::setPadding(float horizPadding, float vertPadding)
   this->horizPadding = horizPadding;
   this->vertPadding = vertPadding;
   }
+
+void UIPanel::setRenderDepth(float* depth, float depthIncrement)
+  {
+  if (renderable)
+    renderable->setZDepth(*depth);
+
+  if (children.count() > 0)
+    {
+    *depth += depthIncrement;
+    for (UIComponentPtr child : *children.getList())
+      child->setRenderDepth(depth, depthIncrement);
+    }
+  }

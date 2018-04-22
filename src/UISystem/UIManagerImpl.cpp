@@ -7,6 +7,8 @@
 #include "UIPanel.h"
 #include "UIInputHandler.h"
 
+#define RENDER_DEPTH_INCREMENT 0.001f
+
 void UIManagerImpl::addComponent(UIComponentPtr component)
   {
   rootComponent->addChild(component);
@@ -33,6 +35,8 @@ bool UIManagerImpl::initialise(GameContext* context)
 void UIManagerImpl::update(GameContext* context)
   {
   rootComponent->onUpdate(context);
+  float depth = -0.9f;
+  rootComponent->setRenderDepth(&depth, RENDER_DEPTH_INCREMENT);
   }
 
 void UIManagerImpl::cleanUp(GameContext* context)

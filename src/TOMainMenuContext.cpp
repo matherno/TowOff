@@ -20,7 +20,7 @@ bool TOMainMenuContext::initialise()
   std::vector<MenuOption> menuButtons;
 
   //  NEW
-  menuButtons.emplace_back(IMAGE_MAINMENU_NEW, [this](uint mouseX, uint mouseY)
+  menuButtons.emplace_back("New", [this](uint mouseX, uint mouseY)
     {
     currentOutcome.optionSelected = optionNew;
     endContext();
@@ -28,7 +28,7 @@ bool TOMainMenuContext::initialise()
     });
 
   //  LOAD
-  menuButtons.emplace_back(IMAGE_MAINMENU_LOAD, [this](uint mouseX, uint mouseY)
+  menuButtons.emplace_back("Load", [this](uint mouseX, uint mouseY)
     {
     currentOutcome.optionSelected = optionLoad;
     showLoadDlg();
@@ -36,7 +36,7 @@ bool TOMainMenuContext::initialise()
     });
 
   //  SETTINGS
-  menuButtons.emplace_back(IMAGE_MAINMENU_SETTINGS, [this](uint mouseX, uint mouseY)
+  menuButtons.emplace_back("Settings", [this](uint mouseX, uint mouseY)
     {
     currentOutcome.optionSelected = optionSettings;
     showSettingsDlg();
@@ -44,29 +44,43 @@ bool TOMainMenuContext::initialise()
     });
 
   //  QUIT
-  menuButtons.emplace_back(IMAGE_MAINMENU_QUIT, [this](uint mouseX, uint mouseY)
+  menuButtons.emplace_back("Quit", [this](uint mouseX, uint mouseY)
     {
     currentOutcome.optionSelected = optionQuit;
     endContext();
     return true;
     });
 
+  UIPanel* background = new UIPanel(getUIManager()->getNextComponentID());
+  background->setColour(Vector3D(0.25, 0.125, 0.1));
+  background->setWidthMatchParent(true);
+  background->setHeightMatchParent(true);
+  getUIManager()->addComponent(UIComponentPtr(background));
+
+  UIPanel* buttonBG = new UIPanel(getUIManager()->getNextComponentID());
+  buttonBG->setSize(Vector2D(300, 0));
+  buttonBG->setColour(Vector3D(0.09, 0.07, 0.04));
+  buttonBG->setPadding(0, 50);
+  buttonBG->setHeightMatchParent(true);
+  buttonBG->setHorizontalAlignment(alignmentCentre);
+  background->addChild(UIComponentPtr(buttonBG));
+
   //  load all the buttons
-  const Vector2D buttonSize(200, 100);
+  const Vector2D buttonSize(250, 70);
   const Vector3D colour(0.3, 0.3, 0.3);
   const Vector3D pressColour(0.2, 0.3, 0.5);
   const float buttonPadding = 50;
-  float buttonYOffset = 200;
+  float buttonYOffset = 100;
   for (MenuOption& menuOption : menuButtons)
     {
     UIButton* button = new UIButton(getUIManager()->getNextComponentID(), false);
-    button->setButtonTexture(getRenderContext()->getSharedTexture(menuOption.first));
+    button->setButtonText(menuOption.first, colour, 60);
     button->setButtonHighlightColour(pressColour, colour);
     button->setSize(buttonSize);
     button->setHorizontalAlignment(Alignment::alignmentCentre);
     button->setOffset(Vector2D(0, buttonYOffset));
     button->setMouseClickCallback(menuOption.second);
-    getUIManager()->addComponent(UIComponentPtr(button));
+    buttonBG->addChild(UIComponentPtr(button));
     buttonYOffset += buttonPadding + buttonSize.y;
     }
   return result;
@@ -115,7 +129,7 @@ void TOMainMenuContext::showLoadDlg()
   saveLoadDlg->setCancelledCallback([this, id]()
       {
       getUIManager()->removeComponent(id);
-                                      getUIManager()->popModalComponent();
+      getUIManager()->popModalComponent();
       });
   }
 

@@ -20,6 +20,7 @@ private:
   Vector2D texCoordBL = Vector2D(0, 0);
   Vector2D texCoordTR = Vector2D(1, 1);
   bool initialised = false;
+  float zDepth = 0;
 
 public:
   UIRenderable(uint id);
@@ -34,6 +35,7 @@ public:
   //  alpha texture means that it uses the assigned single colour and the textures alpha value for the final RGBA of the UI quad
   void setTexture(TexturePtr texture, bool alphaTexture){ this->texture = texture; this->alphaTexture = alphaTexture; }
   void setTextureCoords(const Vector2D& bottomLeft, const Vector2D& topRight);
+  void setZDepth(float depth) { zDepth = depth; }
 
 protected:
   void refreshTexCoords();

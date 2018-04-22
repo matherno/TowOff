@@ -72,6 +72,7 @@ public:
   virtual bool isVisible() const override { return visible; }
   virtual void setMouseClickCallback(OnMouseClickCallback func) override { mouseClickCallback = func; }
   virtual void setPadding(float horizPadding, float vertPadding) override;
+  virtual void setRenderDepth(float* depth, float depthIncrement) override;
 
   void setOnRefreshCallback(OnRefreshCallback func) { onRefreshCallback = func; }
   Vector2D getCurrentScreenPos() const { return currentScreenPos; }

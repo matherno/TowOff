@@ -49,6 +49,7 @@ void UIRenderable::render(RenderContext* renderContext)
   setFaceCulling(false);
   setDepthTest(true);
   setAlphaBlending(true);
+  shaderProgram->setVarFloat("inZDepth", zDepth);
   shaderProgram->setVarVec3("inColour", colour);
   if (texture)
     {

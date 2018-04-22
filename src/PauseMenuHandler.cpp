@@ -79,12 +79,26 @@ void PauseMenuHandler::displayMenu(GameContext* gameContext)
     return true;
     });
 
+  const Vector3D colour(0.3, 0.3, 0.3);
+  UIPanel* buttonBGBorder = new UIPanel(uiManager->getNextComponentID());
+  buttonBGBorder->setSize(Vector2D(200, 500));
+  buttonBGBorder->setOffset(Vector2D(0, 150));
+  buttonBGBorder->setColour(colour);
+  buttonBGBorder->setHorizontalAlignment(alignmentCentre);
+  menuUI->addChild(UIComponentPtr(buttonBGBorder));
+
+  UIPanel* buttonBG = new UIPanel(uiManager->getNextComponentID());
+  buttonBG->setColour(Vector3D(0.12, 0.07, 0.04));
+  buttonBG->setWidthMatchParent(true);
+  buttonBG->setHeightMatchParent(true);
+  buttonBG->setPadding(4, 4);
+  buttonBGBorder->addChild(UIComponentPtr(buttonBG));
+
   //  load all the buttons
   const Vector2D buttonSize(150, 50);
-  const Vector3D colour(0.3, 0.3, 0.3);
   const Vector3D pressColour(0.2, 0.3, 0.5);
   const float buttonPadding = 30;
-  float buttonYOffset = 150;
+  float buttonYOffset = 100;
   for (MenuOption& menuOption : menuButtons)
     {
     UIButton* button = new UIButton(uiManager->getNextComponentID(), false);
@@ -95,7 +109,7 @@ void PauseMenuHandler::displayMenu(GameContext* gameContext)
     button->setOffset(Vector2D(0, buttonYOffset));
     button->setMouseClickCallback(menuOption.second);
     button->setHighlightWidth(3);
-    menuUI->addChild(UIComponentPtr(button));
+    buttonBG->addChild(UIComponentPtr(button));
     buttonYOffset += buttonPadding + buttonSize.y;
     }
   }
