@@ -7,6 +7,7 @@
 #include "PauseMenuHandler.h"
 #include "SaveLoadDlg.h"
 #include "TOGameContext.h"
+#include "SettingsDlg.h"
 
 /*
  * Pause Menu parent UI component
@@ -72,6 +73,13 @@ void PauseMenuHandler::displayMenu(GameContext* gameContext)
     return true;
     });
 
+  //  SETTINGS
+  menuButtons.emplace_back("Settings", [this, gameContext](uint mouseX, uint mouseY)
+    {
+    onSettingsPressed(gameContext);
+    return true;
+    });
+
   //  QUIT
   menuButtons.emplace_back("Quit", [this, gameContext](uint mouseX, uint mouseY)
     {
@@ -82,7 +90,7 @@ void PauseMenuHandler::displayMenu(GameContext* gameContext)
   const Vector3D colour(0.3, 0.3, 0.3);
   UIPanel* buttonBGBorder = new UIPanel(uiManager->getNextComponentID());
   buttonBGBorder->setSize(Vector2D(200, 500));
-  buttonBGBorder->setOffset(Vector2D(0, 150));
+  buttonBGBorder->setOffset(Vector2D(0, 180));
   buttonBGBorder->setColour(colour);
   buttonBGBorder->setHorizontalAlignment(alignmentCentre);
   menuUI->addChild(UIComponentPtr(buttonBGBorder));
@@ -98,7 +106,7 @@ void PauseMenuHandler::displayMenu(GameContext* gameContext)
   const Vector2D buttonSize(150, 50);
   const Vector3D pressColour(0.2, 0.3, 0.5);
   const float buttonPadding = 30;
-  float buttonYOffset = 100;
+  float buttonYOffset = 80;
   for (MenuOption& menuOption : menuButtons)
     {
     UIButton* button = new UIButton(uiManager->getNextComponentID(), false);
@@ -147,6 +155,20 @@ void PauseMenuHandler::onSavePressed(GameContext* gameContext)
         gameContext->getUIManager()->popModalComponent();
         onCancelledSave(gameContext);
         });
+  }
+
+void PauseMenuHandler::onSettingsPressed(GameContext* gameContext)
+  {
+  UIManager* uiManager = gameContext->getUIManager();
+  std::shared_ptr<SettingsDlg> settingsDlg(new SettingsDlg(uiManager->getNextComponentID()));
+  uiManager->addComponent(settingsDlg);
+  uiManager->pushModalComponent(settingsDlg);
+  uint id = settingsDlg->getID();
+  settingsDlg->setOnFinishedCallback([this, uiManager, id]()
+     {
+     uiManager->removeComponent(id);
+     uiManager->popModalComponent();
+     });
   }
 
 void PauseMenuHandler::onQuitPressed(GameContext* gameContext)

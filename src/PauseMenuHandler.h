@@ -23,6 +23,7 @@ public:
 protected:
   void onReturnPressed(GameContext* gameContext);
   void onSavePressed(GameContext* gameContext);
+  void onSettingsPressed(GameContext* gameContext);
   void onQuitPressed(GameContext* gameContext);
   void onCancelledSave(GameContext* gameContext);
   };

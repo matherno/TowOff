@@ -24,6 +24,7 @@ public:
   SettingsDlg(uint id);
 
   virtual void initialise(GameContext* context) override;
+  virtual void onEscapePressed(GameContext* context) override;
   void setOnFinishedCallback(OnFinishedCallback func) { onFinishedFunc = func; }
 
 protected:

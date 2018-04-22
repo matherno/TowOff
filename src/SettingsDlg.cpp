@@ -216,3 +216,8 @@ void SettingsDlg::addBoolOption(GameContext* context, UIPanel* parent, uint yOff
      valueMap->setBoolValue(option->index, toggleButton->isToggledDown());
     });
   }
+
+void SettingsDlg::onEscapePressed(GameContext* context)
+  {
+  onCancelPressed();
+  }
