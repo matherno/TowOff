@@ -4,9 +4,11 @@
 #include <UISystem/UIList.h>
 #include "TOMainMenuContext.h"
 #include "Resources.h"
+#include "SettingsDlg.h"
 
 
-TOMainMenuContext::TOMainMenuContext(const RenderContextPtr& renderContext) : GameContextImpl(renderContext)
+TOMainMenuContext::TOMainMenuContext(const RenderContextPtr& renderContext, std::shared_ptr<TOSettings> settings)
+  : GameContextImpl(renderContext), settings(settings)
   {}
 
 typedef std::pair<string, OnMouseClickCallback> MenuOption;
@@ -30,6 +32,14 @@ bool TOMainMenuContext::initialise()
     {
     currentOutcome.optionSelected = optionLoad;
     showLoadDlg();
+    return true;
+    });
+
+  //  SETTINGS
+  menuButtons.emplace_back(IMAGE_MAINMENU_SETTINGS, [this](uint mouseX, uint mouseY)
+    {
+    currentOutcome.optionSelected = optionSettings;
+    showSettingsDlg();
     return true;
     });
 
@@ -67,10 +77,10 @@ FontPtr TOMainMenuContext::getDefaultFont()
   return getRenderContext()->getSharedFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS);
   }
 
-TOMainMenuContext::MainMenuOutcome TOMainMenuContext::doMainMenu(RenderContextPtr renderContext)
+TOMainMenuContext::MainMenuOutcome TOMainMenuContext::doMainMenu(RenderContextPtr renderContext, std::shared_ptr<TOSettings> settings)
   {
   mathernogl::logInfo("Loading main menu...");
-  TOMainMenuContext mainMenuContext(renderContext);
+  TOMainMenuContext mainMenuContext(renderContext, settings);
   mainMenuContext.initialise();
   while(!mainMenuContext.isContextEnded() && renderContext->isWindowOpen())
     {
@@ -107,4 +117,17 @@ void TOMainMenuContext::showLoadDlg()
       getUIManager()->removeComponent(id);
                                       getUIManager()->popModalComponent();
       });
+  }
+
+void TOMainMenuContext::showSettingsDlg()
+  {
+  std::shared_ptr<SettingsDlg> settingsDlg(new SettingsDlg(getUIManager()->getNextComponentID()));
+  getUIManager()->addComponent(settingsDlg);
+  getUIManager()->pushModalComponent(settingsDlg);
+  uint id = settingsDlg->getID();
+  settingsDlg->setOnFinishedCallback([this, id]()
+     {
+     getUIManager()->removeComponent(id);
+     getUIManager()->popModalComponent();
+     });
   }

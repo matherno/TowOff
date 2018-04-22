@@ -7,6 +7,7 @@
 
 const static std::set<uint> whitespaceCharacters =
   {
+    (uint)'\0',
     (uint)'\n',
     (uint)'\t',
     (uint)'\r',
@@ -27,6 +28,7 @@ void UIText::initialise(GameContext* context)
   UIPanel::initialise(context);
   caretComponent.reset(new UIPanel(context->getUIManager()->getNextComponentID()));
   addChild(caretComponent);
+  setVisible(true, false);
   }
 
 void UIText::setText(string text)
@@ -62,7 +64,7 @@ void UIText::buildCharacter(GameContext* context, FontCharPtr fontCharacter, Vec
   component->setColour(fontColour);
   component->setTexture(font->fontGlyphsPage, true);
   component->setTextureCoords(fontCharacter->texCoordBL, fontCharacter->texCoordTR);
-  component->setVisible(isVisible(), false);
+  component->setVisible(textVisible, false);
   cursor->x += fontCharacter->cursorAdvance * textScaling;
 
   UIComponentPtr componentPtr(component);
@@ -209,10 +211,11 @@ bool UIText::isValidNonWhiteSpaceCharacter(uint ascii) const
 
 void UIText::setVisible(bool visible, bool recurseChildren)
   {
+  textVisible = visible;
   UIPanel::setVisible(visible, recurseChildren);
   if (visible)
     {
-    UIPanel::setVisible(background, false);
+    UIPanel::setVisible(useBackground, false);
     caretComponent->setVisible(caretVisible, true);
     }
   }

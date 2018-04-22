@@ -6,7 +6,7 @@
 
 #define BUTTON_PRESS_TIME 150
 
-UIButton::UIButton(uint id, bool toggle) : UIPanel(id), toggle(toggle)
+UIButton::UIButton(uint id, bool toggle, bool startPressed) : UIPanel(id), toggle(toggle), pressed(startPressed)
   {}
 
 void UIButton::initialise(GameContext* context)

@@ -30,6 +30,7 @@
 
 #define IMAGE_MAINMENU_NEW                  "resources/ui/MainMenuNew.png"
 #define IMAGE_MAINMENU_LOAD                 "resources/ui/MainMenuLoad.png"
+#define IMAGE_MAINMENU_SETTINGS             "resources/ui/MainMenuSettings.png"
 #define IMAGE_MAINMENU_QUIT                 "resources/ui/MainMenuQuit.png"
 
 #define IMAGE_FOG_OF_WAR                    "resources/fogofwar.jpg"

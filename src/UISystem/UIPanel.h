@@ -57,6 +57,7 @@ public:
   virtual void onEscapePressed(GameContext* context) override {};
 
   virtual void setColour(const Vector3D& colour) { this->colour = colour; }
+  Vector3D getColour() const { return colour; }
   virtual void setTexture(TexturePtr texture, bool alphaTexture = false) { this->texture = texture; this->alphaTexture = alphaTexture; }
   virtual void setTextureCoords(const Vector2D& bottomLeft, const Vector2D& topRight) { texCoordBL = bottomLeft; texCoordTR = topRight; }
   virtual void setOffset(const Vector2D& offset) override { this->offset = offset; }

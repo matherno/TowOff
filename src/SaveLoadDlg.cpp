@@ -75,7 +75,7 @@ void SaveLoadDlg::initialise(GameContext* context)
     saveNameTextComp->setHeightMatchParent(true);
     saveNameTextComp->setPadding(3, 3);
     saveNameTextComp->setCharacterLimit(MAX_SAVE_NAME_LENGTH);
-    saveNameTextComp->setOnlyAllowAlphaNumeric(true);
+    saveNameTextComp->setEditType(UIEditText::typeAlphaNumeric);
     editTextBG->addChild(saveNameTextComp);
     }
 

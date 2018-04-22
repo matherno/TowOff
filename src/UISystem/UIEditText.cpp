@@ -21,7 +21,7 @@ bool UIEditText::keyPress(GameContext* context, uint key)
     backspaceAtCaret();
   else if (key == KEY_DELETE)
     deleteAtCaret();
-  else if (key == KEY_SPACE)
+  else if (key == KEY_SPACE && isSpaceAllowed())
     insertAtCaret(" ");
   else if (key == KEY_LEFT)
     moveCaretLeft();
@@ -35,11 +35,10 @@ bool UIEditText::keyPress(GameContext* context, uint key)
     context->getUIManager()->lossFocus(context);
   else
     {
-    if (onlyAllowAlphaNumeric && !isAlphaNumeric(key))
-      return true;
     char character = getCharFromKeyCode(key, context->getInputManager()->isKeyDown(KEY_LSHIFT));
-    if (character != '\0')
-      insertAtCaret(string() + character);
+    if (!verifyCharacterValid(character))
+      return true;
+    insertAtCaret(string() + character);
     }
 
   return true;
@@ -126,4 +125,49 @@ void UIEditText::moveCaretToEnd()
   {
   setCaretPos(-1);
   invalidate();
+  }
+
+bool UIEditText::verifyCharacterValid(char character) const
+  {
+  if (!isValidNonWhiteSpaceCharacter(character))
+    return false;
+
+  bool isNumber = character >= '0' && character <= '9';
+  bool isAlphabet = character >= 'a' && character <= 'z' || character >= 'A' && character <= 'Z';
+
+  switch (editType)
+    {
+    case typeAll:
+      return true;
+    case typeAlphaNumeric:
+      return isNumber || isAlphabet;
+    case typeUInt:
+      return isNumber;
+    case typeFloat:
+      {
+      if(isNumber)
+        return true;
+      if(character == '-')
+        return getCaretPos() == 0 && getText().find('-') == std::string::npos;
+      if(character == '.')
+        return getCaretPos() != 0 && getText().find('.') == std::string::npos;
+      return false;
+      }
+    }
+  return false;
+  }
+
+bool UIEditText::isSpaceAllowed() const
+  {
+  return editType == typeAlphaNumeric || editType == typeAll;
+  }
+
+uint UIEditText::getTextUIntValue()
+  {
+  return (uint)std::max(stoi(getText()), 0);
+  }
+
+float UIEditText::getTextFloatValue()
+  {
+  return stof(getText());
   }

@@ -8,9 +8,18 @@
 
 class UIEditText : public UIText
   {
+public:
+  enum EditType
+    {
+    typeAll,
+    typeAlphaNumeric,   //  a-z, A-Z, 0-9
+    typeUInt,
+    typeFloat,
+    };
+
 private:
   uint characterLimit;
-  bool onlyAllowAlphaNumeric = false;
+  EditType editType = typeAll;
 
 public:
   UIEditText(uint id, const FontPtr& font = nullptr);
@@ -18,7 +27,9 @@ public:
   virtual void onGainFocus(GameContext* context) override;
   virtual void onLossFocus(GameContext* context) override;
   void setCharacterLimit(uint limit) { characterLimit = limit; }
-  void setOnlyAllowAlphaNumeric(bool alphaNumeric) { onlyAllowAlphaNumeric = alphaNumeric; }
+  void setEditType(EditType type) { editType = type; }
+  uint getTextUIntValue();
+  float getTextFloatValue();
 
 protected:
   void moveCaretLeft(int num = 1);
@@ -29,4 +40,6 @@ protected:
   void deleteAtCaret();
   void moveCaretToStart();
   void moveCaretToEnd();
+  bool verifyCharacterValid(char character) const;
+  bool isSpaceAllowed() const;
   };

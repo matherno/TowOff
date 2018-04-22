@@ -56,6 +56,7 @@ private:
 
 public:
   GameConfigValueMap(GameConfigManagerPtr manager) : manager(manager) {}
+  GameConfigValueMap(const GameConfigValueMap& map);
   bool getIntValue(uint optionIdx, int* value) const;
   bool getBoolValue(uint optionIdx, bool* value) const;
   bool getFloatValue(uint optionIdx, float* value) const;

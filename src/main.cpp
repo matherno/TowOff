@@ -36,7 +36,7 @@ int main()
   TOMainMenuContext::MainMenuOutcome mainMenuOutcome;
   while (renderContext->isWindowOpen())
     {
-    mainMenuOutcome = TOMainMenuContext::doMainMenu(renderContext);
+    mainMenuOutcome = TOMainMenuContext::doMainMenu(renderContext, settings);
     if (mainMenuOutcome.isQuitGame())
       break;
 

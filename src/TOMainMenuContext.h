@@ -2,6 +2,7 @@
 
 #include <GameSystem/GameContextImpl.h>
 #include "SaveLoadDlg.h"
+#include "TOSettings.h"
 
 /*
 *   
@@ -16,6 +17,7 @@ public:
     optionNew,
     optionQuit,
     optionLoad,
+    optionSettings,
     };
 
   struct MainMenuOutcome
@@ -29,14 +31,24 @@ public:
 
 private:
   MainMenuOutcome currentOutcome;
+  std::shared_ptr<TOSettings> settings;
 
 public:
-  TOMainMenuContext(const RenderContextPtr& renderContext);
+  TOMainMenuContext(const RenderContextPtr& renderContext, std::shared_ptr<TOSettings> settings);
   MainMenuOutcome getSelectedOption() { return currentOutcome; }
   virtual FontPtr getDefaultFont() override;
   virtual bool initialise() override;
-  static MainMenuOutcome doMainMenu(RenderContextPtr renderContext);
+  TOSettings* getSettings() { return settings.get(); }
+
+  static MainMenuOutcome doMainMenu(RenderContextPtr renderContext, std::shared_ptr<TOSettings> settings);
+  inline static TOMainMenuContext* cast(GameContext* context)
+    {
+    TOMainMenuContext* toContext = dynamic_cast<TOMainMenuContext*>(context);
+    ASSERT(toContext, "Given game context wasn't a TOMainMenuContext!");
+    return toContext;
+    }
 
 protected:
   void showLoadDlg();
+  void showSettingsDlg();
   };

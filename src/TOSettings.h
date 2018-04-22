@@ -27,6 +27,7 @@ public:
   void initialise();
   std::shared_ptr<GameConfigValueMap> createValueMap();
   void setActiveValueMap(std::shared_ptr<GameConfigValueMap> map);
+  const GameConfigValueMap* getActiveValueMap() const { return activeValueMap.get(); }
 
   const GameConfigManager* getConfigManager() const;
   void readSettingsFile(GameConfigValueMap* map) const;

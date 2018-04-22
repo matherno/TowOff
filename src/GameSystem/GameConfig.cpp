@@ -100,6 +100,12 @@ bool GameConfigManager::getDefaultSringValue(uint optionIdx, string* value) cons
  * GameConfigValueMap
  */
 
+GameConfigValueMap::GameConfigValueMap(const GameConfigValueMap& map)
+  {
+  manager = map.manager;
+  values = map.values;
+  }
+
 bool GameConfigValueMap::getIntValue(uint optionIdx, int* value) const
   {
   if (const GameConfigManager::ConfigOption* option = manager->getOption(optionIdx))
@@ -285,3 +291,4 @@ bool GameConfigValueMap::writeIniFile(const string& filePath) const
     }
   return true;
   }
+

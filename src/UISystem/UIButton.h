@@ -31,7 +31,7 @@ private:
   uint textSize;
 
 public:
-  UIButton(uint id, bool toggle);
+  UIButton(uint id, bool toggle, bool startPressed = false);
   void setHighlightWidth(float width) { highlightWidth = width; }
   void setButtonTexture(TexturePtr button){ buttonTexture = button; }
   void setButtonColour(const Vector3D& colour){ buttonColour = colour; buttonTexture = nullptr; }
@@ -47,9 +47,9 @@ public:
   virtual void cleanUp(GameContext* context) override;
 
 protected:
-  bool onButtonClick(uint mouseX, uint mouseY);
-  void onUnpress(uint mouseX, uint mouseY);
-  void onForceUnpress();
+  virtual bool onButtonClick(uint mouseX, uint mouseY);
+  virtual void onUnpress(uint mouseX, uint mouseY);
+  virtual void onForceUnpress();
   void updateGroup(uint mouseX, uint mouseY);
   };
 

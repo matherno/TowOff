@@ -15,7 +15,8 @@ private:
   uint textSize = 25;
   Vector3D fontColour;
   int spaceWidth = -1;   // -1 => use fonts space width definition
-  bool background = true;
+  bool useBackground = true;
+  bool textVisible = true;
   bool centreAlignVert = false;
   bool centreAlignHoriz = false;
   uint textPadding = 0;
@@ -35,7 +36,7 @@ public:
   Vector3D getFontColour() const { return fontColour; }
   void setSpaceWidth (uint width) { spaceWidth = width; }
   void setTextCentreAligned(bool vertical, bool horizontal) { centreAlignVert = vertical; centreAlignHoriz = horizontal; }
-  void showBackground(bool show) { background = show; }
+  void showBackground(bool show) { useBackground = show; }
   void setTextPadding(uint padding) { textPadding = padding; }
   void setMultiLine(bool multiLine) { this->multiLine = multiLine; }
   void showCaret(bool show) { caretVisible = show; }
