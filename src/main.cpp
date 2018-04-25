@@ -8,8 +8,6 @@
 #include <ParticleSystem/ParticleSystem.h>
 #include <UISystem/UIPanel.h>
 #include <RenderSystem/RenderableLineStrips.h>
-#include "TestActor.h"
-#include "TestInputHandler.h"
 #include "TOInputHandler.h"
 #include "TOGameContext.h"
 #include "TOMainMenuContext.h"

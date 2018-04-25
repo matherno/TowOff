@@ -83,20 +83,6 @@ void TOGameContext::processDrawStage()
   GameContextImpl::processDrawStage();
   }
 
-Player* TOGameContext::getPlayer(uint num)
-  {
-  ASSERT(num > 0 && num <= players.size(), "Not a valid player number: " + std::to_string(num));
-  return players[num-1].get();
-  }
-
-Player* TOGameContext::createPlayer()
-  {
-  uint playerNum = (uint)players.size() - 1;
-  players.push_back(std::make_shared<Player>(getNextActorID(), playerNum));
-  addActor(players[playerNum]);
-  return players[playerNum].get();
-  }
-
 TowerPtr TOGameContext::getTower(uint id)
   {
   if (towers.contains(id))

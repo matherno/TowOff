@@ -8,7 +8,6 @@ class TOGameContext;
 #include <RenderSystem/RenderableTerrain.h>
 #include <GameSystem/Timer.h>
 #include "Tower.h"
-#include "Player.h"
 #include "Projectile.h"
 #include "TOInputHandler.h"
 #include "HUDHandler.h"
@@ -34,7 +33,6 @@ class TOGameContext : public GameContextImpl
   {
 private:
   std::shared_ptr<TOGameState> loadedGameState;
-  std::vector<PlayerPtr> players;
   TowerList towers;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
   std::shared_ptr<RenderableTerrain> waterMesh;
@@ -70,9 +68,6 @@ public:
 
   virtual FontPtr getDefaultFont() override;
 
-  Player* getPlayer(uint num);
-  Player* createPlayer();
-  int numPlayers() const { return (int)players.size(); }
   Vector3D getPlayerColour(uint num) const;
   HUDHandler* getHUDHandler(){ return &hudHandler; }
   TowerSelectionManager* getSelectionManager(){ return selectionManager.get(); }
