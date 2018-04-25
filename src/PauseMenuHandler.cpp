@@ -90,9 +90,9 @@ void PauseMenuHandler::displayMenu(GameContext* gameContext)
   const Vector3D colour(0.3, 0.3, 0.3);
   UIPanel* buttonBGBorder = new UIPanel(uiManager->getNextComponentID());
   buttonBGBorder->setSize(Vector2D(200, 500));
-  buttonBGBorder->setOffset(Vector2D(0, 180));
   buttonBGBorder->setColour(colour);
   buttonBGBorder->setHorizontalAlignment(alignmentCentre);
+  buttonBGBorder->setVerticalAlignment(alignmentCentre);
   menuUI->addChild(UIComponentPtr(buttonBGBorder));
 
   UIPanel* buttonBG = new UIPanel(uiManager->getNextComponentID());

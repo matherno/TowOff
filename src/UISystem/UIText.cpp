@@ -231,7 +231,8 @@ void UIText::setupCaretInWord(const Vector2D& wordPosition, const FontWord& word
 
 void UIText::setupCaret(const Vector2D& cursorPos)
   {
-  caretComponent->setSize(Vector2D(2, textSize));
+  float sizeScaling = font ? font->sizeScaling : 1;
+  caretComponent->setSize(Vector2D(2, textSize * sizeScaling));
   caretComponent->setOffset(Vector2D(textPadding, 0) + cursorPos);
   caretComponent->setColour(fontColour);
   caretComponent->setVisible(caretVisible, true);
