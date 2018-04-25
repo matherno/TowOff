@@ -22,8 +22,8 @@
 
 #define FONT_UNISPACE_FNT                   "resources/fonts/Unispace.fnt"
 #define FONT_UNISPACE_GLYPHS                "resources/fonts/Unispace.png"
-#define FONT_BERILIN_FNT                    "resources/fonts/BerlinSmallCaps.fnt"
-#define FONT_BERILIN_GLYPHS                 "resources/fonts/BerlinSmallCaps.png"
+#define FONT_UNISPACE_SCALING               0.8f
 
-#define FONT_DEFAULT_FNT                    FONT_BERILIN_FNT
-#define FONT_DEFAULT_GLYPHS                 FONT_BERILIN_GLYPHS
+#define FONT_DEFAULT_FNT                    FONT_UNISPACE_FNT
+#define FONT_DEFAULT_GLYPHS                 FONT_UNISPACE_GLYPHS
+#define FONT_DEFAULT_SCALING                FONT_UNISPACE_SCALING

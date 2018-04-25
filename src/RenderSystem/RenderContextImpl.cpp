@@ -223,7 +223,7 @@ TexturePtr RenderContextImpl::createEmptyTexture(uint width, uint height, uint b
   return TexturePtr(mathernogl::createEmptyTexture(width, height, options.filtering, options.wrapping, bytesPerPixel));
   }
 
-FontPtr RenderContextImpl::getSharedFont(const string& fntFilePath, const string& glyphsFilePath)
+FontPtr RenderContextImpl::getSharedFont(const string& fntFilePath, const string& glyphsFilePath, float sizeScaling)
   {
   TexturePtr glyphsTexture = getSharedTexture(glyphsFilePath);
   FontDefinitionPtr fontDefinition = resourceCache.getFontDefinition(fntFilePath);
@@ -233,7 +233,7 @@ FontPtr RenderContextImpl::getSharedFont(const string& fntFilePath, const string
     resourceCache.addFontDefinition(fontDefinition, fntFilePath);
     logInfo("Created font: '" + fntFilePath + "'");
     }
-  return FontPtr(new Font(fontDefinition, glyphsTexture));
+  return FontPtr(new Font(fontDefinition, glyphsTexture, sizeScaling));
   }
 
 

@@ -119,7 +119,7 @@ public:
   virtual TexturePtr getSharedTexture(const string& imageFilePath, TextureOptions options = TextureOptions()) = 0;
   virtual TexturePtr createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options = TextureOptions()) = 0;
   virtual RenderableSetPtr createRenderableSet() = 0;
-  virtual FontPtr getSharedFont(const string& fntFilePath, const string& glyphsFilePath) = 0;
+  virtual FontPtr getSharedFont(const string& fntFilePath, const string& glyphsFilePath, float sizeScaling = 1) = 0;
   virtual void pushTransform(const Transform* transform) = 0;
   virtual void popTransform() = 0;
   virtual const Transform* getStackedTransform() = 0;

@@ -60,8 +60,7 @@ void TowerFocusPanel::initialise(GameContext* context)
   energyText->setTextCentreAligned(true, false);
   addChild(energyText);
 
-  FontPtr nameFont = context->getRenderContext()->getSharedFont(FONT_UNISPACE_FNT, FONT_UNISPACE_GLYPHS);
-  nameText.reset(new UIText(uiManager->getNextComponentID(), nameFont));
+  nameText.reset(new UIText(uiManager->getNextComponentID()));
   nameText->setOffset(Vector2D(20, -5));
   nameText->setSize(Vector2D(250, 40));
   nameText->setVerticalAlignment(alignmentEnd);

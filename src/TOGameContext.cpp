@@ -439,7 +439,7 @@ void TOGameContext::hideAllRangeFields()
 
 FontPtr TOGameContext::getDefaultFont()
   {
-  return getRenderContext()->getSharedFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS);
+  return getRenderContext()->getSharedFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS, FONT_DEFAULT_SCALING);
   }
 
 void TOGameContext::doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour)

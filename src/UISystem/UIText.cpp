@@ -47,7 +47,7 @@ void UIText::refresh(GameContext* context, const Vector2D& parentPos, const Vect
   if (font)
     {
     Vector2D cursor = Vector2D(0, 0);
-    float textScaling = (float)textSize / (float)font->fontDefinition->getLineHeight();
+    float textScaling = ((float)textSize * font->sizeScaling) / (float)font->fontDefinition->getLineHeight();
     buildText(context, &cursor, textScaling);
     caretComponent->setVisible(caretVisible, true);
     caretComponent->refresh(context, getCurrentScreenPos(), getCurrentScreenSize());

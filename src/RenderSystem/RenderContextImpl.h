@@ -60,7 +60,7 @@ public:
   virtual MeshStoragePtr createEmptyMeshStorage() override;
   virtual TexturePtr getSharedTexture(const string& imageFilePath, TextureOptions options = TextureOptions()) override;
   virtual TexturePtr createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options = TextureOptions()) override;
-  virtual FontPtr getSharedFont(const string& fntFilePath, const string& glyphsFilePath) override;
+  virtual FontPtr getSharedFont(const string& fntFilePath, const string& glyphsFilePath, float sizeScaling = 1) override;
 
   virtual RenderableSetPtr createRenderableSet() override;
 

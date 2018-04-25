@@ -88,7 +88,7 @@ bool TOMainMenuContext::initialise()
 
 FontPtr TOMainMenuContext::getDefaultFont()
   {
-  return getRenderContext()->getSharedFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS);
+  return getRenderContext()->getSharedFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS, FONT_DEFAULT_SCALING);
   }
 
 TOMainMenuContext::MainMenuOutcome TOMainMenuContext::doMainMenu(RenderContextPtr renderContext, std::shared_ptr<TOSettings> settings)
