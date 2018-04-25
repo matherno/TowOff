@@ -52,7 +52,7 @@ void SettingsDlg::initialise(GameContext* context)
     button->setSize(buttonSize);
     button->setOffset(Vector2D(buttonOffsetX, -25));
     button->setButtonColour(Vector3D(0.5, 0.3, 0.1));
-    button->setButtonText(text, Vector3D(0), 25);
+    button->setButtonText(text, Vector3D(0), Vector3D(0.40, 0.20, 0.05), 25);
     button->setHighlightWidth(2);
     button->setVerticalAlignment(Alignment::alignmentEnd);
     button->setHorizontalAlignment(Alignment::alignmentEnd);

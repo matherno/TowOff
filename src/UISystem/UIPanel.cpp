@@ -220,23 +220,25 @@ uint UIPanel::mouseDblClick(GameContext* context, uint mouseX, uint mouseY)
   return 0;
   }
 
-bool UIPanel::hitTest(uint mouseX, uint mouseY, bool testChildren)
+uint UIPanel::hitTest(uint mouseX, uint mouseY, bool testChildren)
   {
-  if (visible && mouseX >= currentScreenPos.x && mouseX <= currentScreenPos.x + currentScreenSize.x)
-    {
-    if (mouseY >= currentScreenPos.y && mouseY <= currentScreenPos.y + currentScreenSize.y)
-      return true;
-    }
-
   if (testChildren)
     {
     for (UIComponentPtr comp : *children.getList())
       {
-      if (comp->hitTest(mouseX, mouseY, true))
-        return true;
+      uint id = comp->hitTest(mouseX, mouseY, true);
+      if (id > 0)
+        return id;
       }
     }
-  return false;
+
+  if (canHitWithMouse && visible && mouseX >= currentScreenPos.x && mouseX <= currentScreenPos.x + currentScreenSize.x)
+    {
+    if (mouseY >= currentScreenPos.y && mouseY <= currentScreenPos.y + currentScreenSize.y)
+      return getID();
+    }
+
+  return 0;
   }
 
 void UIPanel::setPadding(float horizPadding, float vertPadding)

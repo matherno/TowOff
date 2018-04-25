@@ -31,11 +31,12 @@ private:
   std::list<uint> childrenToRemove;
   Vector2D currentScreenPos, currentScreenSize;
   bool visible = true;
-  OnMouseClickCallback mouseClickCallback;
-  OnMouseClickCallback mouseDblClickCallback;
   OnRefreshCallback onRefreshCallback;
+  bool canHitWithMouse = true;
 
 protected:
+  OnMouseClickCallback mouseClickCallback;
+  OnMouseClickCallback mouseDblClickCallback;
   bool isValid = false;
 
 public:
@@ -55,8 +56,11 @@ public:
   virtual bool keyPress(GameContext* context, uint key) override { return false; }
   virtual void onGainFocus(GameContext* context) override {}
   virtual void onLossFocus(GameContext* context) override {}
-  virtual bool hitTest(uint mouseX, uint mouseY, bool testChildren = false) override;
+  virtual uint hitTest(uint mouseX, uint mouseY, bool testChildren = false) override;
   virtual void onEscapePressed(GameContext* context) override {};
+  virtual void onMouseEnter() override {};
+  virtual void onMouseExit() override {};
+  virtual void setCanHitWithMouse(bool canHit) override { canHitWithMouse = canHit; }
 
   virtual void setColour(const Vector3D& colour) { this->colour = colour; }
   Vector3D getColour() const { return colour; }

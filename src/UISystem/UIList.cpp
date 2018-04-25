@@ -39,7 +39,7 @@ void UIList::refresh(GameContext* context, const Vector2D& parentPos, const Vect
     {
     listItemButton.reset(new UIButton(uiManager->getNextComponentID(), true));
     listItemButton->setGroup(listItemsToggleGroup);
-    listItemButton->setButtonText(idAndText.second, textColour, itemHeight*0.7);
+    listItemButton->setButtonText(idAndText.second, textColour, itemSelectColour, itemHeight*0.7);
     listItemButton->setButtonHighlightColour(itemSelectColour, itemColour);
     listItemButton->setSize(Vector2D(0, itemHeight));
     listItemButton->setOffset(Vector2D(0, buttonOffset));

@@ -23,28 +23,33 @@ private:
   Vector3D pressedColour = Vector3D(0, 0, 1);
   Vector3D unpressedColour = Vector3D(0.3);
   std::shared_ptr<UIText> buttonInnerComponent;
-  OnMouseClickCallback buttonClickCallback;
   UIToggleButtonGroupPtr group;
   Timer pressTimer;
   string text;
   Vector3D textColour;
+  Vector3D textHighlightColour;
   uint textSize;
+  bool isMouseOver = false;
 
 public:
   UIButton(uint id, bool toggle, bool startPressed = false);
   void setHighlightWidth(float width) { highlightWidth = width; }
   void setButtonTexture(TexturePtr button){ buttonTexture = button; }
   void setButtonColour(const Vector3D& colour){ buttonColour = colour; buttonTexture = nullptr; }
-  void setButtonText(string text, const Vector3D& colour, uint size){ this->text = text; textColour = colour; textSize = size; }
+  void setButtonText(string text, const Vector3D& colour, uint size){ setButtonText(text, colour, colour, size); }
+  void setButtonText(string text, const Vector3D& colour, const Vector3D& highlightColour, uint size)
+        { this->text = text; textColour = colour; textHighlightColour = highlightColour; textSize = size; }
   void setButtonHighlightColour(const Vector3D& pressedColour, const Vector3D& unpressedColour = Vector3D(0.3));
   bool isToggledDown() const { return toggle && pressed; }
   void setGroup(UIToggleButtonGroupPtr group);
 
   virtual void initialise(GameContext* context) override;
   virtual void onUpdate(GameContext* context) override;
-  virtual void setMouseClickCallback(OnMouseClickCallback func) override;
   virtual void refresh(GameContext* context, const Vector2D& parentPos, const Vector2D& parentSize) override;
   virtual void cleanUp(GameContext* context) override;
+  virtual void onMouseEnter() override;
+  virtual void onMouseExit() override;
+  virtual uint mouseClick(GameContext* context, uint mouseX, uint mouseY) override;
 
 protected:
   virtual bool onButtonClick(uint mouseX, uint mouseY);

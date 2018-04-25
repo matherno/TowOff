@@ -74,7 +74,7 @@ bool TOMainMenuContext::initialise()
   for (MenuOption& menuOption : menuButtons)
     {
     UIButton* button = new UIButton(getUIManager()->getNextComponentID(), false);
-    button->setButtonText(menuOption.first, colour, 60);
+    button->setButtonText(menuOption.first, colour, pressColour, 60);
     button->setButtonHighlightColour(pressColour, colour);
     button->setSize(buttonSize);
     button->setHorizontalAlignment(Alignment::alignmentCentre);

@@ -27,6 +27,6 @@ public:
   virtual bool initialise(GameContext* context) override;
   virtual void update(GameContext* context) override;
   virtual void cleanUp(GameContext* context) override;
-  virtual bool hitTest(uint mouseX, uint mouseY) override;
+  virtual uint hitTest(uint mouseX, uint mouseY, bool onlyCheckModal) override;
   virtual void lossFocus(GameContext* context) override;
   };

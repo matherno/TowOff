@@ -105,8 +105,10 @@ void UIManagerImpl::lossFocus(GameContext* context)
     }
   }
 
-bool UIManagerImpl::hitTest(uint mouseX, uint mouseY)
+uint UIManagerImpl::hitTest(uint mouseX, uint mouseY, bool onlyCheckModal)
   {
+  if (onlyCheckModal && isModalModeActive())
+    return (*modalComponents.begin())->hitTest(mouseX, mouseY, true);
   return rootComponent->hitTest(mouseX, mouseY, true);
   }
 
@@ -124,4 +126,34 @@ bool UIManagerImpl::isModalModeActive() const
   {
   return !modalComponents.empty();
   }
+
+//void UIManagerImpl::onMouseEnter(uint componentID)
+//  {
+//  UIComponentPtr component;
+//  if (isModalModeActive())
+//    {
+//    UIComponentPtr topModalComponent = (*modalComponents.begin());
+//    if (topModalComponent->getID() == componentID)
+//      component = topModalComponent;
+//    else
+//      component = topModalComponent->getChild(componentID, true);
+//    }
+//  else
+//    component = getComponent(componentID, true);
+//
+//  if (component)
+//    component->onMouseEnter();
+//  mouseOverComponent = component;
+//  }
+//
+//void UIManagerImpl::onMouseExit(uint componentID)
+//  {
+//  if (mouseOverComponent)
+//    {
+//    UIComponentPtr component = getComponent(componentID, true);
+//    if (component)
+//      component->onMouseExit();
+//    mouseOverComponent = nullptr;
+//    }
+//  }
 

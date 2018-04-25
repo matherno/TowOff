@@ -42,9 +42,9 @@ public:
 
 protected:
   void buildSaveFileList();
-  void onDeletePressed();
+  void onDeletePressed(GameContext* context);
   void onLoadPressed();
-  void onSavePressed();
+  void onSavePressed(GameContext* context);
   void onSaveNewPressed();
   void onCancelPressed();
   string getSelectedFilePath();

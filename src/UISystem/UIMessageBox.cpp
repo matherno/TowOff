@@ -44,9 +44,9 @@ void UIMessageBox::initialise(GameContext* context)
     button->setOffset(Vector2D(offsetX, -7));
     button->setVerticalAlignment(alignmentEnd);
     button->setHorizontalAlignment(alignmentEnd);
-    button->setButtonText(text, Vector3D(0), 25);
+    button->setButtonText(text, Vector3D(0), Vector3D(0.05, 0.1, 0.4), 25);
     button->setButtonColour(buttonColour);
-    button->setButtonHighlightColour(Vector3D(0.7, 0, 0));
+    button->setButtonHighlightColour(Vector3D(0.2, 0.2, 0.3));
     button->setMouseClickCallback([this, result](uint mx, uint my)
         {
         closeCallback(result);

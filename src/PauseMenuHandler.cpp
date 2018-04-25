@@ -110,7 +110,7 @@ void PauseMenuHandler::displayMenu(GameContext* gameContext)
   for (MenuOption& menuOption : menuButtons)
     {
     UIButton* button = new UIButton(uiManager->getNextComponentID(), false);
-    button->setButtonText(menuOption.first, colour, 40);
+    button->setButtonText(menuOption.first, colour, pressColour, 40);
     button->setButtonHighlightColour(pressColour, colour);
     button->setSize(buttonSize);
     button->setHorizontalAlignment(Alignment::alignmentCentre);
@@ -178,8 +178,8 @@ void PauseMenuHandler::onQuitPressed(GameContext* gameContext)
         {
         if (result == UIMessageBox::resultContinue)
           {
-          gameContext->getUIManager()->removeComponent(menuUI->getID());
           gameContext->getUIManager()->popModalComponent();
+          gameContext->getUIManager()->removeComponent(menuUI->getID());
           gameContext->endContext();
           }
         });

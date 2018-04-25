@@ -72,6 +72,15 @@ void InputManagerImpl::processInput(GameContext* gameContext)
   uint mouseX = (uint) mouse.x;
   uint mouseY = (uint) mouse.y;
 
+  //  fire mouse move events if the mouse has moved
+  //  mouse move events should be fired before other mouse events
+  if (prevMouseX >= 0 && prevMouseY >= 0 && (mouseX != prevMouseX || mouseY != prevMouseY))
+    {
+    fireMouseMoveEvents(gameContext, mouseX, mouseY, (uint)prevMouseX, (uint)prevMouseY);
+    }
+  prevMouseX = mouseX;
+  prevMouseY = mouseY;
+
   //  fire mouse button events
   for (const mathernogl::MouseButtonEvent& event : *inputSource.getMouseButtonEvents())
     {
@@ -82,14 +91,6 @@ void InputManagerImpl::processInput(GameContext* gameContext)
     else if (event.action == mathernogl::INPUT_RELEASED)
       fireMouseReleasedEvents(gameContext, (uint) event.buttonNum, mouseX, mouseY);
     }
-
-  //  fire mouse move events if the mouse has moved
-  if (prevMouseX >= 0 && prevMouseY >= 0 && (mouseX != prevMouseX || mouseY != prevMouseY))
-    {
-    fireMouseMoveEvents(gameContext, mouseX, mouseY, (uint)prevMouseX, (uint)prevMouseY);
-    }
-  prevMouseX = mouseX;
-  prevMouseY = mouseY;
 
   //  fire scroll wheel events if it was used
   double scrollWheelOffset = inputSource.getScrollWheelOffset();

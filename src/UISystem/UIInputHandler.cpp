@@ -22,7 +22,7 @@ void UIInputHandler::onDetached(GameContext* gameContext)
 
 bool UIInputHandler::onMousePressed(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
-  if (gameContext->getUIManager()->hitTest(mouseX, mouseY))
+  if (componentUnderMouse != 0)
     {
     if (button == MOUSE_LEFT)
       {
@@ -50,17 +50,17 @@ bool UIInputHandler::onMousePressed(GameContext* gameContext, uint button, uint 
 
 bool UIInputHandler::onMouseHeld(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
-  return gameContext->getUIManager()->hitTest(mouseX, mouseY);
+  return gameContext->getUIManager()->hitTest(mouseX, mouseY, false) != 0;
   }
 
 bool UIInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
-  return gameContext->getUIManager()->hitTest(mouseX, mouseY);
+  return gameContext->getUIManager()->hitTest(mouseX, mouseY, false) != 0;
   }
 
 bool UIInputHandler::onMouseScroll(GameContext* gameContext, double scrollOffset, uint mouseX, uint mouseY)
   {
-  return gameContext->getUIManager()->hitTest(mouseX, mouseY);
+  return gameContext->getUIManager()->hitTest(mouseX, mouseY, false) != 0;
   }
 
 bool UIInputHandler::onKeyPressed(GameContext* gameContext, uint key)
@@ -71,4 +71,21 @@ bool UIInputHandler::onKeyPressed(GameContext* gameContext, uint key)
 bool UIInputHandler::onKeyRepeated(GameContext* gameContext, uint key)
   {
   return gameContext->getUIManager()->keyPress(gameContext, key);
+  }
+
+bool UIInputHandler::onMouseMove(GameContext* gameContext, uint mouseX, uint mouseY, uint prevMouseX, uint prevMouseY)
+  {
+  uint hitComponentID = gameContext->getUIManager()->hitTest(mouseX, mouseY, true);
+  if (componentUnderMouse != hitComponentID)
+    {
+    UIComponentPtr component = gameContext->getUIManager()->getComponent(componentUnderMouse, true);
+    if (component)
+      component->onMouseExit();
+
+    component = gameContext->getUIManager()->getComponent(hitComponentID, true);
+    if (component)
+      component->onMouseEnter();
+    componentUnderMouse = hitComponentID;
+    }
+  return false;
   }

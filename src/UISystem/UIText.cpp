@@ -65,6 +65,7 @@ void UIText::buildCharacter(GameContext* context, FontCharPtr fontCharacter, Vec
   component->setTexture(font->fontGlyphsPage, true);
   component->setTextureCoords(fontCharacter->texCoordBL, fontCharacter->texCoordTR);
   component->setVisible(textVisible, false);
+  component->setCanHitWithMouse(false);
   cursor->x += fontCharacter->cursorAdvance * textScaling;
 
   UIComponentPtr componentPtr(component);

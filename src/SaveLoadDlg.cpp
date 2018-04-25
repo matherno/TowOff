@@ -2,6 +2,7 @@
 // Created by matt on 30/03/18.
 //
 
+#include <UISystem/UIMessageBox.h>
 #include "SaveLoadDlg.h"
 
 #define MAX_SAVES 9   // only limited by what can fit on the listComponent at one time (need pagination/scrolling)
@@ -51,10 +52,10 @@ void SaveLoadDlg::initialise(GameContext* context)
   list->setItemColour(Vector3D(0.4, 0.3, 0.2));
   list->setItemSelectColour(Vector3D(0.3, 0.5, 0.2));
   list->setItemTextColour(Vector3D(0.1));
-  list->setItemDblClickedCallback([this](uint id)
+  list->setItemDblClickedCallback([this, context](uint id)
     {
     if(mode == modeSave)
-      onSavePressed();
+      onSavePressed(context);
     else
       onLoadPressed();
     });
@@ -91,7 +92,7 @@ void SaveLoadDlg::initialise(GameContext* context)
     saveLoadButton->setSize(buttonSize);
     saveLoadButton->setOffset(Vector2D(buttonOffsetX, -25));
     saveLoadButton->setButtonColour(Vector3D(0.5, 0.3, 0.1));
-    saveLoadButton->setButtonText(text, Vector3D(0), 25);
+    saveLoadButton->setButtonText(text, Vector3D(0), Vector3D(0.40, 0.20, 0.05), 25);
     saveLoadButton->setHighlightWidth(2);
     saveLoadButton->setVerticalAlignment(Alignment::alignmentEnd);
     saveLoadButton->setHorizontalAlignment(Alignment::alignmentEnd);
@@ -102,14 +103,14 @@ void SaveLoadDlg::initialise(GameContext* context)
     };
 
   createButton("Cancel", [this](uint mouseX, uint mouseY){ onCancelPressed(); return true; });
-  createButton("Delete", [this](uint mouseX, uint mouseY){ onDeletePressed(); return true; });
+  createButton("Delete", [this, context](uint mouseX, uint mouseY){ onDeletePressed(context); return true; });
   if (mode == modeLoad)
     {
     createButton("Load", [this](uint mouseX, uint mouseY){ onLoadPressed(); return true; });
     }
   else // modeSave
     {
-    createButton("Save", [this](uint mouseX, uint mouseY){ onSavePressed(); return true; });
+    createButton("Save", [this, context](uint mouseX, uint mouseY){ onSavePressed(context); return true; });
     createButton("Save New", [this](uint mouseX, uint mouseY){ onSaveNewPressed(); return true; });
     }
   }
@@ -138,18 +139,25 @@ void SaveLoadDlg::buildSaveFileList()
     }
   }
 
-void SaveLoadDlg::onDeletePressed()
+void SaveLoadDlg::onDeletePressed(GameContext* context)
   {
   uint selected;
-  if(listComponent->getSelectedItem(&selected))
-    {
-    if(remove(getSelectedFilePath().c_str()) == 0)
+  if(!listComponent->getSelectedItem(&selected))
+    return;
+
+  UIMessageBox::popupMessageBox(context->getUIManager(), "Delete save?", UIMessageBox::modeContinueCancel,
+    [this, context, selected](UIMessageBox::MsgBoxResult result)
       {
-      listComponent->removeItem(selected);
-      saveFiles.erase(selected);
-      listComponent->invalidate();
-      }
-    }
+      if (result == UIMessageBox::resultContinue)
+        {
+        if(remove(getSelectedFilePath().c_str()) == 0)
+          {
+          listComponent->removeItem(selected);
+          saveFiles.erase(selected);
+          listComponent->invalidate();
+          }
+        }
+      });
   }
 
 void SaveLoadDlg::onLoadPressed()
@@ -166,14 +174,21 @@ void SaveLoadDlg::onLoadPressed()
     }
   }
 
-void SaveLoadDlg::onSavePressed()
+void SaveLoadDlg::onSavePressed(GameContext* context)
   {
   string filePath = getSelectedFilePath();
   if (onSavingFunc && !filePath.empty())
     {
-    mathernogl::logInfo("Saving game to: '" + filePath + "'");
-    std::shared_ptr<TOGameState> state = onSavingFunc();
-    TOGameSaveLoad::saveGame(state.get(), filePath);
+    UIMessageBox::popupMessageBox(context->getUIManager(), "Save over existing save?", UIMessageBox::modeContinueCancel,
+      [this, context, filePath](UIMessageBox::MsgBoxResult result)
+        {
+        if (result == UIMessageBox::resultContinue)
+          {
+          mathernogl::logInfo("Saving game to: '" + filePath + "'");
+          std::shared_ptr<TOGameState> state = onSavingFunc();
+          TOGameSaveLoad::saveGame(state.get(), filePath);
+          }
+        });
     }
   }
 

@@ -28,13 +28,19 @@ void UIButton::refresh(GameContext* context, const Vector2D& parentPos, const Ve
   buttonInnerComponent->setColour(buttonColour);
   buttonInnerComponent->setText(text);
   buttonInnerComponent->setFontSize(textSize);
-  buttonInnerComponent->setFontColour(textColour);
+  buttonInnerComponent->setFontColour(isMouseOver ? textHighlightColour : textColour);
   buttonInnerComponent->setTextCentreAligned(true, true);
-  buttonInnerComponent->setMouseClickCallback([this](uint mouseX, uint mouseY)
-                                                {
-                                                return onButtonClick(mouseX, mouseY);
-                                                });
+  buttonInnerComponent->setCanHitWithMouse(false);
   UIPanel::refresh(context, parentPos, parentSize);
+  }
+
+uint UIButton::mouseClick(GameContext* context, uint mouseX, uint mouseY)
+  {
+  if (hitTest(mouseX, mouseY, false))
+    {
+    onButtonClick(mouseX, mouseY);
+    return getID();
+    }
   }
 
 bool UIButton::onButtonClick(uint mouseX, uint mouseY)
@@ -44,8 +50,8 @@ bool UIButton::onButtonClick(uint mouseX, uint mouseY)
   setButtonHighlightColour(pressedColour, unpressedColour);
   if (pressed)
     updateGroup(mouseX, mouseY);
-  if ((pressed || toggle) && buttonClickCallback)
-    return buttonClickCallback(mouseX, mouseY);
+  if ((pressed || toggle) && mouseClickCallback)
+    return mouseClickCallback(mouseX, mouseY);
   return true;
   }
 
@@ -53,8 +59,8 @@ void UIButton::onUnpress(uint mouseX, uint mouseY)
   {
   pressed = false;
   setButtonHighlightColour(pressedColour, unpressedColour);
-  if (toggle && buttonClickCallback)
-    buttonClickCallback(mouseX, mouseY);
+  if (toggle && mouseClickCallback)
+    mouseClickCallback(mouseX, mouseY);
   }
 
 void UIButton::onForceUnpress()
@@ -90,11 +96,6 @@ void UIButton::setButtonHighlightColour(const Vector3D& pressedColour, const Vec
   invalidate();
   }
 
-void UIButton::setMouseClickCallback(OnMouseClickCallback func)
-  {
-  buttonClickCallback = func;
-  }
-
 void UIButton::setGroup(UIToggleButtonGroupPtr group)
   {
   ASSERT(toggle, "Must be toggle button to be added to a toggle button group!");
@@ -111,3 +112,24 @@ void UIButton::onUpdate(GameContext* context)
     setButtonHighlightColour(pressedColour, unpressedColour);
     }
   }
+
+void UIButton::onMouseEnter()
+  {
+  if (buttonInnerComponent)
+    {
+    isMouseOver = true;
+    buttonInnerComponent->setFontColour(textHighlightColour);
+    buttonInnerComponent->invalidate();
+    }
+  }
+
+void UIButton::onMouseExit()
+  {
+  if (buttonInnerComponent)
+    {
+    isMouseOver = false;
+    buttonInnerComponent->setFontColour(textColour);
+    buttonInnerComponent->invalidate();
+    }
+  }
+
