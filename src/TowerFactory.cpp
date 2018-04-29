@@ -14,7 +14,6 @@
 #define TOWER_BASIC     1
 #define TOWER_PYLON     2
 #define TOWER_MINER     3
-#define TOWER_ENEMY     4
 
 const std::map<uint, TowerType> towerTypes =
   {
@@ -23,7 +22,6 @@ const std::map<uint, TowerType> towerTypes =
   {TOWER_BASIC,    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10,             0.9}},
   {TOWER_PYLON,    TowerType{"Pylon",           IMAGE_ICON_PYLON,        MESH_PYLON,               "",                        Vector3D(0, 4.02, 0),         20,             1.5}},
   {TOWER_MINER,    TowerType{"Miner",           IMAGE_ICON_MINER,        MESH_MINER_BASE,          MESH_MINER_TURRET,         Vector3D(0, 2.61, 0),         10,             1.7}},
-  {TOWER_ENEMY,    TowerType{"Enemy Tower",     IMAGE_ICON_ENEMY_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10,             0.8}},
   };
 
 const std::map<uint, TowerType>* TowerFactory::getTowerTypeMap()
@@ -59,8 +57,6 @@ TowerPtr TowerFactory::createTower(uint towerType, uint id, const Vector3D& posi
       return createPylon(id, towerType, position);
     case TOWER_MINER:
       return createMiner(id, towerType, position);
-    case TOWER_ENEMY:
-      return createBasicTower(id, towerType, position);
     }
   return nullptr;
   }
@@ -110,8 +106,6 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
   std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
   weapon->setCooldownTime(1000);
   weapon->setBeamRadius(0.2);
-  if (towerType == TOWER_ENEMY)
-    weapon->setEnergyPerShot(0);
 
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.45, -1));
@@ -185,7 +179,6 @@ void TowerFactory::createTowerBoundingBoxes(uint towerType, const Vector3D& posi
   switch (towerType)
     {
     case TOWER_BASIC:
-    case TOWER_ENEMY:
       AddBoundingBox(Vector3D(-0.7, 0, -0.7), Vector3D(0.7, 1.3, 0.7));
       break;
     case TOWER_PYLON:
@@ -207,7 +200,6 @@ Tower::TowerFunction TowerFactory::getTowerFunction(uint towerType)
   switch (towerType)
     {
     case TOWER_BASIC:
-    case TOWER_ENEMY:
       return Tower::combat;
     case TOWER_PYLON:
       return Tower::relay;
