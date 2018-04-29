@@ -83,18 +83,12 @@ struct RenderInitConfig
   bool antiAliasing = false;
   };
 
-struct TextureOptions
-  {
-  mathernogl::TextureFiltering filtering = mathernogl::LINEAR;
-  mathernogl::TextureWrapping wrapping = mathernogl::REPEAT;
-  bool generateMipMaps = false;
-  };
-
 /*
 *   RenderContext, main rendering manager
 */
 typedef std::shared_ptr<mathernogl::ShaderProgram> ShaderProgramPtr;
 typedef std::shared_ptr<mathernogl::Texture> TexturePtr;
+typedef mathernogl::TextureOptions TextureOptions;
 class RenderContext
   {
 public:

@@ -97,3 +97,10 @@ void UIRenderable::refreshTexCoords()
       topRight.x,   bottomLeft.y
     });
   }
+
+void UIRenderable::setColour(const Vector3D& colour)
+  {
+  this->colour.x = pow(colour.x, 2.2);
+  this->colour.y = pow(colour.y, 2.2);
+  this->colour.z = pow(colour.z, 2.2);
+  }

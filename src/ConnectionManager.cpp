@@ -144,6 +144,10 @@ void ConnectionManager::addConnection(ConnectionNodePtr nodeA, ConnectionNodePtr
   if (firstTower->isUnderConstruction() || secondTower->isUnderConstruction())
     colour.set(0.4, 0.4, 0.1);
 
+  colour.x = pow(colour.x, 2.2);
+  colour.y = pow(colour.y, 2.2);
+  colour.z = pow(colour.z, 2.2);
+
   connectionBeamIDs[std::make_pair(towerAID, towerBID)] = beamsRenderable->addLine(start, end, colour, 0.8);
   }
 

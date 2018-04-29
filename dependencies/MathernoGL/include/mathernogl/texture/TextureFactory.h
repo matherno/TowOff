@@ -18,16 +18,22 @@ enum TextureWrapping {
 	REPEAT, REPEAT_MIRRORED, CLAMP_EDGE, CLAMP_BORDER
 };
 
-Texture* createTextureFromFile(const std::string& filePath, bool genMipMaps);
-Texture* createTextureFromFile(const std::string& filePath, bool genMipMaps, TextureFiltering filtering, TextureWrapping wrapping);
-Texture* createEmptyTexture(uint width, uint height, TextureFiltering filtering = LINEAR, TextureWrapping wrapping = REPEAT, uint bytesPerPixel = 3);
-Texture* createEmptyAlphaTexture(uint width, uint height, TextureFiltering filtering = LINEAR, TextureWrapping wrapping = REPEAT);
+struct TextureOptions {
+  bool genMipMaps = false;
+  TextureFiltering filtering = NEAREST;
+  TextureWrapping wrapping = REPEAT;
+  bool gammaCorrect = true;
+};
+
+Texture* createTextureFromFile(const std::string& filePath, const TextureOptions& options = TextureOptions());
+Texture* createEmptyTexture(uint width, uint height, uint bytesPerPixel = 3, const TextureOptions& options = TextureOptions());
+Texture* createEmptyAlphaTexture(uint width, uint height, const TextureOptions& options = TextureOptions());
 void updateTexture(Texture* texture);
 
 /*
  * Creates a texture within opengl, returning the ID handle to it
  * if not RGB (rgbFormat), then will read the texture bytes in BGR format
  */
-uint createGLTexture(uint glTexType, uint width, uint height, uint bytesPerPixel, bool genMipMaps, TextureFiltering filtering, TextureWrapping wrapping, bool rgbFormat, const byte* byteData);
+uint createGLTexture(uint glTexType, uint width, uint height, uint bytesPerPixel, const TextureOptions& options, bool rgbFormat, const byte* byteData);
 
 }

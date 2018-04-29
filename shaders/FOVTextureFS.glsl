@@ -4,7 +4,7 @@ uniform sampler2D inTexture;
 uniform sampler2D inVisibilityTexture;
 uniform float inVisibilityWidth = 1;
 uniform float inVisibilityHeight = 1;
-uniform vec3 inFogColour = vec3(0.03);
+uniform vec3 inFogColour = vec3(0.005);
 
 in vec2 worldPos;    // x,z
 

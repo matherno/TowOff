@@ -14,7 +14,7 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
   nextRenderableID = 1;
 
   clearGLErrors();
-  window.reset(initGL(initConfig->windowName, initConfig->windowWidth, initConfig->windowHeight, initConfig->fullscreen, initConfig->antiAliasing));
+  window.reset(initGL(initConfig->windowName, initConfig->windowWidth, initConfig->windowHeight, initConfig->fullscreen, initConfig->antiAliasing, true));
   if (window)
     {
     window->setClearColour(0, 0, 0);
@@ -212,7 +212,7 @@ TexturePtr RenderContextImpl::getSharedTexture(const string& imageFilePath, Text
   if (TexturePtr texture = resourceCache.getTexture(imageFilePath))
     return texture;
 
-  TexturePtr texture = TexturePtr(createTextureFromFile(imageFilePath, options.generateMipMaps, options.filtering, options.wrapping));
+  TexturePtr texture = TexturePtr(createTextureFromFile(imageFilePath, options));
   resourceCache.addTexture(texture, imageFilePath);
   logInfo("Created texture: " + std::to_string(texture->glTexID) + ", '" + imageFilePath + "'");
   return texture;
@@ -220,7 +220,7 @@ TexturePtr RenderContextImpl::getSharedTexture(const string& imageFilePath, Text
 
 TexturePtr RenderContextImpl::createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options)
   {
-  return TexturePtr(mathernogl::createEmptyTexture(width, height, options.filtering, options.wrapping, bytesPerPixel));
+  return TexturePtr(mathernogl::createEmptyTexture(width, height, bytesPerPixel, options));
   }
 
 FontPtr RenderContextImpl::getSharedFont(const string& fntFilePath, const string& glyphsFilePath, float sizeScaling)

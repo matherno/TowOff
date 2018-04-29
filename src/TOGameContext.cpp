@@ -219,14 +219,14 @@ void TOGameContext::initSurface()
   const uint numCells = heightMap->width - 1;
   const float translation = (float)numCells*cellSize*-0.5f;
   surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize));
-  surfaceMesh->setMultiColour(Vector3D(0.2, 0.4, 0.2), Vector3D(0.1, 0.3, 0.0));
+  surfaceMesh->setMultiColour(Vector3D(pow(0.2, 2.2), pow(0.4, 2.2), pow(0.2, 2.2)), Vector3D(pow(0.1, 2.2), pow(0.3, 2.2), pow(0.0, 2.2)));
   surfaceMesh->getTransform()->translate(Vector3D(translation, 0, translation));
   surfaceMesh->setClippingPlane(Vector4D(0, 1, 0, -WATER_HEIGHT));
   surfaceMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(surfaceMesh);
 
   waterMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize));
-  waterMesh->setSingleColour(Vector3D(0.2, 0.2, 0.5));
+  waterMesh->setSingleColour(Vector3D(pow(0.2, 2.2), pow(0.2, 2.2), pow(0.5, 2.2)));
   waterMesh->getTransform()->translate(Vector3D(translation, WATER_HEIGHT, translation));
   waterMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(waterMesh);
