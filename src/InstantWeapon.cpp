@@ -3,6 +3,7 @@
 //
 
 #include <RenderSystem/RenderableMesh.h>
+#include <RenderSystem/RenderableLines.h>
 #include "InstantWeapon.h"
 #include "TimeToLiveActor.h"
 #include "Resources.h"
@@ -42,25 +43,14 @@ void InstantWeapon::endShooting(GameContext* context, Tower* sourceTower)
 void InstantWeapon::createBeamShot(GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
   {
   RenderContext* renderContext = context->getRenderContext();
-  RenderableMesh* mesh = new RenderableMesh(renderContext->getNextRenderableID());
-  mesh->setMeshStorage(renderContext->getSharedMeshStorage(MESH_BEAM));
-  mesh->initialise(renderContext);
+  RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID());
+  line->initialise(renderContext);
+  line->addLine(shootPos, targetPos, Vector3D(0.5, 0.1, 0.1));
 
-  Vector3D shootToTarget = targetPos - shootPos;
-  shootToTarget.y = 0;
-  Vector3D shootDir = shootToTarget;
-  shootDir.makeUniform();
-  mesh->getTransform()->scale(beamRadius, beamRadius, shootToTarget.magnitude());
-  float angle = mathernogl::ccwAngleBetween(Vector2D(0, -1), Vector2D(shootToTarget.x, shootToTarget.z));
-  mesh->getTransform()->rotate(Vector3D(0, 1, 0), angle);
-  mesh->getTransform()->translate(shootPos + shootToTarget * 0.5f);
-  mesh->setLightShaded(false);
-  mesh->setDrawStyleSingleColour(Vector3D(0.5, 0.15, 0.1));
-
-  RenderablePtr meshPtr(mesh);
-  renderContext->getRenderableSet()->addRenderable(meshPtr);
-  TimeToLiveActor* actor = new TimeToLiveActor(context->getNextActorID(), 100);
-  actor->addRenderable(meshPtr);
+  RenderablePtr linePtr(line);
+  renderContext->getRenderableSet()->addRenderable(linePtr);
+  TimeToLiveActor* actor = new TimeToLiveActor(context->getNextActorID(), 60);
+  actor->addRenderable(linePtr);
   context->addActor(GameActorPtr(actor));
   }
 
