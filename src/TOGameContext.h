@@ -109,7 +109,7 @@ public:
 
   void displayTowerRangeField(Tower* tower);
   void hideTowerRangeField(uint towerID);
-  void displayAllRangeFields();
+  void displayAllRelayRanges();
   void hideAllRangeFields();
 
   TowerPtr getFocusedTower();

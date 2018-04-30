@@ -4,6 +4,7 @@
 
 #include "TowerFunctionalities.h"
 #include "TOGameContext.h"
+#include "TowerFactory.h"
 
 void TowerFunctionalityCombat::onAttached(Tower* tower, GameContext* gameContext)
   {
@@ -35,7 +36,8 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
     if (weapon->isCoolingDown())
       return;
 
-    TowerTargetPtr target = toGameContext->findClosestBotTo(tower->getPosition(), 10);
+    const float towerRange = TowerFactory::getCombatRange(tower->getTowerType());
+    TowerTargetPtr target = toGameContext->findClosestBotTo(tower->getPosition(), towerRange);
     if (target && weapon)
       {
       weapon->setTarget(target);

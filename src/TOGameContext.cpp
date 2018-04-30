@@ -391,8 +391,11 @@ void TOGameContext::displayTowerRangeField(Tower* tower)
   float radius = TowerFactory::getTowerRange(tower->getTowerType());
   if (radius > 0)
     {
+    Vector3D colour = Vector3D(0.1, 0.5, 0.5);
+    if (tower->getFunction() == Tower::combat)
+      colour.set(0.6, 0.2, 0.1);
     hideTowerRangeField(tower->getID());
-    towerRangeFields[tower->getID()] = rangeFieldManager->createRangeField(tower->getPosition() + Vector3D(0, 0.02, 0), radius, Vector3D(0.1, 0.5, 0.5));
+    towerRangeFields[tower->getID()] = rangeFieldManager->createRangeField(tower->getPosition() + Vector3D(0, 0.02, 0), radius, colour);
     }
   }
 
@@ -405,11 +408,11 @@ void TOGameContext::hideTowerRangeField(uint towerID)
     }
   }
 
-void TOGameContext::displayAllRangeFields()
+void TOGameContext::displayAllRelayRanges()
   {
   for (TowerPtr tower : *towers.getList())
     {
-    if (!tower->isUnderConstruction())
+    if (!tower->isUnderConstruction() && tower->getFunction() == Tower::relay)
       displayTowerRangeField(tower.get());
     }
   }

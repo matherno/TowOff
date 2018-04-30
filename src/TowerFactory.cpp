@@ -20,7 +20,7 @@ const std::map<uint, TowerType> towerTypes =
   //{   id,     TowerType{     name,              icon image file,        base mesh file,           turret mesh file,           connect offset,        connect radius,  hit radius}},
   {TOWER_HOMEBASE, TowerType{"Home Base",       IMAGE_ICON_HOME_BASE,    MESH_HOME_BASE,           "",                        Vector3D(-0.61, 5.12, 0.61),  10,             2.7}},
   {TOWER_BASIC,    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10,             0.9}},
-  {TOWER_PYLON,    TowerType{"Pylon",           IMAGE_ICON_PYLON,        MESH_PYLON,               "",                        Vector3D(0, 4.02, 0),         20,             1.5}},
+  {TOWER_PYLON,    TowerType{"Pylon",           IMAGE_ICON_PYLON,        MESH_PYLON,               "",                        Vector3D(0, 4.02, 0),         30,             1.5}},
   {TOWER_MINER,    TowerType{"Miner",           IMAGE_ICON_MINER,        MESH_MINER_BASE,          MESH_MINER_TURRET,         Vector3D(0, 2.61, 0),         10,             1.7}},
   };
 
@@ -152,9 +152,11 @@ TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& posi
 
 float TowerFactory::getTowerRange(uint towerType)
   {
-  if (getTowerFunction(towerType) == Tower::relay)
+  Tower::TowerFunction function = getTowerFunction(towerType);
+  if (function == Tower::relay)
     return getRelayPowerRange(towerType);
-  // else if combat, return combat range...
+  else if (function == Tower::combat)
+    return getCombatRange(towerType);
   return 0;
   }
 
@@ -164,6 +166,16 @@ float TowerFactory::getRelayPowerRange(uint towerType)
     {
     case TOWER_PYLON:
       return 20;
+    }
+  return 0;
+  }
+
+float TowerFactory::getCombatRange(uint towerType)
+  {
+  switch (towerType)
+    {
+    case TOWER_BASIC:
+      return 15;
     }
   return 0;
   }

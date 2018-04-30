@@ -9,9 +9,9 @@ RangeFieldManager::RangeFieldManager(uint id) : GameActor(id)
 
 void RangeFieldManager::onAttached(GameContext* gameContext)
   {
-  lineStripsRenderable.reset(new RenderableLineStrips(gameContext->getRenderContext()->getNextRenderableID()));
+  lineStripsRenderable.reset(new RenderableLineStrips(gameContext->getRenderContext()->getNextRenderableID(), false, DRAW_STAGE_TRANSPARENT));
   lineStripsRenderable->initialise(gameContext->getRenderContext());
-  lineStripsRenderable->setLineWidth(2);
+  lineStripsRenderable->setLineWidth(1);
   gameContext->getRenderContext()->getRenderableSet()->addRenderable(lineStripsRenderable);
   }
 
@@ -43,12 +43,12 @@ uint RangeFieldManager::createRangeField(const Vector3D& position, float radius,
   lineStripsRenderable->addXZPlaneCircle(centre, radius, NUM_SECTORS);
   lineStripIDs->push_back(lineStripsRenderable->finishLineStrip());
 
-  centre += Vector3D(0, 0.4, 0);
+  centre += Vector3D(0, 0.3, 0);
   lineStripsRenderable->startLineStrip(colour, transparency * 0.75f);
   lineStripsRenderable->addXZPlaneCircle(centre, radius, NUM_SECTORS);
   lineStripIDs->push_back(lineStripsRenderable->finishLineStrip());
-
-  centre += Vector3D(0, 0.4, 0);
+//
+  centre += Vector3D(0, 0.3, 0);
   lineStripsRenderable->startLineStrip(colour, transparency * 0.5f);
   lineStripsRenderable->addXZPlaneCircle(centre, radius, NUM_SECTORS);
   lineStripIDs->push_back(lineStripsRenderable->finishLineStrip());

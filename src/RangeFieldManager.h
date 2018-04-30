@@ -14,7 +14,7 @@ private:
   mathernogl::MappedList<LineStripIDs> rangeFieldLineStrips;
   uint nextRangeFieldID = 0;
   std::shared_ptr<RenderableLineStrips> lineStripsRenderable;
-  float transparency = 0.8f;
+  float transparency = 0.3f;
 
 public:
   RangeFieldManager(uint id);

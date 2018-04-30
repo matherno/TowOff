@@ -48,7 +48,7 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
   towerHighlightPos.set(0, 0, 0);
   setupHighlightColour();
   setupRangeHighlight(gameContext);
-  TOGameContext::cast(gameContext)->displayAllRangeFields();
+  TOGameContext::cast(gameContext)->displayAllRelayRanges();
   }
 
 void TowerPlacementHandler::onDetached(GameContext* gameContext)
@@ -91,7 +91,7 @@ bool TowerPlacementHandler::onMouseReleased(GameContext* gameContext, uint butto
       else
         {
         //  placing another tower
-        toGameContext->displayAllRangeFields();
+        toGameContext->displayAllRelayRanges();
         }
       }
     }
