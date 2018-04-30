@@ -101,11 +101,6 @@ bool Tower::inflictDamage(int damagePoints)
   return healthPoints <= 0;
   }
 
-void Tower::setPlayerNum(uint playerNum)
-  {
-  this->playerNum = playerNum;
-  }
-
 void Tower::setPosition(const Vector3D& pos)
   {
   position = pos;
@@ -207,7 +202,6 @@ void Tower::getTowerState(TowerState* state)
   state->rotation = turretRotation;
   state->health = (uint)std::max(healthPoints, 0);
   state->energy = storedEnergy;
-  state->playerNum = playerNum;
   state->underConstruction = isUnderConstruction();
   if(functionality)
     functionality->onGetTowerState(state);
@@ -219,7 +213,6 @@ void Tower::setTowerState(const TowerState* state)
   setTurretYRotation(state->rotation);
   healthPoints = std::min((int)state->health, maxHealthPoints);
   storedEnergy = std::min(state->energy, maxEnergy);
-  playerNum = state->playerNum;
   if(functionality)
     functionality->onSetTowerState(state);
   }

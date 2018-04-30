@@ -3,6 +3,7 @@
 #include <GameSystem/GameSystem.h>
 #include <BoundingBox.h>
 #include "TOGameSaveLoad.h"
+#include "TowerTarget.h"
 
 /*
 *   
@@ -32,7 +33,6 @@ protected:
   Vector3D position;
   Vector3D targetPosition;
   Vector3D connectPosition;
-  uint playerNum = 0;
   int maxHealthPoints = 100;
   int healthPoints = maxHealthPoints;
   bool showDamageEffect = false;
@@ -49,8 +49,6 @@ protected:
 public:
   Tower(uint id, uint towerType, TowerFunctionalityPtr functionality);
   virtual ~Tower() {};
-  void setPlayerNum(uint playerNum);
-  uint getPlayerNum() const { return playerNum; }
 
   virtual TowerFunction getFunction() const;
   bool isPowerSrc() const { return getFunction() == miner || getFunction() == storage; }
@@ -110,20 +108,20 @@ typedef mathernogl::MappedList<TowerPtr> TowerList;
 class TowerWeapon
   {
 private:
-  std::weak_ptr<Tower> target;
+  std::weak_ptr<TowerTarget> target;
 
 public:
   TowerWeapon() {}
   virtual ~TowerWeapon() {}
 
-  void setTarget(TowerPtr target) { this->target = target; }
-  TowerPtr getTarget() { return target.lock(); }
+  void setTarget(TowerTargetPtr target) { this->target = target; }
+  TowerTargetPtr getTarget() { return target.lock(); }
   virtual void initShooting(GameContext* context, Tower* sourceTower) = 0;
   virtual void updateIdle(GameContext* context, Tower* sourceTower) {};
 
   //  returns false when shooting should stop after a call to this
   virtual bool updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) = 0;
-  virtual void endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) = 0;
+  virtual void endShooting(GameContext* context, Tower* sourceTower) = 0;
   virtual bool isCoolingDown() = 0;
   };
 

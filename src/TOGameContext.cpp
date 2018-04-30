@@ -11,6 +11,7 @@
 #include "TOInputHandler.h"
 #include "TowerFactory.h"
 #include "UnderConstructTower.h"
+#include "BotFactory.h"
 
 #define LAND_HEIGHT 0
 #define WATER_HEIGHT -1
@@ -90,7 +91,7 @@ TowerPtr TOGameContext::getTower(uint id)
   return nullptr;
   }
 
-TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower, bool onlyEnemies)
+TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower)
   {
   TowerPtr closestTower;
   double closestTowerDist;
@@ -102,11 +103,8 @@ TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower, bool onlyEnemies)
       {
       if (targetTower->getID() != tower->getID())
         {
-        if (!onlyEnemies || tower->getPlayerNum() != targetTower->getPlayerNum())
-          {
-          closestTower = targetTower;
-          closestTowerDist = distance;
-          }
+        closestTower = targetTower;
+        closestTowerDist = distance;
         }
       }
     }
@@ -493,6 +491,50 @@ void TOGameContext::removeVisibilityMarker(uint id)
   {
   if (visibilityMarkers.contains(id))
     visibilityMarkers.remove(id);
+  }
+
+BotPtr TOGameContext::createBot(uint botType, const Vector3D& position)
+  {
+  BotPtr bot = BotFactory::createBot(botType, getNextActorID(), position);
+  if (!bot)
+    return nullptr;
+
+  botList.add(bot, bot->getID());
+  addActor(bot);
+  return bot;
+  }
+
+BotPtr TOGameContext::getBot(uint id)
+  {
+  if (botList.contains(id))
+    return botList.get(id);
+  return nullptr;
+  }
+
+void TOGameContext::removeBot(uint id)
+  {
+  if (botList.contains(id))
+    {
+    botList.remove(id);
+    removeActor(id);
+    }
+  }
+
+BotPtr TOGameContext::findClosestBotTo(const Vector3D& position, float range)
+  {
+  BotPtr closestBot;
+  double closestBotDistance = range;
+  bool infiniteRange = range < 0;
+  for (BotPtr& targetBot : *botList.getList())
+    {
+    double distance = position.distanceToPoint(targetBot->getPosition());
+    if ((infiniteRange && !closestBot) || distance < closestBotDistance)
+      {
+      closestBot = targetBot;
+      closestBotDistance = distance;
+      }
+    }
+  return closestBot;
   }
 
 

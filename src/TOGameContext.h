@@ -20,6 +20,7 @@ class TOGameContext;
 #include "FogOfWarRenderable.h"
 #include "FogOfWarHandler.h"
 #include "TOSettings.h"
+#include "Bot.h"
 
 #define DRAW_STAGE_FOGOFWAR   (DRAW_STAGE_TRANSPARENT + 1)
 
@@ -34,6 +35,7 @@ class TOGameContext : public GameContextImpl
 private:
   std::shared_ptr<TOGameState> loadedGameState;
   TowerList towers;
+  BotList botList;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
   std::shared_ptr<RenderableTerrain> waterMesh;
   HUDHandler hudHandler;
@@ -78,7 +80,7 @@ public:
   TowerPtr getTower(uint id);
   const TowerList* getTowers() const { return &towers; }
   void forEachTower(std::function<void(TowerPtr tower)> func);
-  TowerPtr getClosestTowerTo(const Tower* tower, bool onlyEnemies);
+  TowerPtr getClosestTowerTo(const Tower* tower);
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);
   TowerPtr createTower(uint towerType, const Vector3D& position, bool underConstruction);
@@ -112,8 +114,12 @@ public:
 
   TowerPtr getFocusedTower();
   void doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour = Vector3D(0.9, 0, 0));
-
   void getGameState(TOGameState* state);
+
+  BotPtr createBot(uint botType, const Vector3D& position);
+  BotPtr getBot(uint id);
+  void removeBot(uint id);
+  BotPtr findClosestBotTo(const Vector3D& position, float range = -1);    // range of < 0 is infinite
 
   inline static TOGameContext* cast(GameContext* context)
     {

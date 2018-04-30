@@ -22,7 +22,7 @@ private:
 public:
   virtual void initShooting(GameContext* context, Tower* sourceTower) override;
   virtual bool updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) override;
-  virtual void endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) override;
+  virtual void endShooting(GameContext* context, Tower* sourceTower) override;
 
   void setCreateProjectileFunc(CreateProjectileFunc func){ createProjectileFunc = func; }
   void setCooldownTime(long cooldownTime) { this->cooldownTime = cooldownTime; }

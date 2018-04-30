@@ -19,7 +19,7 @@ public:
   virtual void initShooting(GameContext* context, Tower* sourceTower) override;
   virtual void updateIdle(GameContext* context, Tower* sourceTower) override;
   virtual bool updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) override;
-  virtual void endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos) override;
+  virtual void endShooting(GameContext* context, Tower* sourceTower) override;
 
   void setCooldownTime(long time) { cooldownTimer.setTimeOut(time); }
   void setDamagePerShot(int damagePerShot) { this->damagePerShot = damagePerShot; }

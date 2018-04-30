@@ -143,6 +143,12 @@ bool TOInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint
       }
     return selectionManager->onWorldClick(gameContext, mouseX, mouseY, isCtrlDown);
     }
+  else if (button == MOUSE_RIGHT)
+    {
+    Vector3D worldPos = TOGameContext::cast(gameContext)->terrainHitTest(mouseX, mouseY);
+    TOGameContext::cast(gameContext)->createBot(0, worldPos);
+    return true;
+    }
   return false;
   }
 

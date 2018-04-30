@@ -13,11 +13,11 @@ bool ProjectileWeapon::updateShooting(GameContext* context, Tower* sourceTower, 
   {
   if (createProjectileFunc && context->getGameTime() - lastShootTime > cooldownTime)
     {
-    if (TowerPtr targetPtr = getTarget())
+    if (TowerTargetPtr targetPtr = getTarget())
       {
-      targetPtr->inflictDamage(mathernogl::RandomGenerator::randomInt(9, 11));
+      targetPtr->doDamage(mathernogl::RandomGenerator::randomInt(9, 11));
 
-      Vector3D shootDirection = targetPtr->getTargetPosition() - shootPos;
+      Vector3D shootDirection = targetPtr->getPosition() - shootPos;
       shootDirection.makeUniform();
 
       std::shared_ptr<Projectile> projectile = createProjectileFunc(context->getNextActorID());
@@ -32,7 +32,7 @@ bool ProjectileWeapon::updateShooting(GameContext* context, Tower* sourceTower, 
   return true;
   }
 
-void ProjectileWeapon::endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
+void ProjectileWeapon::endShooting(GameContext* context, Tower* sourceTower)
   {
 
   }

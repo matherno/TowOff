@@ -16,11 +16,11 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
 
   if (transferEnergyTimer.incrementTimer(gameContext->getDeltaTime()))
     {
-    TowerPtr targetTower = toGameContext->findClosestConnectedPowerSrc(tower->getID(), true);
-    if (targetTower)
+    TowerPtr powerSrcTower = toGameContext->findClosestConnectedPowerSrc(tower->getID(), true);
+    if (powerSrcTower)
       {
       uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
-      toGameContext->transferEnergy(targetTower.get(), tower, energyAmount);
+      toGameContext->transferEnergy(powerSrcTower.get(), tower, energyAmount);
       }
     transferEnergyTimer.setTimeOut(toGameContext->timeBetweenEnergyTransfers());
     transferEnergyTimer.reset();
@@ -35,28 +35,30 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
     if (weapon->isCoolingDown())
       return;
 
-    TowerPtr target = toGameContext->getClosestTowerTo(tower, true);
+    TowerTargetPtr target = toGameContext->findClosestBotTo(tower->getPosition(), 10);
     if (target && weapon)
       {
       weapon->setTarget(target);
       weapon->initShooting(toGameContext, tower);
-      tower->setTurretRotation(target->getTargetPosition());
+      tower->setTurretRotation(target->getPosition());
       isShooting = true;
       }
     }
   else
     {
-    Vector3D shootPos = tower->getPosition() + shootOffset;
-    if (tower->getTurretRotation())
-      tower->getTurretRotation()->transform(shootOffset, &shootPos);
-
     bool stopShooting = true;
-    if (weapon->getTarget() && weapon->getTarget()->isAlive())
+    TowerTargetPtr target = weapon->getTarget();
+    if (target && target->isAlive())
+      {
+      tower->setTurretRotation(target->getPosition());
+      Vector3D shootPos = tower->getPosition() + shootOffset;
+      tower->getTurretRotation()->transform(shootOffset, &shootPos);
       stopShooting = !weapon->updateShooting(toGameContext, tower, shootPos);
+      }
 
     if (stopShooting)
       {
-      weapon->endShooting(toGameContext, tower, shootPos);
+      weapon->endShooting(toGameContext, tower);
       isShooting = false;
       }
     }
@@ -65,7 +67,7 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
 void TowerFunctionalityCombat::onDetached(Tower* tower, GameContext* gameContext)
   {
   if (isShooting && weapon)
-    weapon->endShooting(TOGameContext::cast(gameContext), tower, tower->getPosition() + shootOffset);
+    weapon->endShooting(TOGameContext::cast(gameContext), tower);
   }
 
 void TowerFunctionalityCombat::setEnergyTransferRate(float rate)

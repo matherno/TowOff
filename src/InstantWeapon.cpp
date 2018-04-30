@@ -19,11 +19,11 @@ bool InstantWeapon::updateShooting(GameContext* context, Tower* sourceTower, con
     if (sourceTower->getStoredEnergy() < energyPerShot)
       return false;
 
-    if (TowerPtr targetPtr = getTarget())
+    if (TowerTargetPtr targetPtr = getTarget())
       {
       sourceTower->takeEnergy(energyPerShot, true);
-      targetPtr->inflictDamage(damagePerShot);
-      createBeamShot(context, shootPos, targetPtr->getTargetPosition());
+      targetPtr->doDamage(damagePerShot);
+      createBeamShot(context, shootPos, targetPtr->getPosition());
       }
     }
   return true;
@@ -34,7 +34,7 @@ void InstantWeapon::updateIdle(GameContext* context, Tower* sourceTower)
   cooldownTimer.incrementTimer(context->getDeltaTime());
   }
 
-void InstantWeapon::endShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
+void InstantWeapon::endShooting(GameContext* context, Tower* sourceTower)
   {
 
   }

@@ -40,7 +40,6 @@ void UnderConstructTower::onUpdate(GameContext* gameContext)
       {
       toGameContext->removeTower(getID());
       TowerPtr constructedTower = toGameContext->createTower(towerType, getPosition(), false);
-      constructedTower->setPlayerNum(getPlayerNum());
       }
     }
   }

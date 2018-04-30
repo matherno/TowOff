@@ -11,7 +11,6 @@ struct TowerState
   uint type = 0;
   uint health = 0;
   uint energy = 0;
-  uint playerNum = 0;
   bool underConstruction = false;
   };
 

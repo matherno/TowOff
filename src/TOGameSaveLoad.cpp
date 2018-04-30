@@ -25,7 +25,6 @@
 #define TOWER_ROT                 "rot"
 #define TOWER_ENERGY              "energy"
 #define TOWER_HEALTH              "health"
-#define TOWER_PLAYER              "player"
 #define TOWER_CONSTR              "construction"
 
 bool lineStartsWith(const std::string& line, const std::string& attribute)
@@ -146,7 +145,6 @@ bool readTowerList(std::ifstream& inFile, std::vector<TowerState>& towerList)
     getAttributeValue(line, TOWER_ROT, towerState.rotation);
     getAttributeValue(line, TOWER_ENERGY, towerState.energy);
     getAttributeValue(line, TOWER_HEALTH, towerState.health);
-    getAttributeValue(line, TOWER_PLAYER, towerState.playerNum);
     getAttributeValue(line, TOWER_CONSTR, towerState.underConstruction);
 
     if (lineStartsWith(line, TOWER_END))
@@ -230,7 +228,6 @@ void writeTowers(std::ofstream& file, const std::vector<TowerState>* towerStates
     file << TOWER_ROT << " " << state.rotation << "\n";
     file << TOWER_HEALTH << " " << state.health << "\n";
     file << TOWER_ENERGY << " " << state.energy << "\n";
-    file << TOWER_PLAYER << " " << state.playerNum << "\n";
     file << TOWER_CONSTR << " " << (state.underConstruction ? 1 : 0) << "\n";
     file << TOWER_END << "\n";
     file << "\n";
