@@ -91,17 +91,16 @@ TowerPtr TOGameContext::getTower(uint id)
   return nullptr;
   }
 
-TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower)
+TowerPtr findClosestTowerBase(const Vector3D& position, uint excludeTowerID, TowerList& towers)
   {
   TowerPtr closestTower;
   double closestTowerDist;
-  const Vector3D srcTowerPos = tower->getPosition();
   for (TowerPtr& targetTower : *towers.getList())
     {
-    double distance = srcTowerPos.distanceToPoint(targetTower->getPosition());
+    double distance = position.distanceToPoint(targetTower->getPosition());
     if (!closestTower || distance < closestTowerDist)
       {
-      if (targetTower->getID() != tower->getID())
+      if (targetTower->getID() != excludeTowerID)
         {
         closestTower = targetTower;
         closestTowerDist = distance;
@@ -109,6 +108,16 @@ TowerPtr TOGameContext::getClosestTowerTo(const Tower* tower)
       }
     }
   return closestTower;
+  }
+
+TowerPtr TOGameContext::findClosestTowerTo(const Tower* tower)
+  {
+  return findClosestTowerBase(tower->getPosition(), tower->getID(), towers);
+  }
+
+TowerPtr TOGameContext::findClosestTower(const Vector3D& position)
+  {
+  return findClosestTowerBase(position, 0, towers);
   }
 
 void TOGameContext::removeTower(uint id)
@@ -429,9 +438,9 @@ FontPtr TOGameContext::getDefaultFont()
   return getRenderContext()->getSharedFont(FONT_DEFAULT_FNT, FONT_DEFAULT_GLYPHS, FONT_DEFAULT_SCALING);
   }
 
-void TOGameContext::doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour)
+void TOGameContext::doTowerDamageEffect(const Tower* tower)
   {
-  specialEffectsHandler.towerDamageEffect(this, tower, effectColour);
+  specialEffectsHandler.towerDamageEffect(this, tower);
   }
 
 void TOGameContext::getGameState(TOGameState* state)
@@ -523,7 +532,7 @@ void TOGameContext::removeBot(uint id)
     }
   }
 
-BotPtr TOGameContext::findClosestBotTo(const Vector3D& position, float range)
+BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range)
   {
   BotPtr closestBot;
   double closestBotDistance = range;
@@ -540,4 +549,8 @@ BotPtr TOGameContext::findClosestBotTo(const Vector3D& position, float range)
   return closestBot;
   }
 
+void TOGameContext::doBotDamageEffect(const Bot* bot)
+  {
+  specialEffectsHandler.botDamageEffect(this, bot);
+  }
 

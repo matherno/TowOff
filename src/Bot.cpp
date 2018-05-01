@@ -4,6 +4,7 @@
 
 #include "Bot.h"
 #include "Resources.h"
+#include "TOGameContext.h"
 
 Bot::Bot(uint id, uint botType, const string& meshFilePath) : TowerTarget(id), typeID(botType), meshFilePath(meshFilePath)
   {}
@@ -23,18 +24,23 @@ void Bot::onAttached(GameContext* gameContext)
 
 void Bot::onUpdate(GameContext* gameContext)
   {
-  TowerTarget::onUpdate(gameContext);
-
-  // temporary circular movement
-  Vector3D newTargetPos = getPosition() + Vector3D(-200, 0, 0);
-  if (targetPosition)
+  if (!isAlive())
     {
-    newTargetPos = mathernogl::crossProduct(Vector3D(0, 1, 0), (*targetPosition - getPosition()).getUniform()).getUniform();
-    newTargetPos += *targetPosition;
+    destroyThis(gameContext);
+    return;
     }
-  moveToPosition(newTargetPos);
 
+  TowerTarget::onUpdate(gameContext);
+  if (!getTargetTower())
+    findTarget(gameContext);
   doMovement(gameContext);
+  checkTowerCollision(gameContext);
+
+  if (showDamageEffect)
+    {
+    TOGameContext::cast(gameContext)->doBotDamageEffect(this);
+    showDamageEffect = false;
+    }
   }
 
 void Bot::onDetached(GameContext* gameContext)
@@ -45,6 +51,13 @@ void Bot::onDetached(GameContext* gameContext)
   renderable->cleanUp(renderContext);
   renderContext->getRenderableSet()->removeRenderable(renderable->getID());
   renderable.reset();
+  }
+
+bool Bot::doDamage(uint damagePoints)
+  {
+  if (damagePoints > 0)
+    showDamageEffect = true;
+  return TowerTarget::doDamage(damagePoints);
   }
 
 void Bot::moveToPosition(const Vector3D& position)
@@ -81,4 +94,46 @@ void Bot::doMovement(GameContext* gameContext)
     mathernogl::Matrix4 transform = mathernogl::matrixRotate(Vector3D(0, 1, 0), angleBetween) * mathernogl::matrixTranslate(getPosition());
     renderable->getTransform()->setTransformMatrix(transform);
     }
+  }
+
+void Bot::findTarget(GameContext* gameContext)
+  {
+  targetTower.reset();
+  TowerPtr tower = TOGameContext::cast(gameContext)->findClosestTower(getPosition());
+  if (tower)
+    {
+    moveToPosition(tower->getPosition());
+    targetTower = tower;
+    }
+  }
+
+void Bot::checkTowerCollision(GameContext* gameContext)
+  {
+  if (TowerPtr tower = getTargetTower())
+    {
+    if (!tower->isAlive())
+      {
+      tower.reset();
+      return;
+      }
+
+    const float botHitRadius = getHitRadius();
+    const float towerHitRadius = tower->getHitRadius();
+    if (getPosition().distanceToPoint(tower->getPosition()) < botHitRadius + towerHitRadius)
+      {
+      tower->inflictDamage(hitDamage);
+      destroyThis(gameContext);
+      }
+    }
+  }
+
+TowerPtr Bot::getTargetTower()
+  {
+  return targetTower.lock();
+  }
+
+void Bot::destroyThis(GameContext* gameContext)
+  {
+  setHealthPoints(0);
+  TOGameContext::cast(gameContext)->removeBot(getID());
   }

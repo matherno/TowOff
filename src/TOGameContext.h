@@ -80,7 +80,8 @@ public:
   TowerPtr getTower(uint id);
   const TowerList* getTowers() const { return &towers; }
   void forEachTower(std::function<void(TowerPtr tower)> func);
-  TowerPtr getClosestTowerTo(const Tower* tower);
+  TowerPtr findClosestTowerTo(const Tower* tower);
+  TowerPtr findClosestTower(const Vector3D& position);
   int numTowers() const { return towers.count(); }
   void removeTower(uint id);
   TowerPtr createTower(uint towerType, const Vector3D& position, bool underConstruction);
@@ -113,13 +114,14 @@ public:
   void hideAllRangeFields();
 
   TowerPtr getFocusedTower();
-  void doTowerDamageEffect(const Tower* tower, const Vector3D& effectColour = Vector3D(0.9, 0, 0));
+  void doTowerDamageEffect(const Tower* tower);
   void getGameState(TOGameState* state);
 
   BotPtr createBot(uint botType, const Vector3D& position);
   BotPtr getBot(uint id);
   void removeBot(uint id);
-  BotPtr findClosestBotTo(const Vector3D& position, float range = -1);    // range of < 0 is infinite
+  BotPtr findClosestBot(const Vector3D& position, float range = -1);    // range of < 0 is infinite
+  void doBotDamageEffect(const Bot* bot);
 
   inline static TOGameContext* cast(GameContext* context)
     {

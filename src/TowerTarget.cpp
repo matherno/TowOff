@@ -15,8 +15,7 @@ void TowerTarget::onAttached(GameContext* gameContext)
 
 void TowerTarget::onUpdate(GameContext* gameContext)
   {
-  if (!isAlive())
-    TOGameContext::cast(gameContext)->removeBot(getID());
+
   }
 
 void TowerTarget::onDetached(GameContext* gameContext)

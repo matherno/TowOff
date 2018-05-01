@@ -8,7 +8,10 @@
 #define HEALTH_TO_EMIT_SMOKE   0.6f     //  when a tower is at or under this health factor, it'll emit smoke
 
 SpecialEffectsHandler::SpecialEffectsHandler()
-  {}
+  {
+  towerDamageColour.set(0.9, 0, 0);
+  botDamageColour.set(0.5, 0.5, 0.3);
+  }
 
 void SpecialEffectsHandler::initialise(GameContext* gameContext)
   {
@@ -21,6 +24,17 @@ void SpecialEffectsHandler::initialise(GameContext* gameContext)
     system->setParticleSize(4);
     towerDamageParticles.reset(system);
     gameContext->addActor(towerDamageParticles);
+  }
+
+  {
+    ParticleSystem* system = new ParticleSystem(gameContext->getNextActorID(), true);
+    system->setGravityAccel(0.00001);
+    system->setTimeBetweenSpawns(8);
+    system->setInitVelocity(0.005);
+    system->setTimeAlive(300);
+    system->setParticleSize(3);
+    botDamageParticles.reset(system);
+    gameContext->addActor(botDamageParticles);
   }
 
   {
@@ -54,12 +68,18 @@ void SpecialEffectsHandler::update(GameContext* gameContext)
 void SpecialEffectsHandler::cleanUp(GameContext* gameContext)
   {
   gameContext->removeActor(towerDamageParticles->getID());
-  gameContext->removeActor(towerSmokeParticles->getID());
+  gameContext->removeActor(botDamageParticles->getID());
+  gameContext->removeActor(towerSmokeParticles->getID())
   }
 
-void SpecialEffectsHandler::towerDamageEffect(GameContext* gameContext, const Tower* tower, const Vector3D& effectColour)
+void SpecialEffectsHandler::towerDamageEffect(GameContext* gameContext, const Tower* tower)
   {
-  towerDamageParticles->addEmitter(tower->getTargetPosition(), 50, effectColour);
+  towerDamageParticles->addEmitter(tower->getTargetPosition(), 50, towerDamageColour);
+  }
+
+void SpecialEffectsHandler::botDamageEffect(GameContext* gameContext, const Bot* bot)
+  {
+  botDamageParticles->addEmitter(bot->getPosition(), 50, botDamageColour);
   }
 
 void SpecialEffectsHandler::startSmoke(TowerPtr tower)
@@ -91,3 +111,4 @@ bool SpecialEffectsHandler::isSmoking(TowerPtr tower) const
   {
   return towersEmittingSmoke.count(tower->getID()) > 0;
   }
+

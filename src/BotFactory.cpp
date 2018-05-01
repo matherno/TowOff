@@ -11,7 +11,7 @@
 const std::map<uint, BotType> botTypes =
   {
     //{   id,     BotType{     base mesh file,  hit radius,   initial health}},
-    {BOT_SLUG,    BotType{      MESH_BOT_SLUG,      1,              30 }},
+    {BOT_SLUG,    BotType{      MESH_BOT_SLUG,      0.8,              30 }},
   };
 
 BotPtr BotFactory::createBot(uint botType, uint id, const Vector3D& position)

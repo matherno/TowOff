@@ -33,7 +33,7 @@ public:
   bool isAlive() const { return healthPoints > 0; }
 
   //  returns true if this targets health is all gone
-  bool doDamage(uint damagePoints);
+  virtual bool doDamage(uint damagePoints);
   };
 
 typedef std::shared_ptr<TowerTarget> TowerTargetPtr;
