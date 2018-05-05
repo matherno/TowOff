@@ -24,16 +24,16 @@ void Bot::onAttached(GameContext* gameContext)
 
 void Bot::onUpdate(GameContext* gameContext)
   {
-  if (showDamageEffect)
-    {
-    TOGameContext::cast(gameContext)->doBotDamageEffect(this);
-    showDamageEffect = false;
-    }
-
   if (!isAlive())
     {
     destroyThis(gameContext);
     return;
+    }
+
+  if (showDamageEffect)
+    {
+    TOGameContext::cast(gameContext)->doBotDamageEffect(this);
+    showDamageEffect = false;
     }
 
   TowerTarget::onUpdate(gameContext);
@@ -181,5 +181,7 @@ void Bot::checkTowerCollision(GameContext* gameContext, TowerPtr tower)
 void Bot::destroyThis(GameContext* gameContext)
   {
   setHealthPoints(0);
-  TOGameContext::cast(gameContext)->removeBot(getID());
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+  toGameContext->doBotExplosionEffect(this);
+  toGameContext->removeBot(getID());
   }

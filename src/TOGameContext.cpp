@@ -537,6 +537,11 @@ void TOGameContext::doBotDamageEffect(const Bot* bot)
   specialEffectsHandler.botDamageEffect(this, bot);
   }
 
+void TOGameContext::doBotExplosionEffect(const Bot* bot)
+  {
+  specialEffectsHandler.botExplosionEffect(this, bot);
+  }
+
 void TOGameContext::setFogOfWarState(bool isOn)
   {
   if (fogOfWarHandler)
@@ -614,4 +619,3 @@ TowerTargetPtr TOGameContext::findClosestTowerTarget(const Vector3D& position, f
     return closestBot;
   return closestPortal;
   }
-

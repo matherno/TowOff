@@ -24,6 +24,7 @@ BotPtr BotFactory::createBot(uint botType, uint id, const Vector3D& position)
     bot->setHitRadius(type.hitRadius);
     bot->setMaxHealthPoints(type.initHealth);
     bot->setHealthPoints(type.initHealth);
+    bot->setCentreOfMassOffset(Vector3D(0, 1, 0));
     return BotPtr(bot);
     }
 

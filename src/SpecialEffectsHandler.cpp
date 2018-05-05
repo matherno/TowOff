@@ -4,6 +4,7 @@
 
 #include "SpecialEffectsHandler.h"
 #include "TOGameContext.h"
+#include "Resources.h"
 
 #define HEALTH_TO_EMIT_SMOKE   0.6f     //  when a tower is at or under this health factor, it'll emit smoke
 
@@ -50,6 +51,22 @@ void SpecialEffectsHandler::initialise(GameContext* gameContext)
     gameContext->addActor(towerSmokeParticles);
   }
 
+  {
+    ParticleSystem* system = new ParticleSystem(gameContext->getNextActorID(), false);
+    system->setGravityAccel(0);
+    system->setTimeBetweenSpawns(20);
+    system->setInitVelocity(0.001);
+    system->setTimeAlive(300);
+    system->setParticleSize(2);
+    system->addTextureAtlas(gameContext->getRenderContext()->getSharedTexture(IMAGE_EXPLOSION_SHEET));
+    system->setTextureAtlasSize(3, 3);
+    system->setTextureColourMixFactor(0);
+    system->setAdditiveBlending(true);
+    system->setDepthTesting(false);
+    explosionParticles.reset(system);
+    gameContext->addActor(explosionParticles);
+  }
+
   }
 
 void SpecialEffectsHandler::update(GameContext* gameContext)
@@ -82,6 +99,11 @@ void SpecialEffectsHandler::botDamageEffect(GameContext* gameContext, const Bot*
   botDamageParticles->addEmitter(bot->getPosition(), 50, botDamageColour);
   }
 
+void SpecialEffectsHandler::botExplosionEffect(GameContext* gameContext, const Bot* bot)
+  {
+  explosionParticles->addEmitter(bot->getCentreOfMass(), 50);
+  }
+
 void SpecialEffectsHandler::startSmoke(TowerPtr tower)
   {
   if (!isSmoking(tower))
@@ -111,4 +133,5 @@ bool SpecialEffectsHandler::isSmoking(TowerPtr tower) const
   {
   return towersEmittingSmoke.count(tower->getID()) > 0;
   }
+
 

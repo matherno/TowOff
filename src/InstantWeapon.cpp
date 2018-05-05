@@ -24,7 +24,7 @@ bool InstantWeapon::updateShooting(GameContext* context, Tower* sourceTower, con
       {
       sourceTower->takeEnergy(energyPerShot, true);
       targetPtr->doDamage(damagePerShot);
-      createBeamShot(context, shootPos, targetPtr->getPosition());
+      createBeamShot(context, shootPos, targetPtr->getTargetPosition());
       }
     }
   return true;

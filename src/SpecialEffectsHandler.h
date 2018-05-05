@@ -16,6 +16,7 @@ private:
   ParticleSystemPtr towerDamageParticles;
   ParticleSystemPtr botDamageParticles;
   ParticleSystemPtr towerSmokeParticles;
+  ParticleSystemPtr explosionParticles;
   std::set<uint> towersEmittingSmoke;
   Vector3D towerDamageColour;
   Vector3D botDamageColour;
@@ -28,6 +29,7 @@ public:
 
   void towerDamageEffect(GameContext* gameContext, const Tower* tower);
   void botDamageEffect(GameContext* gameContext, const Bot* bot);
+  void botExplosionEffect(GameContext* gameContext, const Bot* bot);
 
 protected:
   void startSmoke(TowerPtr tower);

@@ -15,6 +15,7 @@
 #define MESH_BOTPORTAL                      "resources/Portal.obj"
 
 #define IMAGE_TEXTURE_PALETTE               "resources/basic_palette.png"
+#define IMAGE_EXPLOSION_SHEET               "resources/explosion_sheet.png"
 
 #define IMAGE_ICON_BASIC_TOWER              "resources/tower_icons/BasicTower.png"
 #define IMAGE_ICON_HOME_BASE                "resources/tower_icons/HomeBase.png"
