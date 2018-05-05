@@ -67,7 +67,7 @@ void Bot::doSwarmMovement(GameContext* gameContext)
   const BotList* botList = toGameContext->getBotList();
 
   //  get swarm vectors based on neighbour bots => alignment, cohesion, separation
-  Vector2D position = getPosition2D();
+  const Vector2D position = getPosition2D();
   const Vector2D previousVelocity = getVelocity2D();
   Vector2D alignment, cohesion, separation;
   Vector2D neighbourPos, thisToNeighbour;
@@ -121,12 +121,20 @@ void Bot::doSwarmMovement(GameContext* gameContext)
     velocity += posToTower.getUniform() * multiplier;
     }
 
-  //  limit the speed, and update the position
+  //  limit the speed
   velocity = velocity * 0.1f + previousVelocity * 0.9f;
   if (velocity.magnitude() > movementSpeed)
     velocity = velocity.getUniform() * movementSpeed;
-  position += velocity * (float)gameContext->getDeltaTime() * 0.001f;
-  setPosition(Vector3D(position.x, 0, position.y));
+
+  // update position, checking if leaving map
+  Vector2D deltaPos = velocity * (float)gameContext->getDeltaTime() * 0.001f;
+  Vector2D newPosition = position + deltaPos;
+  if (!toGameContext->isPositionOnMap(Vector3D(newPosition.x, 0, newPosition.y)))
+    {
+    velocity *= -1;
+    newPosition = position - deltaPos;
+    }
+  setPosition(Vector3D(newPosition.x, 0, newPosition.y));
 
   //  update the renderables transform
   double angleBetween = mathernogl::ccwAngleBetween(Vector2D(0, -1), velocity.getUniform());
