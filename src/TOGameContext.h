@@ -21,6 +21,7 @@ class TOGameContext;
 #include "FogOfWarHandler.h"
 #include "TOSettings.h"
 #include "Bot.h"
+#include "BotPortal.h"
 
 #define DRAW_STAGE_FOGOFWAR   (DRAW_STAGE_TRANSPARENT + 1)
 
@@ -36,6 +37,7 @@ private:
   std::shared_ptr<TOGameState> loadedGameState;
   TowerList towers;
   BotList botList;
+  BotPortalList botPortalList;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
   std::shared_ptr<RenderableTerrain> waterMesh;
   HUDHandler hudHandler;
@@ -124,6 +126,11 @@ public:
   const BotList* getBotList() const { return &botList; }
   BotPtr findClosestBot(const Vector3D& position, float range = -1);    // range of < 0 is infinite
   void doBotDamageEffect(const Bot* bot);
+  BotPortalPtr createBotPortal(const Vector3D& position);
+  void removeBotPortal(uint id);
+  const BotPortalList* getBotPortalList() const { return &botPortalList; }
+  BotPortalPtr findClosestBotPortal(const Vector3D& position, float range = -1);    // range of < 0 is infinite
+  TowerTargetPtr findClosestTowerTarget(const Vector3D& position, float range = -1);    // range of < 0 is infinite
 
   inline static TOGameContext* cast(GameContext* context)
     {

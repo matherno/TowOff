@@ -136,9 +136,10 @@ bool TOInputHandler::onMouseHeld(GameContext* gameContext, uint button, uint mou
 
 bool TOInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint mouseX, uint mouseY)
   {
+  TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   if (button == MOUSE_LEFT)
     {
-    TowerSelectionManager* selectionManager = TOGameContext::cast(gameContext)->getSelectionManager();
+    TowerSelectionManager* selectionManager = toGameContext->getSelectionManager();
     bool isCtrlDown = gameContext->getInputManager()->isKeyDown(KEY_LCTRL);
     if (selectionManager->isMouseDragging())
       {
@@ -150,8 +151,7 @@ bool TOInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint
   else if (button == MOUSE_RIGHT)
     {
     Vector3D worldPos = TOGameContext::cast(gameContext)->terrainHitTest(mouseX, mouseY);
-    for (int n = 0; n < 10; ++n)
-      TOGameContext::cast(gameContext)->createBot(0, worldPos);
+    toGameContext->createBotPortal(worldPos);
     return true;
     }
   return false;

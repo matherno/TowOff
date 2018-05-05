@@ -65,6 +65,7 @@ void Bot::doSwarmMovement(GameContext* gameContext)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   const BotList* botList = toGameContext->getBotList();
+  const BotPortalList* botPortalList = toGameContext->getBotPortalList();
 
   //  get swarm vectors based on neighbour bots => alignment, cohesion, separation
   const Vector2D position = getPosition2D();
@@ -95,6 +96,20 @@ void Bot::doSwarmMovement(GameContext* gameContext)
       }
     }
 
+  //  factor neighbouring bot portals into the separation vector
+  for (const BotPortalPtr& portal : *botPortalList->getList())
+    {
+    thisToNeighbour = portal->getPosition2D() - position;
+    const float distance = thisToNeighbour.magnitude() - hitRadius - portal->getHitRadius();
+    if (distance < SEPARATION_RADIUS)
+      {
+      thisToNeighbour.makeUniform();
+      thisToNeighbour *= 1.0f - (distance / SEPARATION_RADIUS);
+      thisToNeighbour *= 4.0f;
+      separation -= thisToNeighbour;
+      }
+    }
+
   //  add those swarm vectors to velocity
   if (numNeighbours > 0)
     {
@@ -104,8 +119,8 @@ void Bot::doSwarmMovement(GameContext* gameContext)
     cohesion.x /= numNeighbours;
     cohesion.y /= numNeighbours;
     cohesion = cohesion - position;
-    velocity += alignment + cohesion + separation;
     }
+  velocity += alignment + cohesion + separation;
 
   //  find closest tower and make bot head roughly in its direction
   TowerPtr targetTower = toGameContext->findClosestTower(getPosition());
@@ -167,10 +182,4 @@ void Bot::destroyThis(GameContext* gameContext)
   {
   setHealthPoints(0);
   TOGameContext::cast(gameContext)->removeBot(getID());
-  }
-
-Vector2D Bot::getPosition2D() const
-  {
-  Vector3D position = getPosition();
-  return Vector2D(position.x, position.z);
   }

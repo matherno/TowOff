@@ -27,6 +27,7 @@ public:
   void setMaxHealthPoints(uint max);
 
   Vector3D getPosition() const { return position; }
+  Vector2D getPosition2D() const;
   float getHitRadius() const { return hitRadius; }
   uint getHealthPoints() const { return healthPoints; }
   uint getMaxHealthPoints() const { return maxHealthPoints; }

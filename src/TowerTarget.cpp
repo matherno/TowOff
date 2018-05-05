@@ -40,3 +40,8 @@ bool TowerTarget::doDamage(uint damagePoints)
   healthPoints -= damagePoints;
   return false;
   }
+
+Vector2D TowerTarget::getPosition2D() const
+  {
+  return Vector2D(position.x, position.z);
+  }

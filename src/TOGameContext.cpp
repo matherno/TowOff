@@ -532,23 +532,6 @@ void TOGameContext::removeBot(uint id)
     }
   }
 
-BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range)
-  {
-  BotPtr closestBot;
-  double closestBotDistance = range;
-  bool infiniteRange = range < 0;
-  for (BotPtr& targetBot : *botList.getList())
-    {
-    double distance = position.distanceToPoint(targetBot->getPosition());
-    if ((infiniteRange && !closestBot) || distance < closestBotDistance)
-      {
-      closestBot = targetBot;
-      closestBotDistance = distance;
-      }
-    }
-  return closestBot;
-  }
-
 void TOGameContext::doBotDamageEffect(const Bot* bot)
   {
   specialEffectsHandler.botDamageEffect(this, bot);
@@ -558,5 +541,77 @@ void TOGameContext::setFogOfWarState(bool isOn)
   {
   if (fogOfWarHandler)
     fogOfWarHandler->setState(isOn);
+  }
+
+BotPortalPtr TOGameContext::createBotPortal(const Vector3D& position)
+  {
+  BotPortalPtr portal = BotFactory::createBotPortal(getNextActorID(), position);
+  if (!portal)
+    return nullptr;
+
+  botPortalList.add(portal, portal->getID());
+  addActor(portal);
+  return portal;
+  }
+
+void TOGameContext::removeBotPortal(uint id)
+  {
+  if (botPortalList.contains(id))
+    {
+    botPortalList.remove(id);
+    removeActor(id);
+    }
+  }
+
+
+BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range)
+  {
+  BotPtr closestTarget;
+  double closestDistance = range;
+  bool infiniteRange = range < 0;
+  for (BotPtr& target : *botList.getList())
+    {
+    double distance = position.distanceToPoint(target->getPosition());
+    if ((infiniteRange && !closestTarget) || distance < closestDistance)
+      {
+      closestTarget = target;
+      closestDistance = distance;
+      }
+    }
+  return closestTarget;
+  }
+
+BotPortalPtr TOGameContext::findClosestBotPortal(const Vector3D& position, float range)
+  {
+  BotPortalPtr closestTarget;
+  double closestDistance = range;
+  bool infiniteRange = range < 0;
+  for (BotPortalPtr& target : *botPortalList.getList())
+    {
+    double distance = position.distanceToPoint(target->getPosition());
+    if ((infiniteRange && !closestTarget) || distance < closestDistance)
+      {
+      closestTarget = target;
+      closestDistance = distance;
+      }
+    }
+  return closestTarget;
+  }
+
+TowerTargetPtr TOGameContext::findClosestTowerTarget(const Vector3D& position, float range)
+  {
+  TowerTargetPtr closestBot = findClosestBot(position, range);
+  TowerTargetPtr closestPortal = findClosestBotPortal(position, range);
+
+  if (closestBot && !closestPortal)
+    return closestBot;
+  if (!closestBot && closestPortal)
+    return closestPortal;
+  if (!closestBot && !closestPortal)
+    return nullptr;
+
+  if (closestBot->getPosition().distanceToPoint(position) < closestPortal->getPosition().distanceToPoint(position))
+    return closestBot;
+  return closestPortal;
   }
 

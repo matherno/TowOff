@@ -25,7 +25,6 @@ public:
   void setHitDamagePoints(uint hitDamage) { this->hitDamage = hitDamage; }
 
   Vector2D getVelocity2D() const { return velocity; }
-  Vector2D getPosition2D() const;
 
   virtual bool doDamage(uint damagePoints) override;
   virtual void onAttached(GameContext* gameContext) override;

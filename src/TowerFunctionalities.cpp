@@ -37,7 +37,7 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
       return;
 
     const float towerRange = TowerFactory::getCombatRange(tower->getTowerType());
-    TowerTargetPtr target = toGameContext->findClosestBot(tower->getPosition(), towerRange);
+    TowerTargetPtr target = toGameContext->findClosestTowerTarget(tower->getPosition(), towerRange);
     if (target && weapon)
       {
       weapon->setTarget(target);

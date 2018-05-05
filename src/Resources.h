@@ -12,6 +12,7 @@
 #define MESH_MINER_BASE                     "resources/MinerTowerBase.obj"
 #define MESH_MINER_TURRET                   "resources/MinerTowerTurret.obj"
 #define MESH_BOT_STAR                       "resources/StarBot.obj"
+#define MESH_BOTPORTAL                      "resources/Portal.obj"
 
 #define IMAGE_TEXTURE_PALETTE               "resources/basic_palette.png"
 
