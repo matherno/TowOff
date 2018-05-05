@@ -120,6 +120,7 @@ public:
   BotPtr createBot(uint botType, const Vector3D& position);
   BotPtr getBot(uint id);
   void removeBot(uint id);
+  const BotList* getBotList() const { return &botList; }
   BotPtr findClosestBot(const Vector3D& position, float range = -1);    // range of < 0 is infinite
   void doBotDamageEffect(const Bot* bot);
 

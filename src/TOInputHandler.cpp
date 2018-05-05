@@ -146,7 +146,8 @@ bool TOInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint
   else if (button == MOUSE_RIGHT)
     {
     Vector3D worldPos = TOGameContext::cast(gameContext)->terrainHitTest(mouseX, mouseY);
-    TOGameContext::cast(gameContext)->createBot(0, worldPos);
+    for (int n = 0; n < 10; ++n)
+      TOGameContext::cast(gameContext)->createBot(0, worldPos);
     return true;
     }
   return false;

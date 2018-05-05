@@ -69,7 +69,7 @@ void SpecialEffectsHandler::cleanUp(GameContext* gameContext)
   {
   gameContext->removeActor(towerDamageParticles->getID());
   gameContext->removeActor(botDamageParticles->getID());
-  gameContext->removeActor(towerSmokeParticles->getID())
+  gameContext->removeActor(towerSmokeParticles->getID());
   }
 
 void SpecialEffectsHandler::towerDamageEffect(GameContext* gameContext, const Tower* tower)

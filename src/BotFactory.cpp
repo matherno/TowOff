@@ -6,12 +6,12 @@
 #include "Resources.h"
 #include "Bot.h"
 
-#define BOT_SLUG 0
+#define BOT_STAR 0
 
 const std::map<uint, BotType> botTypes =
   {
     //{   id,     BotType{     base mesh file,  hit radius,   initial health}},
-    {BOT_SLUG,    BotType{      MESH_BOT_SLUG,      0.8,              30 }},
+    {BOT_STAR,    BotType{      MESH_BOT_STAR,      0.8,              10 }},
   };
 
 BotPtr BotFactory::createBot(uint botType, uint id, const Vector3D& position)

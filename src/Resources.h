@@ -11,7 +11,7 @@
 #define MESH_PYLON                          "resources/PylonTower.obj"
 #define MESH_MINER_BASE                     "resources/MinerTowerBase.obj"
 #define MESH_MINER_TURRET                   "resources/MinerTowerTurret.obj"
-#define MESH_BOT_SLUG                       "resources/SlugBot.obj"
+#define MESH_BOT_STAR                       "resources/StarBot.obj"
 
 #define IMAGE_TEXTURE_PALETTE               "resources/basic_palette.png"
 

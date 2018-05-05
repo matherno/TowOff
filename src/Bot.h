@@ -14,17 +14,18 @@ private:
   const uint typeID;
   const string meshFilePath;
   std::shared_ptr<RenderableMesh> renderable;
-  std::unique_ptr<Vector3D> targetPosition;
-  std::weak_ptr<Tower> targetTower;
-  float movementSpeed = 0.5;
+  Vector2D velocity = Vector2D(0, -1); // (x, z)
+  float movementSpeed = 5;
   uint hitDamage = 20;
   bool showDamageEffect = false;
 
 public:
   Bot(uint id, uint botType, const string& meshFilePath);
-  void moveToPosition(const Vector3D& position);
   void setMovementSpeed(float speed) { movementSpeed = speed; }
   void setHitDamagePoints(uint hitDamage) { this->hitDamage = hitDamage; }
+
+  Vector2D getVelocity2D() const { return velocity; }
+  Vector2D getPosition2D() const;
 
   virtual bool doDamage(uint damagePoints) override;
   virtual void onAttached(GameContext* gameContext) override;
@@ -32,10 +33,8 @@ public:
   virtual void onDetached(GameContext* gameContext) override;
 
 protected:
-  void doMovement(GameContext* gameContext);
-  void findTarget(GameContext* gameContext);
-  void checkTowerCollision(GameContext* gameContext);
-  TowerPtr getTargetTower();
+  void doSwarmMovement(GameContext* gameContext);
+  void checkTowerCollision(GameContext* gameContext, TowerPtr tower);
   void destroyThis(GameContext* gameContext);
   };
 
