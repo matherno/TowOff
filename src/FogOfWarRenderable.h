@@ -15,6 +15,7 @@ private:
   TexturePtr worldVisibilityTexture;
   float worldVisibilityWidth;
   float worldVisibilityHeight;
+  bool isFogVisible = true;
 
 public:
   FogOfWarRenderable(uint id, float fogQuadWidth);
@@ -24,4 +25,5 @@ public:
   virtual void initialise(RenderContext* renderContext) override;
   virtual void cleanUp(RenderContext* renderContext) override;
   virtual void render(RenderContext* renderContext) override;
+  void setState(bool isOn) { isFogVisible = isOn; }
   };

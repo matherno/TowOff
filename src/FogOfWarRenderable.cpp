@@ -46,6 +46,9 @@ void FogOfWarRenderable::cleanUp(RenderContext* renderContext)
 
 void FogOfWarRenderable::render(RenderContext* renderContext)
   {
+  if (!isFogVisible)
+    return;
+
   mathernogl::clearGLErrors();
   renderContext->activateShaderProgram(shaderProgram);
   int loc = renderContext->bindTexture(worldVisibilityTexture);

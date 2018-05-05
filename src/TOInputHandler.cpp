@@ -107,6 +107,10 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
       paused = !paused;
       gameContext->setPaused(paused);
       return true;
+    case 'F':
+      fogOfWarShown = !fogOfWarShown;
+      TOGameContext::cast(gameContext)->setFogOfWarState(fogOfWarShown);
+      return true;
     }
   return false;
   }

@@ -21,6 +21,7 @@ private:
   Matrix4 rotationMatrix;
   float zoomOffset;
   bool paused = false;
+  bool fogOfWarShown = true;
   uint activePlayer = 0;
 
 public:

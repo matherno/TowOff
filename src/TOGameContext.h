@@ -76,6 +76,7 @@ public:
   TOSettings* getSettings(){ return settingsHandler.get(); }
   void displayPauseMenu();
   Vector3D getCameraFocalPosition() const;
+  void setFogOfWarState(bool isOn);
 
   TowerPtr getTower(uint id);
   const TowerList* getTowers() const { return &towers; }

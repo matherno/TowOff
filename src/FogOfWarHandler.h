@@ -18,6 +18,7 @@ private:
 public:
   FogOfWarHandler(uint id, uint visibilityTextureWidth);
   void refreshFOW(GameContext* gameContext);
+  void setState(bool isOn);
 
   virtual void onAttached(GameContext* gameContext) override;
   virtual void onUpdate(GameContext* gameContext) override;

@@ -120,3 +120,9 @@ void FogOfWarHandler::refreshFOW(GameContext* gameContext)
 
   return false;
   }
+
+void FogOfWarHandler::setState(bool isOn)
+  {
+  if (fogRenderable)
+    fogRenderable->setState(isOn);
+  }

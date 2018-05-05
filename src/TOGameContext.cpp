@@ -554,3 +554,9 @@ void TOGameContext::doBotDamageEffect(const Bot* bot)
   specialEffectsHandler.botDamageEffect(this, bot);
   }
 
+void TOGameContext::setFogOfWarState(bool isOn)
+  {
+  if (fogOfWarHandler)
+    fogOfWarHandler->setState(isOn);
+  }
+
