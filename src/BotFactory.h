@@ -12,6 +12,7 @@ struct BotType
   string meshFilePath;
   float hitRadius;
   uint initHealth;
+  float speed;
   };
 
 class BotFactory

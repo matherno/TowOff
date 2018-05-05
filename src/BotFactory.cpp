@@ -7,11 +7,13 @@
 #include "Bot.h"
 
 #define BOT_STAR 0
+#define BOT_COMET 1
 
 const std::map<uint, BotType> botTypes =
   {
-    //{   id,     BotType{     base mesh file,  hit radius,   initial health}},
-    {BOT_STAR,    BotType{      MESH_BOT_STAR,      0.8,              10 }},
+    //{   id,     BotType{     base mesh file,  hit radius,   initial health,   speed}},
+    {BOT_STAR,    BotType{      MESH_BOT_STAR,      0.8,              10,         5 }},
+    {BOT_COMET,   BotType{      MESH_BOT_COMET,     1.0,              30,         4 }},
   };
 
 BotPtr BotFactory::createBot(uint botType, uint id, const Vector3D& position)
@@ -24,6 +26,7 @@ BotPtr BotFactory::createBot(uint botType, uint id, const Vector3D& position)
     bot->setHitRadius(type.hitRadius);
     bot->setMaxHealthPoints(type.initHealth);
     bot->setHealthPoints(type.initHealth);
+    bot->setMovementSpeed(type.speed);
     bot->setCentreOfMassOffset(Vector3D(0, 1, 0));
     return BotPtr(bot);
     }
@@ -33,7 +36,7 @@ BotPtr BotFactory::createBot(uint botType, uint id, const Vector3D& position)
 
 BotPortalPtr BotFactory::createBotPortal(uint id, const Vector3D& position)
   {
-  static std::shared_ptr<BotPortalSpawnDef> basicSpawnDef(new BotPortalSpawnDef(5000, {0, 0, 0, 0, 0}));
+  static std::shared_ptr<BotPortalSpawnDef> basicSpawnDef(new BotPortalSpawnDef(5000, {BOT_COMET, BOT_COMET, BOT_STAR, BOT_STAR, BOT_STAR}));
 
   BotPortal* portal = new BotPortal(id, MESH_BOTPORTAL);
   portal->setPosition(position);
