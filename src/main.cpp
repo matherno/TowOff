@@ -88,7 +88,7 @@ void runGame()
       catch (const null_exception& err)   //  no exceptions will be caught (so they can be captured in debug)
 #endif
         {
-        mathernogl::logInfo("Game crashed: " + string(err.what()));
+        mathernogl::logError("Game crashed: " + string(err.what()));
         attemptCrashCleanup(renderContext.get());
         }
 
@@ -112,6 +112,6 @@ int main()
   catch (const null_exception& err)   //  no exceptions will be caught (so they can be captured in debug)
 #endif
     {
-    mathernogl::logInfo("Game completely crashed: " + string(err.what()));
+    mathernogl::logError("Game completely crashed: " + string(err.what()));
     }
   }
