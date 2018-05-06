@@ -12,7 +12,25 @@
 #include "TOGameContext.h"
 #include "TOMainMenuContext.h"
 
-int main()
+//  essentially an exception type that will never be thrown (to make a try-catch block not catch anything)
+class null_exception : public std::exception
+  {};
+
+void attemptCrashCleanup(RenderContext* renderContext)
+  {
+  std::vector<RenderablePtr> renderables;
+  renderContext->getRenderableSet()->forEachChild([&renderables](RenderablePtr renderable)
+    {
+    renderables.push_back(renderable);
+    });
+  for (RenderablePtr renderable : renderables)
+    {
+    renderable->cleanUp(renderContext);
+    renderContext->getRenderableSet()->removeRenderable(renderable->getID());
+    }
+  }
+
+void runGame()
   {
   std::shared_ptr<TOSettings> settings(new TOSettings());
   settings->initialise();
@@ -28,7 +46,7 @@ int main()
   if (!renderContext->initialise(&renderConfig))
     {
     mathernogl::logError("Failed to initialise render system!");
-    return 0;
+    return;
     }
 
   TOMainMenuContext::MainMenuOutcome mainMenuOutcome;
@@ -49,22 +67,51 @@ int main()
     if (mainMenuOutcome.isNewGame() || mainMenuOutcome.isLoadGame())
       {
       mathernogl::logInfo("Starting game...");
-      TOGameContext gameContext(renderContext, settings, loadedState);
-      gameContext.initialise();
-      while (!gameContext.isContextEnded() && renderContext->isWindowOpen())
+
+      try
         {
-        gameContext.startFrame();
-        gameContext.processInputStage();
-        gameContext.processUpdateStage();
-        gameContext.processDrawStage();
-        gameContext.endFrame(60);
+        TOGameContext gameContext(renderContext, settings, loadedState);
+        gameContext.initialise();
+        while (!gameContext.isContextEnded() && renderContext->isWindowOpen())
+          {
+          gameContext.startFrame();
+          gameContext.processInputStage();
+          gameContext.processUpdateStage();
+          gameContext.processDrawStage();
+          gameContext.endFrame(60);
+          }
+        gameContext.cleanUp();
         }
-      gameContext.cleanUp();
+#ifdef NDEBUG
+      catch (const std::exception& err)
+#else
+      catch (const null_exception& err)   //  no exceptions will be caught (so they can be captured in debug)
+#endif
+        {
+        mathernogl::logInfo("Game crashed: " + string(err.what()));
+        attemptCrashCleanup(renderContext.get());
+        }
+
       renderContext->reset();
       }
     }
 
   renderContext->cleanUp();
   mathernogl::logInfo("Quiting...");
-  return 0;
+  }
+
+int main()
+  {
+  try
+    {
+    runGame();
+    }
+#ifdef NDEBUG
+    catch (const std::exception& err)
+#else
+  catch (const null_exception& err)   //  no exceptions will be caught (so they can be captured in debug)
+#endif
+    {
+    mathernogl::logInfo("Game completely crashed: " + string(err.what()));
+    }
   }

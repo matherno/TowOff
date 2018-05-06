@@ -24,7 +24,7 @@ void UnderConstructTower::onUpdate(GameContext* gameContext)
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   Tower::onUpdate(gameContext);
 
-  if (transferEnergyTimer.incrementTimer(gameContext->getDeltaTime()))
+  if (isAlive() && transferEnergyTimer.incrementTimer(gameContext->getDeltaTime()))
     {
     TowerPtr targetTower = toGameContext->findClosestConnectedPowerSrc(getID(), true);
     if (targetTower)
