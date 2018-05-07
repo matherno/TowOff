@@ -189,6 +189,9 @@ void HUDHandler::setupTowerBuildPanel(GameContext* context)
     const uint towerTypeID = pair.first;
     const TowerType& towerType = pair.second;
 
+    if (!TowerFactory::canConstructTowerType(towerTypeID))
+      continue;
+
     UIButton* button = new UIButton(uiManager->getNextComponentID(), true);
     button->setOffset(Vector2D(50 + towerNum * 70, 20));
     button->setSize(Vector2D(50, 50));

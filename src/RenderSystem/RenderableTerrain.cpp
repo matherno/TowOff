@@ -73,9 +73,9 @@ void RenderableTerrain::setMultiColour(const Vector3D& baseColour1, const Vector
 
 float RenderableTerrain::getHeightAt(const Vector3D& worldPos) const
   {
+  const Vector3D objectPos = getTransform()->getInverse().transform(worldPos);
   if (heightMap)
     {
-    Vector3D objectPos = getTransform()->getInverse().transform(worldPos);
     int topLeftCol = (int)floor(objectPos.x / cellSize);
     int topLeftRow = (int)floor(objectPos.z / cellSize);
     float avgHeight = 0;
@@ -95,6 +95,12 @@ float RenderableTerrain::getHeightAt(const Vector3D& worldPos) const
     return avgHeight / 4;
     }
   else
-    return 0;
+    {
+    const float terrainWidth = cellSize * numCells;
+    if (objectPos.x >= 0 && objectPos.z >= 0 && objectPos.x <= terrainWidth && objectPos.z <= terrainWidth)
+      return 0;
+    else
+      return TERRAIN_OUT_OF_BOUNDS;
+    }
   }
 

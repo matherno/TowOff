@@ -223,3 +223,13 @@ Tower::TowerFunction TowerFactory::getTowerFunction(uint towerType)
       return Tower::combat;
     }
   }
+
+bool TowerFactory::canConstructTowerType(uint towerType)
+  {
+  return towerTypes.count(towerType) > 0 && towerType != getStartTowerTypeID();
+  }
+
+uint TowerFactory::getStartTowerTypeID()
+  {
+  return TOWER_HOMEBASE;
+  }

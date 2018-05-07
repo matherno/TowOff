@@ -16,7 +16,6 @@ struct TowerState
 
 struct TOGameState
   {
-  std::shared_ptr<HeightMap> terrainHeightMap;
   Vector3D cameraFocalPos;
   double cameraZoomFactor = 0;
   double cameraRotation = 0;

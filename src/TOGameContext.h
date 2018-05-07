@@ -39,7 +39,6 @@ private:
   BotList botList;
   BotPortalList botPortalList;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
-  std::shared_ptr<RenderableTerrain> waterMesh;
   HUDHandler hudHandler;
   SpecialEffectsHandler specialEffectsHandler;
   std::shared_ptr<TOSettings> settingsHandler;

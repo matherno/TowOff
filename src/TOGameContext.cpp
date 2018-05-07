@@ -42,9 +42,11 @@ bool TOGameContext::initialise()
   fogOfWarHandler.reset(new FogOfWarHandler(getNextActorID(), 52));
   addActor(fogOfWarHandler);
 
-  addInitialTowers();
-  if (towers.count() == 0)    // just for now, so that we have some map visible when we start with nothing
-    addVisibilityMarker(Vector3D(0, 0, 0), 30);
+  if (loadedGameState)
+    addInitialTowers();
+  else
+    createTower(TowerFactory::getStartTowerTypeID(), Vector3D(0, LAND_HEIGHT, 0), false);
+
   return success;
   }
 
@@ -53,9 +55,7 @@ void TOGameContext::cleanUp()
   if (surfaceMesh)
     {
     getRenderContext()->getRenderableSet()->removeRenderable(surfaceMesh->getID());
-    getRenderContext()->getRenderableSet()->removeRenderable(waterMesh->getID());
     surfaceMesh->cleanUp(getRenderContext());
-    waterMesh->cleanUp(getRenderContext());
 
     hudHandler.cleanUp(this);
     specialEffectsHandler.cleanUp(this);
@@ -202,41 +202,15 @@ Vector3D TOGameContext::getPlayerColour(uint num) const
 void TOGameContext::initSurface()
   {
   RenderContext* renderContext = getRenderContext();
-  std::shared_ptr<HeightMap> heightMap;
-  uint size = 7;
 
-  if (loadedGameState)
-    {
-    heightMap = loadedGameState->terrainHeightMap;
-    }
-  else
-    {
-    heightMap.reset(new HeightMap());
-    HeightMapFactory::createDiamondSquareMap(heightMap.get(), size, 20, 0.75);
-    for (float& height : heightMap->heights)
-      {
-      if (height > 0)
-        height = LAND_HEIGHT;
-      else
-        height = WATER_FLOOR_HEIGHT;
-      }
-    }
-
-  const float cellSize = 1;
-  const uint numCells = heightMap->width - 1;
+  const float cellSize = 0.75f;
+  const uint numCells = 200;
   const float translation = (float)numCells*cellSize*-0.5f;
-  surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), heightMap, cellSize));
-  surfaceMesh->setMultiColour(Vector3D(pow(0.2, 2.2), pow(0.4, 2.2), pow(0.2, 2.2)), Vector3D(pow(0.1, 2.2), pow(0.3, 2.2), pow(0.0, 2.2)));
-  surfaceMesh->getTransform()->translate(Vector3D(translation, 0, translation));
-  surfaceMesh->setClippingPlane(Vector4D(0, 1, 0, -WATER_HEIGHT));
+  surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize));
+  surfaceMesh->setMultiColour(Vector3D(pow(0.2, 2.2), pow(0.4, 2.2), pow(0.2, 2.2)), Vector3D(pow(0.15, 2.2), pow(0.3, 2.2), pow(0.15, 2.2)));
+  surfaceMesh->getTransform()->translate(Vector3D(translation, LAND_HEIGHT, translation));
   surfaceMesh->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(surfaceMesh);
-
-  waterMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize));
-  waterMesh->setSingleColour(Vector3D(pow(0.2, 2.2), pow(0.2, 2.2), pow(0.5, 2.2)));
-  waterMesh->getTransform()->translate(Vector3D(translation, WATER_HEIGHT, translation));
-  waterMesh->initialise(renderContext);
-  renderContext->getRenderableSet()->addRenderable(waterMesh);
   }
 
 Vector3D TOGameContext::terrainHitTest(uint cursorX, uint cursorY, bool* isLand /*= nullptr*/) const
@@ -392,7 +366,7 @@ bool TOGameContext::isPositionOnMap(const Vector3D& pos) const
 
 float TOGameContext::getMapWidth() const
   {
-  return surfaceMesh->getCellSize() * (surfaceMesh->getHeightMap()->width - 1);
+  return surfaceMesh->getCellSize() * surfaceMesh->getNumCellsAcross();
   }
 
 void TOGameContext::displayTowerRangeField(Tower* tower)
@@ -448,7 +422,6 @@ void TOGameContext::getGameState(TOGameState* state)
   state->cameraFocalPos = toInputHandler->getFocalPosition();
   state->cameraRotation = toInputHandler->getRotation();
   state->cameraZoomFactor = toInputHandler->getZoomOffset();
-  state->terrainHeightMap = surfaceMesh->getHeightMap();
   for (TowerPtr tower : *towers.getList())
     {
     TowerState towerState;

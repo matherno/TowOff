@@ -27,6 +27,8 @@ public:
   static float getRelayPowerRange(uint towerType);
   static float getCombatRange(uint towerType);
   static Tower::TowerFunction getTowerFunction(uint towerType);
+  static bool canConstructTowerType(uint towerType);
+  static uint getStartTowerTypeID();
 
   static TowerPtr createTower(uint towerType, uint id, const Vector3D& position);
   static TowerPtr createUnderConstructTower(uint towerType, uint id, const Vector3D& position);

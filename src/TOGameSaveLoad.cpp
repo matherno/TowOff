@@ -6,9 +6,6 @@
 
 #define SAVE_FILE_VERIFY_LINE "TOSaveFile"
 #define CURRENT_VERSION 1.0
-#define TERRAIN_WIDTH             "terrain_width"
-#define TERRAIN_HEIGHTMAP_START   "terrain_heightmap_start"
-#define TERRAIN_HEIGHTMAP_END     "terrain_heightmap_end"
 #define CAMERA_POS_X              "camera_pos_x"
 #define CAMERA_POS_Y              "camera_pos_y"
 #define CAMERA_POS_Z              "camera_pos_z"
@@ -91,44 +88,6 @@ bool getAttributeValue(const std::string& line, const std::string& attribute, lo
   return false;
   }
 
-std::shared_ptr<HeightMap> readTerrainHeightMap(std::ifstream& inFile, uint width)
-  {
-  if (width <= 1)
-    return nullptr;
-
-  std::shared_ptr<HeightMap> heightMap(new HeightMap());
-  heightMap->heights.resize(width * width);
-  std::fill(heightMap->heights.begin(), heightMap->heights.end(), 0);
-  heightMap->width = (uint)width;
-
-  std::string line;
-  int rowNum = 0;
-  while (std::getline(inFile, line) && rowNum < width)
-    {
-    if (lineStartsWith(line, TERRAIN_HEIGHTMAP_END))
-      return nullptr;
-
-    int colNum = 0;
-    string delimiter = " ";
-    while (colNum < width)
-      {
-      size_t idx = line.find(delimiter);
-      float height = (float)atof(line.substr(0, idx).c_str());
-      heightMap->heights[colNum + (width - rowNum - 1) * width] = height;
-      line.erase(0, idx + delimiter.length());
-      ++colNum;
-      if (idx == string::npos)
-        break;
-      }
-
-    if (colNum != width)
-      return nullptr;
-    ++rowNum;
-    }
-
-  return heightMap;
-  }
-
 bool readTowerList(std::ifstream& inFile, std::vector<TowerState>& towerList)
   {
   std::string line;
@@ -158,7 +117,6 @@ bool TOGameSaveLoad::loadGame(TOGameState* state, string filePath)
   if (!state)
     return false;
 
-  uint terrainWidth = 0;
   string errMsg = "Failed to load game from " + filePath + ". ";
 
   std::ifstream infile(filePath);
@@ -177,22 +135,11 @@ bool TOGameSaveLoad::loadGame(TOGameState* state, string filePath)
 
   while (std::getline(infile, line))
     {
-    getAttributeValue(line, TERRAIN_WIDTH, terrainWidth);
     getAttributeValue(line, CAMERA_POS_X, state->cameraFocalPos.x);
     getAttributeValue(line, CAMERA_POS_Y, state->cameraFocalPos.y);
     getAttributeValue(line, CAMERA_POS_Z, state->cameraFocalPos.z);
     getAttributeValue(line, CAMERA_ROT, state->cameraRotation);
     getAttributeValue(line, CAMERA_ZOOM, state->cameraZoomFactor);
-
-    if (lineStartsWith(line, TERRAIN_HEIGHTMAP_START))
-      {
-      state->terrainHeightMap = readTerrainHeightMap(infile, terrainWidth);
-      if (!state->terrainHeightMap)
-        {
-        mathernogl::logError(errMsg + "Height map invalid.");
-        return false;
-        }
-      }
 
     if (lineStartsWith(line, TOWER_LIST_START))
       readTowerList(infile, state->towers);
@@ -249,19 +196,6 @@ bool TOGameSaveLoad::saveGame(const TOGameState* state, string filePath)
     file << std::ctime(&timeNow);
     file << "\n";
 
-    //  terrain
-    file << TERRAIN_WIDTH << " " << state->terrainHeightMap->width << "\n";
-    file << TERRAIN_HEIGHTMAP_START << "\n";
-    if (!writeHeightMap(file, state->terrainHeightMap.get()))
-      {
-      mathernogl::logError(errMsg + "Height map is invalid!");
-      file.close();
-      std::ofstream ofs (filePath, std::ios::trunc);
-      return false;
-      }
-    file << TERRAIN_HEIGHTMAP_END << "\n";
-    file << "\n";
-
     //  camera
     file << CAMERA_POS_X << " " << state->cameraFocalPos.x << "\n";
     file << CAMERA_POS_Y << " " << state->cameraFocalPos.y << "\n";
@@ -283,13 +217,5 @@ bool TOGameSaveLoad::saveGame(const TOGameState* state, string filePath)
 
 bool TOGameSaveLoad::verifyState(const TOGameState* state)
   {
-  if (state->terrainHeightMap)
-    {
-    uint terrainWidth = state->terrainHeightMap->width;
-    if (terrainWidth == 0)
-      return false;
-    if (state->terrainHeightMap->heights.size() < terrainWidth * terrainWidth)
-      return false;
-    }
   return true;
   }
