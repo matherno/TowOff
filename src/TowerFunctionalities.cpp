@@ -27,6 +27,9 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
     transferEnergyTimer.reset();
     }
 
+  const float towerRange = TowerFactory::getCombatRange(tower->getTowerType());
+  const float towerMinRange = TowerFactory::getCombatMinRange(tower->getTowerType());
+
   if (!isShooting)
     {
     if (!weapon)
@@ -36,8 +39,7 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
     if (weapon->isCoolingDown())
       return;
 
-    const float towerRange = TowerFactory::getCombatRange(tower->getTowerType());
-    TowerTargetPtr target = toGameContext->findClosestTowerTarget(tower->getPosition(), towerRange);
+    TowerTargetPtr target = toGameContext->findClosestTowerTarget(tower->getPosition(), towerRange, towerMinRange);
     if (target && weapon)
       {
       weapon->setTarget(target);
@@ -52,10 +54,13 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
     TowerTargetPtr target = weapon->getTarget();
     if (target && target->isAlive())
       {
-      tower->setTurretRotation(target->getPosition());
-      Vector3D shootPos = tower->getPosition() + shootOffset;
-      tower->getTurretRotation()->transform(shootOffset, &shootPos);
-      stopShooting = !weapon->updateShooting(toGameContext, tower, shootPos);
+      if (target->isInRange(tower->getPosition(), towerRange, towerMinRange))
+        {
+        tower->setTurretRotation(target->getPosition());
+        Vector3D shootPos = tower->getPosition() + shootOffset;
+        tower->getTurretRotation()->transform(shootOffset, &shootPos);
+        stopShooting = !weapon->updateShooting(toGameContext, tower, shootPos);
+        }
       }
 
     if (stopShooting)

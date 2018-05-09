@@ -2,6 +2,7 @@
 // Created by matt on 28/01/18.
 //
 
+#include <RenderSystem/RenderableLines.h>
 #include "TowerFactory.h"
 #include "Tower.h"
 #include "ProjectileWeapon.h"
@@ -10,18 +11,20 @@
 #include "TowerFunctionalities.h"
 #include "UnderConstructTower.h"
 
-#define TOWER_HOMEBASE  0
-#define TOWER_BASIC     1
-#define TOWER_PYLON     2
-#define TOWER_MINER     3
+#define TOWER_HOMEBASE        0
+#define TOWER_BASIC           1
+#define TOWER_PYLON           2
+#define TOWER_MINER           3
+#define TOWER_MACHINEGUN      4
 
 const std::map<uint, TowerType> towerTypes =
   {
-  //{   id,     TowerType{     name,              icon image file,        base mesh file,           turret mesh file,           connect offset,        connect radius,  hit radius}},
-  {TOWER_HOMEBASE, TowerType{"Home Base",       IMAGE_ICON_HOME_BASE,    MESH_HOME_BASE,           "",                        Vector3D(-0.61, 5.12, 0.61),  10,             2.7}},
-  {TOWER_BASIC,    TowerType{"Basic Tower A",   IMAGE_ICON_BASIC_TOWER,  MESH_BASIC_TOWER_BASE,    MESH_BASIC_TOWER_TURRET,   Vector3D(0, 1, 0),            10,             0.9}},
-  {TOWER_PYLON,    TowerType{"Pylon",           IMAGE_ICON_PYLON,        MESH_PYLON,               "",                        Vector3D(0, 4.02, 0),         30,             1.5}},
-  {TOWER_MINER,    TowerType{"Miner",           IMAGE_ICON_MINER,        MESH_MINER_BASE,          MESH_MINER_TURRET,         Vector3D(0, 2.61, 0),         10,             1.7}},
+  //{   id,         TowerType{     name,                  icon image file,        base mesh file,                turret mesh file,                 connect offset,        connect radius,  hit radius}},
+  {TOWER_HOMEBASE,     TowerType{"Home Base",           IMAGE_ICON_HOME_BASE,    MESH_HOME_BASE,                "",                              Vector3D(-0.61, 5.12, 0.61),  10,             2.7}},
+  {TOWER_BASIC,        TowerType{"Basic Tower A",       IMAGE_ICON_BASIC_TOWER,  MESH_BASIC_TOWER_BASE,         MESH_BASIC_TOWER_TURRET,         Vector3D(0, 1, 0),            10,             0.9}},
+  {TOWER_PYLON,        TowerType{"Pylon",               IMAGE_ICON_PYLON,        MESH_PYLON,                    "",                              Vector3D(0, 4.02, 0),         30,             1.5}},
+  {TOWER_MINER,        TowerType{"Miner",               IMAGE_ICON_MINER,        MESH_MINER_BASE,               MESH_MINER_TURRET,               Vector3D(0, 2.61, 0),         10,             1.7}},
+  {TOWER_MACHINEGUN,   TowerType{"Machine Gun Tower",   IMAGE_ICON_BASIC_TOWER,  MESH_MACHINEGUN_TOWER_BASE,    MESH_MACHINEGUN_TOWER_TURRET,    Vector3D(0, 1, 0),            10,             1.2}},
   };
 
 const std::map<uint, TowerType>* TowerFactory::getTowerTypeMap()
@@ -57,6 +60,8 @@ TowerPtr TowerFactory::createTower(uint towerType, uint id, const Vector3D& posi
       return createPylon(id, towerType, position);
     case TOWER_MINER:
       return createMiner(id, towerType, position);
+    case TOWER_MACHINEGUN:
+      return createMachineGunTower(id, towerType, position);
     }
   return nullptr;
   }
@@ -105,7 +110,19 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
   {
   std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
   weapon->setCooldownTime(1000);
-  weapon->setBeamRadius(0.2);
+  weapon->setShootEffectFunction([](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
+     {
+       RenderContext* renderContext = context->getRenderContext();
+       RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID());
+       line->initialise(renderContext);
+       line->addLine(shootPos, targetPos, Vector3D(0.7, 0.1, 0.1));
+
+       RenderablePtr linePtr(line);
+       renderContext->getRenderableSet()->addRenderable(linePtr);
+       TimeToLiveActor* actor = new TimeToLiveActor(context->getNextActorID(), 60);
+       actor->addRenderable(linePtr);
+       context->addActor(GameActorPtr(actor));
+     });
 
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.45, -1));
@@ -150,6 +167,42 @@ TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& posi
   return tower;
   }
 
+TowerPtr TowerFactory::createMachineGunTower(uint id, uint towerType, const Vector3D& position)
+  {
+  std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
+  weapon->setCooldownTime(100);
+  weapon->setDamagePerShot(3);
+  weapon->setShootEffectFunction([](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
+      {
+      const Vector3D shootDirection = Vector3D(targetPos - shootPos).getUniform();
+      const Vector3D turretRight = mathernogl::crossProduct(shootDirection, Vector3D(0, 1, 0));
+      static const float gunsOffset = 0.71f;
+      static const float targetOffset = 0.1f;
+      static const Vector3D beamColour = Vector3D(0.3, 0.2, 0.8);
+
+      RenderContext* renderContext = context->getRenderContext();
+      RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID());
+      line->initialise(renderContext);
+      line->addLine(shootPos + turretRight * gunsOffset, targetPos + turretRight * targetOffset, beamColour);
+      line->addLine(shootPos - turretRight * gunsOffset, targetPos - turretRight * targetOffset, beamColour);
+
+      RenderablePtr linePtr(line);
+      renderContext->getRenderableSet()->addRenderable(linePtr);
+      TimeToLiveActor* actor = new TimeToLiveActor(context->getNextActorID(), 60);
+      actor->addRenderable(linePtr);
+      context->addActor(GameActorPtr(actor));
+      });
+
+  TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
+  function->setShootOffset(Vector3D(0, 1.6, -1.56));
+  function->setWeapon(std::move(weapon));
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
+  tower->setPosition(position);
+  setCommonTowerParameters(tower, towerType);
+  return tower;
+  }
+
 float TowerFactory::getTowerRange(uint towerType)
   {
   Tower::TowerFunction function = getTowerFunction(towerType);
@@ -176,6 +229,18 @@ float TowerFactory::getCombatRange(uint towerType)
     {
     case TOWER_BASIC:
       return 15;
+    case TOWER_MACHINEGUN:
+      return 15;
+    }
+  return 0;
+  }
+
+float TowerFactory::getCombatMinRange(uint towerType)
+  {
+  switch (towerType)
+    {
+    case TOWER_MACHINEGUN:
+      return 5;
     }
   return 0;
   }
@@ -204,6 +269,9 @@ void TowerFactory::createTowerBoundingBoxes(uint towerType, const Vector3D& posi
       AddBoundingBox(Vector3D(-2.6, 0, -2.6), Vector3D(2.6, 0.65, 2.6));
       AddBoundingBox(Vector3D(-1.3, 0, -1.3), Vector3D(1.3, 5.5, 1.3));
       break;
+    case TOWER_MACHINEGUN:
+      AddBoundingBox(Vector3D(-1.0, 0, -1.0), Vector3D(1.0, 1.8, 1.0));
+      break;
     }
   }
 
@@ -212,6 +280,7 @@ Tower::TowerFunction TowerFactory::getTowerFunction(uint towerType)
   switch (towerType)
     {
     case TOWER_BASIC:
+    case TOWER_MACHINEGUN:
       return Tower::combat;
     case TOWER_PYLON:
       return Tower::relay;

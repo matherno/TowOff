@@ -542,15 +542,15 @@ void TOGameContext::removeBotPortal(uint id)
   }
 
 
-BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range)
+BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range, float minRange)
   {
   BotPtr closestTarget;
-  double closestDistance = range;
+  float closestDistance = range;
   bool infiniteRange = range < 0;
   for (BotPtr& target : *botList.getList())
     {
-    double distance = position.distanceToPoint(target->getPosition());
-    if ((infiniteRange && !closestTarget) || distance < closestDistance)
+    const float distance = (float) position.distanceToPoint(target->getPosition());
+    if ((infiniteRange && !closestTarget) || target->isInRange(position, closestDistance, minRange))
       {
       closestTarget = target;
       closestDistance = distance;
@@ -559,15 +559,15 @@ BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range)
   return closestTarget;
   }
 
-BotPortalPtr TOGameContext::findClosestBotPortal(const Vector3D& position, float range)
+BotPortalPtr TOGameContext::findClosestBotPortal(const Vector3D& position, float range, float minRange)
   {
   BotPortalPtr closestTarget;
-  double closestDistance = range;
+  float closestDistance = range;
   bool infiniteRange = range < 0;
   for (BotPortalPtr& target : *botPortalList.getList())
     {
-    double distance = position.distanceToPoint(target->getPosition());
-    if ((infiniteRange && !closestTarget) || distance < closestDistance)
+    const float distance = (float) position.distanceToPoint(target->getPosition());
+    if ((infiniteRange && !closestTarget) || target->isInRange(position, closestDistance, minRange))
       {
       closestTarget = target;
       closestDistance = distance;
@@ -576,10 +576,10 @@ BotPortalPtr TOGameContext::findClosestBotPortal(const Vector3D& position, float
   return closestTarget;
   }
 
-TowerTargetPtr TOGameContext::findClosestTowerTarget(const Vector3D& position, float range)
+TowerTargetPtr TOGameContext::findClosestTowerTarget(const Vector3D& position, float range, float minRange)
   {
-  TowerTargetPtr closestBot = findClosestBot(position, range);
-  TowerTargetPtr closestPortal = findClosestBotPortal(position, range);
+  TowerTargetPtr closestBot = findClosestBot(position, range, minRange);
+  TowerTargetPtr closestPortal = findClosestBotPortal(position, range, minRange);
 
   if (closestBot && !closestPortal)
     return closestBot;

@@ -26,6 +26,7 @@ public:
   static float getTowerRange(uint towerType);
   static float getRelayPowerRange(uint towerType);
   static float getCombatRange(uint towerType);
+  static float getCombatMinRange(uint towerType);
   static Tower::TowerFunction getTowerFunction(uint towerType);
   static bool canConstructTowerType(uint towerType);
   static uint getStartTowerTypeID();
@@ -37,6 +38,7 @@ public:
   static TowerPtr createHomeBase(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createPylon(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createMiner(uint id, uint towerType, const Vector3D& position);
+  static TowerPtr createMachineGunTower(uint id, uint towerType, const Vector3D& position);
 
   static void createTowerBoundingBoxes(uint towerType, const Vector3D& position, std::list<BoundingBoxPtr>* boundingBoxes);
 
