@@ -185,6 +185,7 @@ TowerPtr TowerFactory::createMachineGunTower(uint id, uint towerType, const Vect
       line->initialise(renderContext);
       line->addLine(shootPos + turretRight * gunsOffset, targetPos + turretRight * targetOffset, beamColour);
       line->addLine(shootPos - turretRight * gunsOffset, targetPos - turretRight * targetOffset, beamColour);
+      line->setLineWidth(1);
 
       RenderablePtr linePtr(line);
       renderContext->getRenderableSet()->addRenderable(linePtr);
