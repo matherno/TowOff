@@ -8,7 +8,6 @@
 #define MESH_BASIC_TOWER_TURRET             "resources/BasicTowerTurret.obj"
 #define MESH_MACHINEGUN_TOWER_BASE          "resources/GunTowerBaseA.obj"
 #define MESH_MACHINEGUN_TOWER_TURRET        "resources/MachineGunTurret.obj"
-#define MESH_BEAM                           "resources/BeamUnscaled.obj"
 #define MESH_HOME_BASE                      "resources/HomeBaseTower.obj"
 #define MESH_PYLON                          "resources/PylonTower.obj"
 #define MESH_MINER_BASE                     "resources/MinerTowerBase.obj"
@@ -24,6 +23,7 @@
 #define IMAGE_ICON_HOME_BASE                "resources/tower_icons/HomeBase.png"
 #define IMAGE_ICON_PYLON                    "resources/tower_icons/Pylon.png"
 #define IMAGE_ICON_MINER                    "resources/tower_icons/Miner.png"
+#define IMAGE_ICON_MACHINEGUN               "resources/tower_icons/MachineGunTower.png"
 
 #define FONT_UNISPACE_FNT                   "resources/fonts/Unispace.fnt"
 #define FONT_UNISPACE_GLYPHS                "resources/fonts/Unispace.png"

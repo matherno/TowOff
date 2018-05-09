@@ -24,7 +24,7 @@ const std::map<uint, TowerType> towerTypes =
   {TOWER_BASIC,        TowerType{"Basic Tower A",       IMAGE_ICON_BASIC_TOWER,  MESH_BASIC_TOWER_BASE,         MESH_BASIC_TOWER_TURRET,         Vector3D(0, 1, 0),            10,             0.9}},
   {TOWER_PYLON,        TowerType{"Pylon",               IMAGE_ICON_PYLON,        MESH_PYLON,                    "",                              Vector3D(0, 4.02, 0),         30,             1.5}},
   {TOWER_MINER,        TowerType{"Miner",               IMAGE_ICON_MINER,        MESH_MINER_BASE,               MESH_MINER_TURRET,               Vector3D(0, 2.61, 0),         10,             1.7}},
-  {TOWER_MACHINEGUN,   TowerType{"Machine Gun Tower",   IMAGE_ICON_BASIC_TOWER,  MESH_MACHINEGUN_TOWER_BASE,    MESH_MACHINEGUN_TOWER_TURRET,    Vector3D(0, 1, 0),            10,             1.2}},
+  {TOWER_MACHINEGUN,   TowerType{"Machine Gun Tower",   IMAGE_ICON_MACHINEGUN,   MESH_MACHINEGUN_TOWER_BASE,    MESH_MACHINEGUN_TOWER_TURRET,    Vector3D(0, 1, 0),            10,             1.2}},
   };
 
 const std::map<uint, TowerType>* TowerFactory::getTowerTypeMap()

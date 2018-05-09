@@ -193,8 +193,8 @@ void HUDHandler::setupTowerBuildPanel(GameContext* context)
       continue;
 
     UIButton* button = new UIButton(uiManager->getNextComponentID(), true);
-    button->setOffset(Vector2D(50 + towerNum * 70, 20));
-    button->setSize(Vector2D(50, 50));
+    button->setOffset(Vector2D(50 + towerNum * 80, 20));
+    button->setSize(Vector2D(60, 60));
     button->setButtonTexture(context->getRenderContext()->getSharedTexture(towerType.iconFilePath));
     button->setButtonHighlightColour(Vector3D(0.3, 0.3, 1));
     button->setVerticalAlignment(alignmentStart);
