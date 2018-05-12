@@ -30,6 +30,7 @@ public:
   void towerDamageEffect(GameContext* gameContext, const Tower* tower);
   void botDamageEffect(GameContext* gameContext, const Bot* bot);
   void botExplosionEffect(GameContext* gameContext, const Bot* bot);
+  void weaponExplosionEffect(GameContext* gameContext, const Vector3D& position, float scale);
 
 protected:
   void startSmoke(TowerPtr tower);

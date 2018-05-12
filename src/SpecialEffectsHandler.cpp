@@ -60,7 +60,7 @@ void SpecialEffectsHandler::initialise(GameContext* gameContext)
     system->setParticleSize(2);
     system->addTextureAtlas(gameContext->getRenderContext()->getSharedTexture(IMAGE_EXPLOSION_SHEET));
     system->setTextureAtlasSize(3, 3);
-    system->setTextureColourMixFactor(0);
+    system->setTextureColourMixFactor(0.5);
     system->setAdditiveBlending(true);
     system->setDepthTesting(false);
     explosionParticles.reset(system);
@@ -101,7 +101,12 @@ void SpecialEffectsHandler::botDamageEffect(GameContext* gameContext, const Bot*
 
 void SpecialEffectsHandler::botExplosionEffect(GameContext* gameContext, const Bot* bot)
   {
-  explosionParticles->addEmitter(bot->getCentreOfMass(), 50);
+  explosionParticles->addEmitter(bot->getCentreOfMass(), 50, Vector3D(0.1));
+  }
+
+void SpecialEffectsHandler::weaponExplosionEffect(GameContext* gameContext, const Vector3D& position, float scale)
+  {
+  explosionParticles->addEmitter(position, 150, Vector3D(1, 0, 0), scale);
   }
 
 void SpecialEffectsHandler::startSmoke(TowerPtr tower)
@@ -133,5 +138,6 @@ bool SpecialEffectsHandler::isSmoking(TowerPtr tower) const
   {
   return towersEmittingSmoke.count(tower->getID()) > 0;
   }
+
 
 

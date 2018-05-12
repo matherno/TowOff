@@ -6,11 +6,7 @@
 
 #include "TOGameContext.h"
 #include "Resources.h"
-#include "ProjectileWeapon.h"
-#include "InstantWeapon.h"
-#include "TOInputHandler.h"
 #include "TowerFactory.h"
-#include "UnderConstructTower.h"
 #include "BotFactory.h"
 
 #define LAND_HEIGHT 0
@@ -417,6 +413,11 @@ void TOGameContext::doTowerDamageEffect(const Tower* tower)
   specialEffectsHandler.towerDamageEffect(this, tower);
   }
 
+void TOGameContext::doWeaponExplosionEffect(const Vector3D& position, float scale)
+  {
+  specialEffectsHandler.weaponExplosionEffect(this, position, scale);
+  }
+
 void TOGameContext::getGameState(TOGameState* state)
   {
   state->cameraFocalPos = toInputHandler->getFocalPosition();
@@ -591,4 +592,12 @@ TowerTargetPtr TOGameContext::findClosestTowerTarget(const Vector3D& position, f
   if (closestBot->getPosition().distanceToPoint(position) < closestPortal->getPosition().distanceToPoint(position))
     return closestBot;
   return closestPortal;
+  }
+
+void TOGameContext::forEachTowerTarget(std::function<void(TowerTargetPtr)> func)
+  {
+  for (BotPtr bot : *botList.getList())
+    func(bot);
+  for (BotPortalPtr portal : *botPortalList.getList())
+    func(portal);
   }

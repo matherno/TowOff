@@ -2,13 +2,13 @@
 // Created by matt on 10/12/17.
 //
 
-#include "InstantWeapon.h"
+#include "DiscreteWeapon.h"
 
-void InstantWeapon::initShooting(GameContext* context, Tower* sourceTower)
+void DiscreteWeapon::initShooting(GameContext* context, Tower* sourceTower)
   {
   }
 
-bool InstantWeapon::updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
+bool DiscreteWeapon::updateShooting(GameContext* context, Tower* sourceTower, const Vector3D& shootPos)
   {
   if (cooldownTimer.incrementTimer(context->getDeltaTime()))
     {
@@ -19,7 +19,8 @@ bool InstantWeapon::updateShooting(GameContext* context, Tower* sourceTower, con
     if (TowerTargetPtr targetPtr = getTarget())
       {
       sourceTower->takeEnergy(energyPerShot, true);
-      targetPtr->doDamage(damagePerShot);
+      if (damagePerShot > 0)
+        targetPtr->doDamage(damagePerShot);
       if (shootEffectFunction)
         shootEffectFunction(context, shootPos, targetPtr->getTargetPosition());
       }
@@ -27,17 +28,17 @@ bool InstantWeapon::updateShooting(GameContext* context, Tower* sourceTower, con
   return true;
   }
 
-void InstantWeapon::updateIdle(GameContext* context, Tower* sourceTower)
+void DiscreteWeapon::updateIdle(GameContext* context, Tower* sourceTower)
   {
   cooldownTimer.incrementTimer(context->getDeltaTime());
   }
 
-void InstantWeapon::endShooting(GameContext* context, Tower* sourceTower)
+void DiscreteWeapon::endShooting(GameContext* context, Tower* sourceTower)
   {
 
   }
 
-bool InstantWeapon::isCoolingDown()
+bool DiscreteWeapon::isCoolingDown()
   {
   return !cooldownTimer.timedOut();
   }

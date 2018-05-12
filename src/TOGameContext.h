@@ -117,6 +117,7 @@ public:
 
   TowerPtr getFocusedTower();
   void doTowerDamageEffect(const Tower* tower);
+  void doWeaponExplosionEffect(const Vector3D& position, float scale);
   void getGameState(TOGameState* state);
 
   BotPtr createBot(uint botType, const Vector3D& position);
@@ -131,6 +132,7 @@ public:
   const BotPortalList* getBotPortalList() const { return &botPortalList; }
   BotPortalPtr findClosestBotPortal(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
   TowerTargetPtr findClosestTowerTarget(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
+  void forEachTowerTarget(std::function<void(TowerTargetPtr)> func);
 
   inline static TOGameContext* cast(GameContext* context)
     {

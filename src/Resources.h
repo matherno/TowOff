@@ -3,11 +3,13 @@
 // Created by matt on 13/12/17.
 //
 
-#define MESH_FOOTBALL_PROJECTILE            "resources/FootballProjectile.obj"
 #define MESH_BASIC_TOWER_BASE               "resources/BasicTowerBase.obj"
 #define MESH_BASIC_TOWER_TURRET             "resources/BasicTowerTurret.obj"
 #define MESH_MACHINEGUN_TOWER_BASE          "resources/GunTowerBaseA.obj"
 #define MESH_MACHINEGUN_TOWER_TURRET        "resources/MachineGunTurret.obj"
+#define MESH_MORTAR_BASE                    "resources/MortarBase.obj"
+#define MESH_MORTAR_TURRET                  "resources/MortarTurret.obj"
+#define MESH_MORTAR_PROJECTILE              "resources/MortarProjectile.obj"
 #define MESH_HOME_BASE                      "resources/HomeBaseTower.obj"
 #define MESH_PYLON                          "resources/PylonTower.obj"
 #define MESH_MINER_BASE                     "resources/MinerTowerBase.obj"
@@ -24,6 +26,7 @@
 #define IMAGE_ICON_PYLON                    "resources/tower_icons/Pylon.png"
 #define IMAGE_ICON_MINER                    "resources/tower_icons/Miner.png"
 #define IMAGE_ICON_MACHINEGUN               "resources/tower_icons/MachineGunTower.png"
+#define IMAGE_ICON_MORTAR                   "resources/tower_icons/Mortar.png"
 
 #define FONT_UNISPACE_FNT                   "resources/fonts/Unispace.fnt"
 #define FONT_UNISPACE_GLYPHS                "resources/fonts/Unispace.png"

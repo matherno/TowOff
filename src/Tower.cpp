@@ -5,9 +5,6 @@
 #include <RenderSystem/RenderableMesh.h>
 #include "Tower.h"
 #include "TOGameContext.h"
-#include "InstantWeapon.h"
-#include "ProjectileWeapon.h"
-#include "TowerFactory.h"
 #include "Resources.h"
 
 Tower::Tower(uint id, uint towerType, TowerFunctionalityPtr functionality)

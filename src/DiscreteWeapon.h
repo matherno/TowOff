@@ -4,18 +4,19 @@
 #include "Tower.h"
 
 /*
-*   A tower weapon that causes "instant" damage to its target
-*/
+ *  The type of weapon that fires in a discrete manor, rather than a continuous shot
+ *    e.g. A projectile weapon
+ */
 
-typedef std::function<void(GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)> DisplayShootEffect;
+typedef std::function<void(GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)> OnShootFunction;
 
-class InstantWeapon : public TowerWeapon
+class DiscreteWeapon : public TowerWeapon
   {
 private:
   Timer cooldownTimer;
   int damagePerShot = 10;
   uint energyPerShot = 2;
-  DisplayShootEffect shootEffectFunction;
+  OnShootFunction shootEffectFunction;
 
 public:
   virtual void initShooting(GameContext* context, Tower* sourceTower) override;
@@ -26,7 +27,7 @@ public:
   void setCooldownTime(long time) { cooldownTimer.setTimeOut(time); }
   void setDamagePerShot(int damagePerShot) { this->damagePerShot = damagePerShot; }
   void setEnergyPerShot(uint energy) { energyPerShot = energy; }
-  void setShootEffectFunction(DisplayShootEffect function) { this->shootEffectFunction = function; }
+  void setShootEffectFunction(OnShootFunction function) { this->shootEffectFunction = function; }
 
   virtual bool isCoolingDown() override;
   };

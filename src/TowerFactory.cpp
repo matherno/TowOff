@@ -5,17 +5,19 @@
 #include <RenderSystem/RenderableLines.h>
 #include "TowerFactory.h"
 #include "Tower.h"
-#include "ProjectileWeapon.h"
 #include "Resources.h"
-#include "InstantWeapon.h"
+#include "DiscreteWeapon.h"
 #include "TowerFunctionalities.h"
 #include "UnderConstructTower.h"
+#include "TimeToLiveActor.h"
+#include "Projectile.h"
 
 #define TOWER_HOMEBASE        0
 #define TOWER_BASIC           1
 #define TOWER_PYLON           2
 #define TOWER_MINER           3
 #define TOWER_MACHINEGUN      4
+#define TOWER_MORTAR          5
 
 const std::map<uint, TowerType> towerTypes =
   {
@@ -25,6 +27,7 @@ const std::map<uint, TowerType> towerTypes =
   {TOWER_PYLON,        TowerType{"Pylon",               IMAGE_ICON_PYLON,        MESH_PYLON,                    "",                              Vector3D(0, 4.02, 0),         30,             1.5}},
   {TOWER_MINER,        TowerType{"Miner",               IMAGE_ICON_MINER,        MESH_MINER_BASE,               MESH_MINER_TURRET,               Vector3D(0, 2.61, 0),         10,             1.7}},
   {TOWER_MACHINEGUN,   TowerType{"Machine Gun Tower",   IMAGE_ICON_MACHINEGUN,   MESH_MACHINEGUN_TOWER_BASE,    MESH_MACHINEGUN_TOWER_TURRET,    Vector3D(0, 1, 0),            10,             1.2}},
+  {TOWER_MORTAR,       TowerType{"Mortar Tower",        IMAGE_ICON_MORTAR,       MESH_MORTAR_BASE,              MESH_MORTAR_TURRET,              Vector3D(0, 1, 0),            10,             1.2}},
   };
 
 const std::map<uint, TowerType>* TowerFactory::getTowerTypeMap()
@@ -36,16 +39,6 @@ const TowerType* TowerFactory::getTowerType(uint towerType)
   {
   ASSERT(towerTypes.count(towerType) > 0, "Invalid tower type number");
   return &towerTypes.at(towerType);
-  }
-
-ProjectilePtr createFootballProjectile(uint id)
-  {
-  ProjectilePtr projectile(new Projectile(id));
-  projectile->setScale(2);
-  projectile->setMeshFilePath(MESH_FOOTBALL_PROJECTILE);
-  projectile->setDragEffect(0.5);
-  projectile->setTimeToLive(1000);
-  return projectile;
   }
 
 TowerPtr TowerFactory::createTower(uint towerType, uint id, const Vector3D& position)
@@ -62,6 +55,8 @@ TowerPtr TowerFactory::createTower(uint towerType, uint id, const Vector3D& posi
       return createMiner(id, towerType, position);
     case TOWER_MACHINEGUN:
       return createMachineGunTower(id, towerType, position);
+    case TOWER_MORTAR:
+      return createMortar(id, towerType, position);
     }
   return nullptr;
   }
@@ -85,30 +80,9 @@ TowerPtr TowerFactory::createUnderConstructTower(uint towerType, uint id, const 
   return tower;
   }
 
-TowerPtr TowerFactory::createBasicTowerProj(uint id, uint towerType, const Vector3D& position)
-  {
-  std::unique_ptr<ProjectileWeapon> weapon(new ProjectileWeapon());
-  weapon->setCooldownTime(1000);
-  weapon->setShootForce(100);
-  weapon->setGravityForce(0);
-  weapon->setCreateProjectileFunc([](uint id)->ProjectilePtr
-                                    {
-                                    return createFootballProjectile(id);
-                                    });
-
-  TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
-  function->setShootOffset(Vector3D(0, 2, -1));
-  function->setWeapon(std::move(weapon));
-
-  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
-  tower->setPosition(position);
-  setCommonTowerParameters(tower, towerType);
-  return tower;
-  }
-
 TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D& position)
   {
-  std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
+  std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
   weapon->setCooldownTime(1000);
   weapon->setShootEffectFunction([](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
      {
@@ -169,7 +143,7 @@ TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& posi
 
 TowerPtr TowerFactory::createMachineGunTower(uint id, uint towerType, const Vector3D& position)
   {
-  std::unique_ptr<InstantWeapon> weapon(new InstantWeapon());
+  std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
   weapon->setCooldownTime(100);
   weapon->setDamagePerShot(3);
   weapon->setShootEffectFunction([](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
@@ -196,6 +170,54 @@ TowerPtr TowerFactory::createMachineGunTower(uint id, uint towerType, const Vect
 
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.6, -1.56));
+  function->setWeapon(std::move(weapon));
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
+  tower->setPosition(position);
+  setCommonTowerParameters(tower, towerType);
+  return tower;
+  }
+
+TowerPtr TowerFactory::createMortar(uint id, uint towerType, const Vector3D& position)
+  {
+  std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
+  weapon->setCooldownTime(3000);
+  weapon->setDamagePerShot(0);
+  weapon->setShootEffectFunction([](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
+    {
+    static const float inclination = 30;
+    static const float sinI = (float) sin(mathernogl::degToRad(inclination));
+    static const float cosI = (float) cos(mathernogl::degToRad(inclination));
+    static const float cos2I = cosI * cosI;
+    static const Vector3D inclinationDir = Vector3D(0, 0, -1) * mathernogl::matrixRotate(Vector3D(1, 0, 0), inclination);
+    static const float gravity = 15;
+
+    const Vector3D posToTarget = Vector3D(targetPos - shootPos);
+    float azimuth = (float) mathernogl::ccwAngleBetween(Vector2D(0, -1), Vector2D(posToTarget.x, posToTarget.z).getUniform());
+    const Vector3D shootDirection = inclinationDir * mathernogl::matrixRotate(Vector3D(0, 1, 0), azimuth);
+
+    const float vertDisp = targetPos.y - shootPos.y;
+    const float horizDisp = (posToTarget + Vector3D(0, 1, 0) * vertDisp).magnitude();
+    float initialSpeed = gravity * horizDisp * horizDisp;
+    initialSpeed /= (2 * cosI * sinI * horizDisp) - (2 * cos2I * vertDisp);
+    initialSpeed = sqrtf(initialSpeed);
+
+    MortarProjectile* projectile = new MortarProjectile(context->getNextActorID());
+    projectile->setScale(1.5);
+    projectile->setMeshFilePath(MESH_MORTAR_PROJECTILE);
+    projectile->setTextureFilePath(IMAGE_TEXTURE_PALETTE);
+    projectile->setDragEffect(0.2);
+    projectile->setTimeToLive(5000);
+    projectile->setPosition(shootPos);
+    projectile->setVelocity(shootDirection * initialSpeed);
+    projectile->setAcceleration(Vector3D(0, -1, 0) * gravity);
+    projectile->setDamageRadius(6);
+    projectile->setDamageAmount(20);
+    context->addActor(ProjectilePtr(projectile));
+    });
+
+  TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
+  function->setShootOffset(Vector3D(0, 2.6, -1.3));
   function->setWeapon(std::move(weapon));
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
@@ -232,6 +254,8 @@ float TowerFactory::getCombatRange(uint towerType)
       return 15;
     case TOWER_MACHINEGUN:
       return 15;
+    case TOWER_MORTAR:
+      return 35;
     }
   return 0;
   }
@@ -242,6 +266,8 @@ float TowerFactory::getCombatMinRange(uint towerType)
     {
     case TOWER_MACHINEGUN:
       return 5;
+    case TOWER_MORTAR:
+      return 15;
     }
   return 0;
   }
@@ -273,6 +299,9 @@ void TowerFactory::createTowerBoundingBoxes(uint towerType, const Vector3D& posi
     case TOWER_MACHINEGUN:
       AddBoundingBox(Vector3D(-1.0, 0, -1.0), Vector3D(1.0, 1.8, 1.0));
       break;
+    case TOWER_MORTAR:
+      AddBoundingBox(Vector3D(-1.0, 0, -1.0), Vector3D(1.0, 2.0, 1.0));
+      break;
     }
   }
 
@@ -282,6 +311,7 @@ Tower::TowerFunction TowerFactory::getTowerFunction(uint towerType)
     {
     case TOWER_BASIC:
     case TOWER_MACHINEGUN:
+    case TOWER_MORTAR:
       return Tower::combat;
     case TOWER_PYLON:
       return Tower::relay;
