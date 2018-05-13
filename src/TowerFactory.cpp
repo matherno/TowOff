@@ -272,7 +272,7 @@ TowerPtr TowerFactory::createMissileLauncher(uint id, uint towerType, const Vect
   );
 
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
-  function->setShootOffset(Vector3D(0, 1.8, -0.6));
+  function->setShootOffset(Vector3D(0, 1.8, -0.9));
   function->setWeapon(std::move(weapon));
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));

@@ -17,15 +17,15 @@ SpecialEffectsHandler::SpecialEffectsHandler()
 void SpecialEffectsHandler::initialise(GameContext* gameContext)
   {
   {
-    ParticleSystem* system = new ParticleSystem(gameContext->getNextActorID(), true);
-    system->setGravityAccel(0.00001);
-    system->setTimeBetweenSpawns(5);
-    system->setInitVelocity(0.008);
-    system->setTimeAlive(300);
-    system->setParticleSize(4);
-    towerDamageParticles.reset(system);
-    gameContext->addActor(towerDamageParticles);
-  }
+  ParticleSystem* system = new ParticleSystem(gameContext->getNextActorID(), true);
+  system->setGravityAccel(0.00001);
+  system->setTimeBetweenSpawns(5);
+  system->setInitVelocity(0.008);
+  system->setTimeAlive(300);
+  system->setParticleSize(4);
+  towerDamageParticles.reset(system);
+  gameContext->addActor(towerDamageParticles);
+}
 
   {
     ParticleSystem* system = new ParticleSystem(gameContext->getNextActorID(), true);
@@ -60,7 +60,7 @@ void SpecialEffectsHandler::initialise(GameContext* gameContext)
     system->setParticleSize(2);
     system->addTextureAtlas(gameContext->getRenderContext()->getSharedTexture(IMAGE_EXPLOSION_SHEET));
     system->setTextureAtlasSize(3, 3);
-    system->setTextureColourMixFactor(0.5);
+    system->setTextureColourMixFactor(0.75);
     system->setAdditiveBlending(true);
     system->setDepthTesting(false);
     explosionParticles.reset(system);
