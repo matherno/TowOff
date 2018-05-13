@@ -22,6 +22,10 @@ void TimeToLiveActor::onUpdate(GameContext* gameContext)
 void TimeToLiveActor::onDetached(GameContext* gameContext)
   {
   RenderContext* renderContext = gameContext->getRenderContext();
+  for (GameActorPtr actor : actors)
+    {
+    gameContext->removeActor(actor->getID());
+    }
   for (RenderablePtr renderable : renderables)
     {
     renderable->cleanUp(renderContext);

@@ -93,6 +93,22 @@ void MortarProjectile::onUpdate(GameContext* gameContext)
  * TrackingMissileProjectile
  */
 
+void TrackingMissileProjectile::onAttached(GameContext* gameContext)
+  {
+  Projectile::onAttached(gameContext);
+
+  missileParticles.reset(new ParticleSystem(gameContext->getNextActorID(), true));
+  missileParticles->setGravityAccel(0.000001);
+  missileParticles->setTimeBetweenSpawns(5);
+  missileParticles->setInitVelocity(0.001);
+  missileParticles->setTimeAlive(250);
+  missileParticles->setParticleSize(1.5);
+  missileParticles->setParticleSpawnPoint();
+  missileParticles->setParticleDirectionRandom();
+  missileParticles->addEmitter(Vector3D(0), 3000, Vector3D(0.2, 0.01, 0));
+  gameContext->addActor(missileParticles);
+  }
+
 void TrackingMissileProjectile::onUpdate(GameContext* gameContext)
   {
   Projectile::onUpdate(gameContext);
@@ -105,6 +121,7 @@ void TrackingMissileProjectile::onUpdate(GameContext* gameContext)
     posToTarget.makeUniform();
     setPosition(getPosition() + posToTarget * displacement);
     updateRenderable(posToTarget);
+    missileParticles->setTranslation(getPosition());
     }
   else
     {
@@ -113,4 +130,13 @@ void TrackingMissileProjectile::onUpdate(GameContext* gameContext)
     TOGameContext::cast(gameContext)->doWeaponExplosionEffect(getPosition(), 2);
     gameContext->removeActor(getID());
     }
+  }
+
+void TrackingMissileProjectile::onDetached(GameContext* gameContext)
+  {
+  Projectile::onDetached(gameContext);
+  TimeToLiveActor* timeToLiveActor = new TimeToLiveActor(gameContext->getNextActorID(), 250);
+  timeToLiveActor->addGameActor(missileParticles);
+  gameContext->addActor(GameActorPtr(timeToLiveActor));
+  missileParticles.reset();
   }

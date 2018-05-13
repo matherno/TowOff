@@ -2,6 +2,7 @@
 
 #include <RenderSystem/RenderSystem.h>
 #include <GameSystem/GameSystem.h>
+#include <ParticleSystem/ParticleSystem.h>
 #include "TimeToLiveActor.h"
 #include "TrackingWeapon.h"
 
@@ -64,11 +65,14 @@ private:
   float damageRadius = 4;
   uint maxDamageAmount = 10;
   float missileSpeed = 3;
+  ParticleSystemPtr missileParticles;
 
 public:
   TrackingMissileProjectile(uint id) : Projectile(id) {}
   virtual void onUpdate(GameContext* gameContext) override;
+  virtual void onAttached(GameContext* gameContext) override;
+  virtual void onDetached(GameContext* gameContext) override;
   void setDamageRadius(float radius) { damageRadius = radius; }
   void setDamageAmount(uint damage) { maxDamageAmount = damage; }
-  void setMissleSpeed(float speed) { this->missileSpeed = speed; }
+  void setMissileSpeed(float speed) { this->missileSpeed = speed; }
   };

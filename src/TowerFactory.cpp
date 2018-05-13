@@ -255,7 +255,7 @@ TowerPtr TowerFactory::createMissileLauncher(uint id, uint towerType, const Vect
       projectile->setTimeToLive(5000);
       projectile->setDamageRadius(3);
       projectile->setDamageAmount(10);
-      projectile->setMissleSpeed(2);
+      projectile->setMissileSpeed(2);
       projectile->updateTargetPosition(target->getTargetPosition());
 
       const Vector3D shootDirection = Vector3D(target->getTargetPosition() - shootPos).getUniform();
