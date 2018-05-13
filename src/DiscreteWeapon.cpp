@@ -21,8 +21,7 @@ bool DiscreteWeapon::updateShooting(GameContext* context, Tower* sourceTower, co
       sourceTower->takeEnergy(energyPerShot, true);
       if (damagePerShot > 0)
         targetPtr->doDamage(damagePerShot);
-      if (shootEffectFunction)
-        shootEffectFunction(context, shootPos, targetPtr->getTargetPosition());
+      onShootTarget(context, shootPos, targetPtr);
       }
     }
   return true;
@@ -41,4 +40,10 @@ void DiscreteWeapon::endShooting(GameContext* context, Tower* sourceTower)
 bool DiscreteWeapon::isCoolingDown()
   {
   return !cooldownTimer.timedOut();
+  }
+
+void DiscreteWeapon::onShootTarget(GameContext* context, const Vector3D& shootPos, TowerTargetPtr target)
+  {
+  if (onShootFunction)
+    onShootFunction(context, shootPos, target->getTargetPosition());
   }

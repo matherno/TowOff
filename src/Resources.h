@@ -10,6 +10,8 @@
 #define MESH_MORTAR_BASE                    "resources/MortarBase.obj"
 #define MESH_MORTAR_TURRET                  "resources/MortarTurret.obj"
 #define MESH_MORTAR_PROJECTILE              "resources/MortarProjectile.obj"
+#define MESH_MISSILELAUNCHER_BASE           "resources/MissileLauncherBase.obj"
+#define MESH_MISSILELAUNCHER_TURRET         "resources/MissileLauncherTurret.obj"
 #define MESH_HOME_BASE                      "resources/HomeBaseTower.obj"
 #define MESH_PYLON                          "resources/PylonTower.obj"
 #define MESH_MINER_BASE                     "resources/MinerTowerBase.obj"
@@ -27,6 +29,7 @@
 #define IMAGE_ICON_MINER                    "resources/tower_icons/Miner.png"
 #define IMAGE_ICON_MACHINEGUN               "resources/tower_icons/MachineGunTower.png"
 #define IMAGE_ICON_MORTAR                   "resources/tower_icons/Mortar.png"
+#define IMAGE_ICON_MISSILELAUNCHER          "resources/tower_icons/MissileLauncher.png"
 
 #define FONT_UNISPACE_FNT                   "resources/fonts/Unispace.fnt"
 #define FONT_UNISPACE_GLYPHS                "resources/fonts/Unispace.png"

@@ -16,7 +16,7 @@ private:
   Timer cooldownTimer;
   int damagePerShot = 10;
   uint energyPerShot = 2;
-  OnShootFunction shootEffectFunction;
+  OnShootFunction onShootFunction;
 
 public:
   virtual void initShooting(GameContext* context, Tower* sourceTower) override;
@@ -27,7 +27,10 @@ public:
   void setCooldownTime(long time) { cooldownTimer.setTimeOut(time); }
   void setDamagePerShot(int damagePerShot) { this->damagePerShot = damagePerShot; }
   void setEnergyPerShot(uint energy) { energyPerShot = energy; }
-  void setShootEffectFunction(OnShootFunction function) { this->shootEffectFunction = function; }
+  void setOnShootFunction(OnShootFunction function) { this->onShootFunction = function; }
 
   virtual bool isCoolingDown() override;
+
+protected:
+  virtual void onShootTarget(GameContext* context, const Vector3D& shootPos, TowerTargetPtr target);
   };

@@ -39,6 +39,7 @@ public:
   static TowerPtr createMiner(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createMachineGunTower(uint id, uint towerType, const Vector3D& position);
   static TowerPtr createMortar(uint id, uint towerType, const Vector3D& position);
+  static TowerPtr createMissileLauncher(uint id, uint towerType, const Vector3D& position);
 
   static void createTowerBoundingBoxes(uint towerType, const Vector3D& position, std::list<BoundingBoxPtr>* boundingBoxes);
 

@@ -87,3 +87,30 @@ void MortarProjectile::onUpdate(GameContext* gameContext)
     gameContext->removeActor(getID());
     }
   }
+
+
+/*
+ * TrackingMissileProjectile
+ */
+
+void TrackingMissileProjectile::onUpdate(GameContext* gameContext)
+  {
+  Projectile::onUpdate(gameContext);
+
+  const Vector3D targetPos = getTargetPosition();
+  const float displacement = (float)gameContext->getDeltaTime() * 0.01f * missileSpeed;
+  Vector3D posToTarget = targetPos - getPosition();
+  if (posToTarget.magnitude() > displacement)
+    {
+    posToTarget.makeUniform();
+    setPosition(getPosition() + posToTarget * displacement);
+    updateRenderable(posToTarget);
+    }
+  else
+    {
+    setPosition(targetPos);
+    doAreaEffectDamage(gameContext, getPosition(), damageRadius, maxDamageAmount);
+    TOGameContext::cast(gameContext)->doWeaponExplosionEffect(getPosition(), 2);
+    gameContext->removeActor(getID());
+    }
+  }

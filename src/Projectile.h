@@ -3,6 +3,7 @@
 #include <RenderSystem/RenderSystem.h>
 #include <GameSystem/GameSystem.h>
 #include "TimeToLiveActor.h"
+#include "TrackingWeapon.h"
 
 /*
 *   
@@ -55,4 +56,19 @@ public:
   void setDragEffect(float dragEffect) { this->dragEffect = dragEffect; }
   void setDamageRadius(float radius) { damageRadius = radius; }
   void setDamageAmount(uint damage) { maxDamageAmount = damage; }
+  };
+
+class TrackingMissileProjectile : public Projectile, public TargetTracker
+  {
+private:
+  float damageRadius = 4;
+  uint maxDamageAmount = 10;
+  float missileSpeed = 3;
+
+public:
+  TrackingMissileProjectile(uint id) : Projectile(id) {}
+  virtual void onUpdate(GameContext* gameContext) override;
+  void setDamageRadius(float radius) { damageRadius = radius; }
+  void setDamageAmount(uint damage) { maxDamageAmount = damage; }
+  void setMissleSpeed(float speed) { this->missileSpeed = speed; }
   };
