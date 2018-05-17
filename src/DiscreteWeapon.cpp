@@ -12,7 +12,6 @@ bool DiscreteWeapon::updateShooting(GameContext* context, Tower* sourceTower, co
   {
   if (cooldownTimer.incrementTimer(context->getDeltaTime()))
     {
-    cooldownTimer.reset();
     if (sourceTower->getStoredEnergy() < energyPerShot)
       return false;
 
@@ -23,6 +22,20 @@ bool DiscreteWeapon::updateShooting(GameContext* context, Tower* sourceTower, co
         targetPtr->doDamage(damagePerShot);
       onShootTarget(context, shootPos, targetPtr);
       }
+
+    if (currentBurstShot < burstNumShots - 1)
+      {
+      //  continue bursting
+      cooldownTimer.setTimeOut(burstTimeBetweenShots);
+      ++currentBurstShot;
+      }
+    else
+      {
+      //  end bursting
+      cooldownTimer.setTimeOut(cooldownTime);
+      currentBurstShot = 0;
+      }
+    cooldownTimer.reset();
     }
   return true;
   }
@@ -46,4 +59,11 @@ void DiscreteWeapon::onShootTarget(GameContext* context, const Vector3D& shootPo
   {
   if (onShootFunction)
     onShootFunction(context, shootPos, target->getTargetPosition());
+  }
+
+void DiscreteWeapon::setBurstParams(uint numShots, long timeBetweenShots)
+  {
+  burstNumShots = std::max(numShots, 1u);
+  burstTimeBetweenShots = timeBetweenShots;
+  currentBurstShot = 0;
   }

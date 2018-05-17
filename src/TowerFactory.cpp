@@ -19,6 +19,7 @@
 #define TOWER_MACHINEGUN      4
 #define TOWER_MORTAR          5
 #define TOWER_MISSILELAUNCHER 6
+#define TOWER_SNIPER          7
 
 const std::map<uint, TowerType> towerTypes =
   {
@@ -30,6 +31,7 @@ const std::map<uint, TowerType> towerTypes =
   {TOWER_MACHINEGUN,   TowerType{"Machine Gun Tower",   IMAGE_ICON_MACHINEGUN,   MESH_MACHINEGUN_TOWER_BASE,    MESH_MACHINEGUN_TOWER_TURRET,    Vector3D(0, 1, 0),            10,             1.2}},
   {TOWER_MORTAR,       TowerType{"Mortar Tower",        IMAGE_ICON_MORTAR,       MESH_MORTAR_BASE,              MESH_MORTAR_TURRET,              Vector3D(0, 1, 0),            10,             1.2}},
   {TOWER_MISSILELAUNCHER, TowerType{"Missile Launcher", IMAGE_ICON_MISSILELAUNCHER, MESH_MISSILELAUNCHER_BASE,  MESH_MISSILELAUNCHER_TURRET,     Vector3D(0, 1, 0),            10,             1.4}},
+  {TOWER_SNIPER,          TowerType{"Sniper Tower",     IMAGE_ICON_SNIPER,       MESH_SNIPER_BASE,              MESH_SNIPER_TURRET,              Vector3D(0, 1, 0),            10,             1.4}},
   };
 
 const std::map<uint, TowerType>* TowerFactory::getTowerTypeMap()
@@ -61,6 +63,8 @@ TowerPtr TowerFactory::createTower(uint towerType, uint id, const Vector3D& posi
       return createMortar(id, towerType, position);
     case TOWER_MISSILELAUNCHER:
       return createMissileLauncher(id, towerType, position);
+    case TOWER_SNIPER:
+      return createSniperTower(id, towerType, position);
     }
   return nullptr;
   }
@@ -243,7 +247,8 @@ TowerPtr TowerFactory::createMortar(uint id, uint towerType, const Vector3D& pos
 TowerPtr TowerFactory::createMissileLauncher(uint id, uint towerType, const Vector3D& position)
   {
   std::unique_ptr<TrackingWeapon> weapon(new TrackingWeapon());
-  weapon->setCooldownTime(500);
+  weapon->setCooldownTime(1000);
+  weapon->setBurstParams(4, 100);
   weapon->setDamagePerShot(0);
   weapon->setCreateTrackerFunction(
     [](GameContext* context, const Vector3D& shootPos, TowerTargetPtr target)
@@ -273,6 +278,62 @@ TowerPtr TowerFactory::createMissileLauncher(uint id, uint towerType, const Vect
 
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.8, -0.9));
+  function->setWeapon(std::move(weapon));
+
+  TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
+  tower->setPosition(position);
+  setCommonTowerParameters(tower, towerType);
+  return tower;
+  }
+
+TowerPtr TowerFactory::createSniperTower(uint id, uint towerType, const Vector3D& position)
+  {
+  std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
+  weapon->setCooldownTime(3000);
+  weapon->setDamagePerShot(50);
+  weapon->setOnShootFunction(
+    [](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
+      {
+      const Vector3D beamColour = Vector3D(0.0, 0.1, 0.3);
+      RenderContext* renderContext = context->getRenderContext();
+      RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID());
+      line->initialise(renderContext);
+      line->addLine(shootPos, targetPos, beamColour);
+      line->setLineWidth(3);
+
+      const long beamTimeAlive = 200;
+      RenderablePtr linePtr(line);
+      renderContext->getRenderableSet()->addRenderable(linePtr);
+      TimeToLiveActor* actor = new TimeToLiveActor(context->getNextActorID(), beamTimeAlive);
+      actor->addRenderable(linePtr);
+      context->addActor(GameActorPtr(actor));
+
+      const long particleTimeAlive = 100;
+      ParticleSystemPtr particles(new ParticleSystem(context->getNextActorID(), false));
+      particles->setGravityAccel(0);
+      particles->setTimeBetweenSpawns(3);
+      particles->setInitVelocity(0.002);
+      particles->setTimeAlive(particleTimeAlive);
+      particles->setParticleSpawnLine(shootPos, targetPos);
+      particles->setParticleDirectionRandom();
+      particles->setDepthTesting(true);
+      particles->setAdditiveBlending(false);
+      particles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_BLUEENERGY_SHEET1));
+      particles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_BLUEENERGY_SHEET2));
+      particles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_BLUEENERGY_SHEET3));
+      particles->setTextureAtlasSize(3, 3);
+      particles->setTextureColourMixFactor(0);
+      particles->addEmitter(Vector3D(0), beamTimeAlive + particleTimeAlive, beamColour, 0.3);
+      particles->addEmitter(Vector3D(0), beamTimeAlive,                     beamColour, 0.5);
+      context->addActor(particles);
+
+      actor = new TimeToLiveActor(context->getNextActorID(), beamTimeAlive + particleTimeAlive + particleTimeAlive);
+      actor->addGameActor(particles);
+      context->addActor(GameActorPtr(actor));
+      });
+
+  TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
+  function->setShootOffset(Vector3D(0, 2.48, -0.68));
   function->setWeapon(std::move(weapon));
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
@@ -313,6 +374,8 @@ float TowerFactory::getCombatRange(uint towerType)
       return 35;
     case TOWER_MISSILELAUNCHER:
       return 20;
+    case TOWER_SNIPER:
+      return 35;
     }
   return 0;
   }
@@ -325,6 +388,7 @@ float TowerFactory::getCombatMinRange(uint towerType)
     case TOWER_MISSILELAUNCHER:
       return 5;
     case TOWER_MORTAR:
+    case TOWER_SNIPER:
       return 15;
     }
   return 0;
@@ -363,6 +427,9 @@ void TowerFactory::createTowerBoundingBoxes(uint towerType, const Vector3D& posi
     case TOWER_MISSILELAUNCHER:
       AddBoundingBox(Vector3D(-1.5, 0, -1.5), Vector3D(1.5, 2.1, 1.5));
       break;
+    case TOWER_SNIPER:
+      AddBoundingBox(Vector3D(-1.5, 0, -1.5), Vector3D(1.5, 3.2, 1.5));
+      break;
     }
   }
 
@@ -374,6 +441,7 @@ Tower::TowerFunction TowerFactory::getTowerFunction(uint towerType)
     case TOWER_MACHINEGUN:
     case TOWER_MORTAR:
     case TOWER_MISSILELAUNCHER:
+    case TOWER_SNIPER:
       return Tower::combat;
     case TOWER_PYLON:
       return Tower::relay;
@@ -395,4 +463,5 @@ uint TowerFactory::getStartTowerTypeID()
   {
   return TOWER_HOMEBASE;
   }
+
 
