@@ -141,7 +141,9 @@ TowerPtr TowerFactory::createPylon(uint id, uint towerType, const Vector3D& posi
 TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& position)
   {
   TowerFunctionalityMiner* function = new TowerFunctionalityMiner();
-  function->setEnergyTransferRate(20);
+  function->setEnergyTransferRate(60);
+  function->addMiningBeamOffset(Vector3D(0.7, 1.6, 0));
+  function->addMiningBeamOffset(Vector3D(-0.7, 1.6, 0));
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
@@ -349,6 +351,8 @@ float TowerFactory::getTowerRange(uint towerType)
     return getRelayPowerRange(towerType);
   else if (function == Tower::combat)
     return getCombatRange(towerType);
+  else if (function == Tower::miner)
+    return getMinerRange(towerType);
   return 0;
   }
 
@@ -390,6 +394,16 @@ float TowerFactory::getCombatMinRange(uint towerType)
     case TOWER_MORTAR:
     case TOWER_SNIPER:
       return 15;
+    }
+  return 0;
+  }
+
+float TowerFactory::getMinerRange(uint towerType)
+  {
+  switch (towerType)
+    {
+    case TOWER_MINER:
+      return 10;
     }
   return 0;
   }
@@ -463,5 +477,6 @@ uint TowerFactory::getStartTowerTypeID()
   {
   return TOWER_HOMEBASE;
   }
+
 
 

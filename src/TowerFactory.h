@@ -27,6 +27,7 @@ public:
   static float getRelayPowerRange(uint towerType);
   static float getCombatRange(uint towerType);
   static float getCombatMinRange(uint towerType);
+  static float getMinerRange(uint towerType);
   static Tower::TowerFunction getTowerFunction(uint towerType);
   static bool canConstructTowerType(uint towerType);
   static uint getStartTowerTypeID();

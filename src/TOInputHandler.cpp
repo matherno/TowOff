@@ -154,6 +154,12 @@ bool TOInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint
     toGameContext->createBotPortal(worldPos);
     return true;
     }
+  else if (button == MOUSE_MIDDLE)
+    {
+    Vector3D worldPos = TOGameContext::cast(gameContext)->terrainHitTest(mouseX, mouseY);
+    toGameContext->createDeposit(worldPos);
+    return true;
+    }
   return false;
   }
 

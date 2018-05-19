@@ -140,7 +140,7 @@ void Tower::setTurretRotation(const Vector3D& targetPos)
     }
   }
 
-const Transform* Tower::getTurretRotation() const
+const Transform* Tower::getTurretTransform() const
   {
   if (towerTurret)
     return towerTurret->getTransform();

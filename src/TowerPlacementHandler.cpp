@@ -9,6 +9,7 @@
 #include "TowerFactory.h"
 #include "TOGameContext.h"
 #include "PhasingMesh.h"
+#include "Deposit.h"
 
 TowerPlacementHandler::TowerPlacementHandler(uint id, uint towerTypeID) : InputHandler(id), towerTypeID(towerTypeID)
   {}
@@ -184,6 +185,13 @@ bool TowerPlacementHandler::isHighlightTowerColliding(GameContext* gameContext, 
     const float minDistance = tower->getHitRadius() + towerHighlightHitRadius;
     if (towerHighlightPosition.distanceToPoint(tower->getPosition()) <= minDistance)
       return true;    // highlight tower collides with an existing tower
+    }
+
+  for (const DepositPtr deposit : *TOGameContext::cast(gameContext)->getDepositList()->getList())
+    {
+    const float minDistance = deposit->getHitRadius() + towerHighlightHitRadius;
+    if (towerHighlightPosition.distanceToPoint(deposit->getPosition()) <= minDistance)
+      return true;    // highlight tower collides with a resource deposit
     }
   return false;
   }

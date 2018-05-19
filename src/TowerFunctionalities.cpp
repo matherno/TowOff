@@ -58,7 +58,7 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
         {
         tower->setTurretRotation(target->getPosition());
         Vector3D shootPos = tower->getPosition() + shootOffset;
-        tower->getTurretRotation()->transform(shootOffset, &shootPos);
+        tower->getTurretTransform()->transform(shootOffset, &shootPos);
         stopShooting = !weapon->updateShooting(toGameContext, tower, shootPos);
         }
       }
@@ -111,6 +111,19 @@ void TowerFunctionalityStorage::setEnergyTransferRate(float rate)
 void TowerFunctionalityMiner::onAttached(Tower* tower, GameContext* gameContext)
   {
   transferEnergyTimer.setTimeOut(TOGameContext::cast(gameContext)->timeBetweenEnergyTransfers());
+
+  RenderContext* renderContext = gameContext->getRenderContext();
+  miningBeams.reset(new RenderableLines(renderContext->getNextRenderableID()));
+  miningBeams->setLineWidth(2);
+  miningBeams->initialise(renderContext);
+  renderContext->getRenderableSet()->addRenderable(miningBeams);
+  }
+
+void TowerFunctionalityMiner::onDetached(Tower* tower, GameContext* gameContext)
+  {
+  miningBeams->cleanUp(gameContext->getRenderContext());
+  gameContext->getRenderContext()->getRenderableSet()->removeRenderable(miningBeams->getID());
+  miningBeams.reset();
   }
 
 void TowerFunctionalityMiner::onUpdate(Tower* tower, GameContext* gameContext)
@@ -118,14 +131,79 @@ void TowerFunctionalityMiner::onUpdate(Tower* tower, GameContext* gameContext)
   if (transferEnergyTimer.incrementTimer(gameContext->getDeltaTime()))
     {
     TOGameContext* toGameContext = TOGameContext::cast(gameContext);
-    uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
-    tower->storeEnergy(energyAmount);
-    transferEnergyTimer.setTimeOut(toGameContext->timeBetweenEnergyTransfers());
-    transferEnergyTimer.reset();
+    uint energyToMine = (uint) ((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
+
+    DepositPtr deposit = targetDeposit.lock();
+    if (!deposit)
+      {
+      //  find new deposit to mine
+      const float range = TowerFactory::getTowerRange(tower->getTowerType());
+      deposit = toGameContext->findClosestDeposit(tower->getPosition(), energyToMine, range);
+      targetDeposit = deposit;
+      if (deposit)
+        {
+        }
+      }
+
+    if (deposit)
+      {
+      //  stop mining if deposit is depleted
+      if (deposit->getStoredEnergyAmount() < energyToMine)
+        {
+        targetDeposit.reset();
+        miningBeams->clearLines();
+        stopMiningBeams();
+        return;
+        }
+
+      //  mine energy
+      energyToMine = std::min(tower->getAvailableEnergyStorage(), energyToMine);
+      if (energyToMine > 0)
+        {
+        energyToMine = deposit->takeEnergy(energyToMine, false);
+        tower->storeEnergy(energyToMine);
+        transferEnergyTimer.setTimeOut(toGameContext->timeBetweenEnergyTransfers());
+        transferEnergyTimer.reset();
+        tower->setTurretRotation(deposit->getPosition());
+        startMiningBeams(tower, deposit.get());
+        }
+      else
+        {
+        stopMiningBeams();
+        }
+      }
     }
   }
 
 void TowerFunctionalityMiner::setEnergyTransferRate(float rate)
   {
   energyTransferRate = std::max(rate, 0.0f);
+  }
+
+void TowerFunctionalityMiner::startMiningBeams(Tower* tower, Deposit* deposit)
+  {
+  if (beamsActive)
+    return;
+
+  miningBeams->disableRebuild();
+  miningBeams->clearLines();
+  const Transform* transform = tower->getTurretTransform();
+  for (Vector3D beamStart : miningBeamOffsets)
+    {
+    if (transform)
+      beamStart = transform->transform(beamStart);
+    else
+      beamStart += tower->getPosition();
+    miningBeams->addLine(beamStart, deposit->getPosition(), beamColour);
+    }
+  miningBeams->enableRebuild();
+  miningBeams->rebuildBuffer();
+  beamsActive = true;
+  }
+
+void TowerFunctionalityMiner::stopMiningBeams()
+  {
+  if (beamsActive)
+    miningBeams->clearLines();
+  beamsActive = false;
   }

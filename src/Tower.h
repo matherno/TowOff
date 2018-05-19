@@ -76,6 +76,7 @@ public:
   uint getStoredEnergy() const { return storedEnergy; }
   uint getMaxEnergy() const { return maxEnergy; }
   void setMaxEnergy(uint max) { maxEnergy = max; }
+  uint getAvailableEnergyStorage() const { return maxEnergy - storedEnergy; }
 
   // returns the amount taken/stored
   uint takeEnergy(uint amount, bool allOrNothing);
@@ -92,7 +93,7 @@ public:
   void setVisibilityRadius(float radius) { visibilityRadius = radius; }
   float getVisibilityRadius() const { return visibilityRadius; }
   void setTurretRotation(const Vector3D& targetPos);
-  const Transform* getTurretRotation() const;
+  const Transform* getTurretTransform() const;
   void setTurretYRotation(double yRotation);
   double getTurretYRotation() const;
   RenderablePtr getBaseMeshRenderable() { return towerBase; }

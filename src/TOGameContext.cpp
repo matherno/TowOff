@@ -601,3 +601,42 @@ void TOGameContext::forEachTowerTarget(std::function<void(TowerTargetPtr)> func)
   for (BotPortalPtr portal : *botPortalList.getList())
     func(portal);
   }
+
+DepositPtr TOGameContext::createDeposit(const Vector3D& position)
+  {
+  DepositPtr deposit(new Deposit(getNextActorID()));
+  deposit->setPosition(position);
+  deposit->setStoredEnergyAmount(1000);
+  depositList.add(deposit, deposit->getID());
+  addActor(deposit);
+  return deposit;
+  }
+
+void TOGameContext::removeDeposit(uint id)
+  {
+  if (depositList.contains(id))
+    {
+    depositList.remove(id);
+    removeActor(id);
+    }
+  }
+
+DepositPtr TOGameContext::findClosestDeposit(const Vector3D& position, uint minEnergy, float range)
+  {
+  DepositPtr closestDepo;
+  float closestDistance = range;
+  bool infiniteRange = range < 0;
+  for (DepositPtr& deposit : *depositList.getList())
+    {
+    if (deposit->getStoredEnergyAmount() < minEnergy)
+      continue;
+
+    const float distance = (float) position.distanceToPoint(deposit->getPosition());
+    if ((infiniteRange && !closestDepo) || distance < closestDistance)
+      {
+      closestDepo = deposit;
+      closestDistance = distance;
+      }
+    }
+  return closestDepo;
+  }

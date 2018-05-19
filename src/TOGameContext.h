@@ -22,6 +22,7 @@ class TOGameContext;
 #include "TOSettings.h"
 #include "Bot.h"
 #include "BotPortal.h"
+#include "Deposit.h"
 
 #define DRAW_STAGE_FOGOFWAR   (DRAW_STAGE_TRANSPARENT + 1)
 
@@ -38,6 +39,7 @@ private:
   TowerList towers;
   BotList botList;
   BotPortalList botPortalList;
+  DepositList depositList;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
   HUDHandler hudHandler;
   SpecialEffectsHandler specialEffectsHandler;
@@ -133,6 +135,11 @@ public:
   BotPortalPtr findClosestBotPortal(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
   TowerTargetPtr findClosestTowerTarget(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
   void forEachTowerTarget(std::function<void(TowerTargetPtr)> func);
+
+  DepositPtr createDeposit(const Vector3D& position);
+  void removeDeposit(uint id);
+  const DepositList* getDepositList() const { return &depositList; };
+  DepositPtr findClosestDeposit(const Vector3D& position, uint minEnergy, float range = -1);     // range of < 0 is infinite
 
   inline static TOGameContext* cast(GameContext* context)
     {

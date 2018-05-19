@@ -1,7 +1,9 @@
 #pragma once
 
 #include <GameSystem/Timer.h>
+#include <RenderSystem/RenderableLines.h>
 #include "Tower.h"
+#include "Deposit.h"
 
 class TowerFunctionalityCombat : public TowerFunctionality
   {
@@ -48,11 +50,22 @@ class TowerFunctionalityMiner : public TowerFunctionality
 private:
   Timer transferEnergyTimer;
   float energyTransferRate = 15;   // base value of how much energy per second this takes from resources
+  std::weak_ptr<Deposit> targetDeposit;
+  std::shared_ptr<RenderableLines> miningBeams;
+  std::vector<Vector3D> miningBeamOffsets;    // can have any number of mining beams
+  Vector3D beamColour = Vector3D(0.5, 0.5, 0.1);
+  bool beamsActive = false;
 
 public:
   TowerFunctionalityMiner() : TowerFunctionality(Tower::miner) {}
   void setEnergyTransferRate(float rate);
+  void addMiningBeamOffset(const Vector3D& offset){ miningBeamOffsets.push_back(offset); }
 
   virtual void onAttached(Tower* tower, GameContext* gameContext) override;
   virtual void onUpdate(Tower* tower, GameContext* gameContext) override;
+  virtual void onDetached(Tower* tower, GameContext* gameContext) override;
+
+protected:
+  void startMiningBeams(Tower* tower, Deposit* deposit);
+  void stopMiningBeams();
   };
