@@ -140,9 +140,6 @@ void TowerFunctionalityMiner::onUpdate(Tower* tower, GameContext* gameContext)
       const float range = TowerFactory::getTowerRange(tower->getTowerType());
       deposit = toGameContext->findClosestDeposit(tower->getPosition(), energyToMine, range);
       targetDeposit = deposit;
-      if (deposit)
-        {
-        }
       }
 
     if (deposit)

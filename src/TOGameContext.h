@@ -137,6 +137,7 @@ public:
   void forEachTowerTarget(std::function<void(TowerTargetPtr)> func);
 
   DepositPtr createDeposit(const Vector3D& position);
+  void createDepositGroup(const Vector3D& centrePosition, float radius, uint numDeposits);
   void removeDeposit(uint id);
   const DepositList* getDepositList() const { return &depositList; };
   DepositPtr findClosestDeposit(const Vector3D& position, uint minEnergy, float range = -1);     // range of < 0 is infinite

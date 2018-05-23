@@ -13,11 +13,16 @@ out vec4 outputColour;
 uniform int inLightShaded = 1;
 uniform float inAlpha = 1;
 uniform sampler2D inTexture;
+uniform float inTextureColourMix = 0;
 uniform int inDrawStyle = DRAW_STYLE_SINGLE_COLOUR;
 
 vec3 getColour(){
-  if (inDrawStyle == DRAW_STYLE_TEXTURE)
-    return texture(inTexture, texCoords).rgb;
+  if (inDrawStyle == DRAW_STYLE_TEXTURE){
+    vec3 texColour = texture(inTexture, texCoords).rgb;
+    if (inTextureColourMix > 0)
+      texColour = mix(texColour, colour, inTextureColourMix);
+    return texColour;
+  }
   else
     return colour;
 }

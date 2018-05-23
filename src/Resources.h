@@ -29,6 +29,9 @@
 #define MESH_CRYSTALA                       "resources/CrystalA.obj"
 #define MESH_CRYSTALB                       "resources/CrystalB.obj"
 #define MESH_CRYSTALC                       "resources/CrystalC.obj"
+#define MESH_CRYSTALD                       "resources/CrystalD.obj"
+#define MESH_CRYSTALE                       "resources/CrystalE.obj"
+#define MESH_CRYSTALF                       "resources/CrystalF.obj"
 
 //  textures
 #define IMAGE_TEXTURE_PALETTE               "resources/basic_palette.png"
@@ -37,6 +40,8 @@
 #define IMAGE_BLUEENERGY_SHEET1              "resources/blueenergy_sheet1.png"
 #define IMAGE_BLUEENERGY_SHEET2              "resources/blueenergy_sheet2.png"
 #define IMAGE_BLUEENERGY_SHEET3              "resources/blueenergy_sheet3.png"
+#define IMAGE_CRYSTALAMBIENT_SHEET1         "resources/crystalambient_sheet1.png"
+#define IMAGE_CRYSTALAMBIENT_SHEET2         "resources/crystalambient_sheet2.png"
 
 //  icons
 #define IMAGE_ICON_BASIC_TOWER              "resources/tower_icons/BasicTower.png"

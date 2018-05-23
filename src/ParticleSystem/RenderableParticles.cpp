@@ -6,7 +6,7 @@
 
 using namespace mathernogl;
 
-RenderableParticles::RenderableParticles(uint id, bool renderAsPoints) : Renderable(id), renderAsPoints(renderAsPoints)
+RenderableParticles::RenderableParticles(uint id, bool renderAsPoints) : Renderable(id, DRAW_STAGE_TRANSPARENT), renderAsPoints(renderAsPoints)
   {}
 
 void RenderableParticles::initialise(RenderContext* renderContext)

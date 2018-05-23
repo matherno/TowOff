@@ -157,7 +157,7 @@ bool TOInputHandler::onMouseReleased(GameContext* gameContext, uint button, uint
   else if (button == MOUSE_MIDDLE)
     {
     Vector3D worldPos = TOGameContext::cast(gameContext)->terrainHitTest(mouseX, mouseY);
-    toGameContext->createDeposit(worldPos);
+    toGameContext->createDepositGroup(worldPos, 2.5, 10);
     return true;
     }
   return false;

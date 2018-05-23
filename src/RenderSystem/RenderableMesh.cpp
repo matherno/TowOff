@@ -31,10 +31,15 @@ void RenderableMesh::render(RenderContext* renderContext)
     renderContext->activateShaderProgram(shaderProgram);
     shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0, true);
     shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1), true);
+    shaderProgram->setVarFloat("inTextureColourMix", textureColourMix, true);
 
     shaderProgram->setVarInt("inDrawStyle", drawStyle, true);
     if (drawStyle == MESH_DRAW_STYLE_TEXTURE && texture)
+      {
       shaderProgram->setVarInt("inTexture", renderContext->bindTexture(texture), true);
+      if (textureColourMix > 0)
+        shaderProgram->setVarVec3("inColour", colour, true);
+      }
     if (drawStyle == MESH_DRAW_STYLE_SINGLE_COLOUR)
       shaderProgram->setVarVec3("inColour", colour, true);
 
@@ -64,6 +69,13 @@ void RenderableMesh::setDrawStyleTexture(TexturePtr texture)
   {
   drawStyle = MESH_DRAW_STYLE_TEXTURE;
   this->texture = texture;
+  }
+
+void RenderableMesh::setDrawStyleTexture(TexturePtr texture, float colourMixFactor, const Vector3D& colour)
+  {
+  setDrawStyleTexture(texture);
+  this->colour = colour;
+  this->textureColourMix = colourMixFactor;
   }
 
 void RenderableMesh::setDrawStyleVertColours()

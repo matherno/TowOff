@@ -606,10 +606,25 @@ DepositPtr TOGameContext::createDeposit(const Vector3D& position)
   {
   DepositPtr deposit(new Deposit(getNextActorID()));
   deposit->setPosition(position);
-  deposit->setStoredEnergyAmount(1000);
+  deposit->setTotalEnergy(1000);
   depositList.add(deposit, deposit->getID());
   addActor(deposit);
   return deposit;
+  }
+
+void TOGameContext::createDepositGroup(const Vector3D& centrePosition, float radius, uint numDeposits)
+  {
+  for (uint depoNum = 0; depoNum < numDeposits; ++depoNum)
+    {
+    Vector3D depositOffset;
+    do
+      {
+      const float randomX = mathernogl::RandomGenerator::randomFloat(-1, 1);
+      const float randomZ = mathernogl::RandomGenerator::randomFloat(-1, 1);
+      depositOffset.set(randomX, 0, randomZ);
+      } while(depositOffset.magnitude() > 1);
+    createDeposit(centrePosition + depositOffset * radius);
+    }
   }
 
 void TOGameContext::removeDeposit(uint id)

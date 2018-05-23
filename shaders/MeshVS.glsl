@@ -27,12 +27,11 @@ void performClipping(vec4 worldSpaceVert){
 
 void main(){
     normal = normalize(inNorm * mat3(inVertToWorld));
+    colour = inColour;
 
-    if (inDrawStyle == DRAW_STYLE_SINGLE_COLOUR)
-        colour = inColour;
-    else if (inDrawStyle == DRAW_STYLE_TEXTURE)
+    if (inDrawStyle == DRAW_STYLE_TEXTURE)
         texCoords = inTexCoord;
-    else
+    else if (inDrawStyle == DRAW_STYLE_VERT_COLOUR)
         colour = inVertColour;
 
     vec4 worldVertex = inVert * inVertToWorld;

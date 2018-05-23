@@ -5,6 +5,8 @@
 #include "Deposit.h"
 #include "Resources.h"
 
+#define UPDATE_TIME 1000
+
 Deposit::Deposit(uint id) : GameActor(id)
   {}
 
@@ -13,7 +15,11 @@ static const std::vector<string> possibleModelFiles =
     MESH_CRYSTALA,
     MESH_CRYSTALB,
     MESH_CRYSTALC,
+    MESH_CRYSTALD,
+    MESH_CRYSTALE,
+    MESH_CRYSTALF,
   };
+
 
 void Deposit::onAttached(GameContext* gameContext)
   {
@@ -22,24 +28,60 @@ void Deposit::onAttached(GameContext* gameContext)
   ASSERT(modelIdx >= 0 && modelIdx < possibleModelFiles.size(), "Invalid model index!");
 
   RenderContext* renderContext = gameContext->getRenderContext();
-  modelRenderable.reset(new RenderableMesh(renderContext->getNextRenderableID()));
+  modelTexture = renderContext->getSharedTexture(IMAGE_TEXTURE_PALETTE);
+  modelRenderable.reset(new RenderableMesh(renderContext->getNextRenderableID(), DRAW_STAGE_TRANSPARENT));
   modelRenderable->setMeshStorage(renderContext->getSharedMeshStorage(possibleModelFiles[modelIdx]));
-  modelRenderable->setDrawStyleTexture(renderContext->getSharedTexture(IMAGE_TEXTURE_PALETTE));
+  modelRenderable->setDrawStyleTexture(modelTexture);
+  modelRenderable->setTransparency(0.3);
   randomiseTransform();
   modelRenderable->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(modelRenderable);
 
+  ambientParticles.reset(new ParticleSystem(gameContext->getNextActorID(), false));
+  ambientParticles->setParticleDirectionRandom();
+  ambientParticles->setParticleSpawnSphere(1.5);
+  ambientParticles->setInitVelocity(0.0004);
+  ambientParticles->setGravityAccel(0);
+  ambientParticles->setParticleSize(0.4);
+  ambientParticles->setDepthTesting(false);
+  ambientParticles->setAdditiveBlending(true);
+  ambientParticles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_CRYSTALAMBIENT_SHEET1));
+  ambientParticles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_CRYSTALAMBIENT_SHEET2));
+  ambientParticles->setTextureAtlasSize(3, 3);
+  ambientParticles->setTextureColourMixFactor(0);
+  gameContext->addActor(ambientParticles);
+
+  updateTimer.setTimeOut(UPDATE_TIME);
   }
+
 
 void Deposit::onUpdate(GameContext* gameContext)
   {
+  if (updateTimer.incrementTimer(gameContext->getDeltaTime()))
+    {
+    const float energyFactor = (float) storedEnergy / (float) maxEnergy;
+    if (energyFactor > 0.1)
+      {
+      const long timeAlive = mathernogl::RandomGenerator::randomInt(1000, 2000);
+      const long timeBetweenSpawns = mathernogl::RandomGenerator::randomInt(1500, 2000);
+      const float size = mathernogl::RandomGenerator::randomFloat(0.2, 0.5);
+      ambientParticles->setTimeAlive(timeAlive);
+      ambientParticles->setTimeBetweenSpawns(timeBetweenSpawns + (1.0f - energyFactor) * 2000);
+      ambientParticles->addEmitter(position, UPDATE_TIME + timeAlive, Vector3D(), size);
+      }
+    modelRenderable->setDrawStyleTexture(modelTexture, (1.0f - energyFactor) * 0.9f, Vector3D(0.01, 0, 0.01));
+    updateTimer.reset();
+    storedEnergy += energyRegenPerSec;
+    }
   }
 
 void Deposit::onDetached(GameContext* gameContext)
   {
   modelRenderable->cleanUp(gameContext->getRenderContext());
   gameContext->getRenderContext()->getRenderableSet()->removeRenderable(modelRenderable->getID());
+  gameContext->removeActor(ambientParticles->getID());
   modelRenderable.reset();
+  ambientParticles.reset();
   }
 
 void Deposit::setPosition(const Vector3D& position)
