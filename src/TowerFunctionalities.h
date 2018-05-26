@@ -53,7 +53,7 @@ private:
   std::weak_ptr<Deposit> targetDeposit;
   std::shared_ptr<RenderableLines> miningBeams;
   std::vector<Vector3D> miningBeamOffsets;    // can have any number of mining beams
-  Vector3D beamColour = Vector3D(0.5, 0.5, 0.1);
+  Vector3D beamColour = Vector3D(0.5, 0.3, 0.1);
   bool beamsActive = false;
 
 public:

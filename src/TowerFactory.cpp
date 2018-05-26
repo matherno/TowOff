@@ -142,8 +142,8 @@ TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& posi
   {
   TowerFunctionalityMiner* function = new TowerFunctionalityMiner();
   function->setEnergyTransferRate(60);
-  function->addMiningBeamOffset(Vector3D(0.7, 1.6, 0));
-  function->addMiningBeamOffset(Vector3D(-0.7, 1.6, 0));
+  function->addMiningBeamOffset(Vector3D(0.65, 1.6, 0));
+  function->addMiningBeamOffset(Vector3D(-0.65, 1.6, 0));
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);

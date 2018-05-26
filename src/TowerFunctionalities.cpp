@@ -114,7 +114,7 @@ void TowerFunctionalityMiner::onAttached(Tower* tower, GameContext* gameContext)
 
   RenderContext* renderContext = gameContext->getRenderContext();
   miningBeams.reset(new RenderableLines(renderContext->getNextRenderableID()));
-  miningBeams->setLineWidth(2);
+  miningBeams->setLineWidth(1.5);
   miningBeams->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(miningBeams);
   }
@@ -185,13 +185,18 @@ void TowerFunctionalityMiner::startMiningBeams(Tower* tower, Deposit* deposit)
   miningBeams->disableRebuild();
   miningBeams->clearLines();
   const Transform* transform = tower->getTurretTransform();
-  for (Vector3D beamStart : miningBeamOffsets)
+  for (const Vector3D& beamStart : miningBeamOffsets)
     {
-    if (transform)
-      beamStart = transform->transform(beamStart);
-    else
-      beamStart += tower->getPosition();
-    miningBeams->addLine(beamStart, deposit->getPosition(), beamColour);
+    const float offset = 0.1f;
+    for (const Vector2D& beamOffset : {Vector2D(0, offset), Vector2D(0, -offset), Vector2D(offset, 0), Vector2D(-offset, 0)})
+      {
+      Vector3D transformedStart = beamStart;
+      if (transform)
+        transformedStart = transform->transform(beamStart + beamOffset);
+      else
+        transformedStart += tower->getPosition() + beamOffset;
+      miningBeams->addLine(transformedStart, deposit->getPosition(), beamColour);
+      }
     }
   miningBeams->enableRebuild();
   miningBeams->rebuildBuffer();
