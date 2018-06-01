@@ -4,9 +4,9 @@
 #define DRAW_STYLE_TEXTURE        2
 #define DRAW_STYLE_VERT_COLOUR    3
 
-in vec3 normal;
-in vec3 colour;
-in vec2 texCoords;
+centroid in vec3 normal;
+centroid in vec3 colour;
+centroid in vec2 texCoords;
 
 out vec4 outputColour;
 

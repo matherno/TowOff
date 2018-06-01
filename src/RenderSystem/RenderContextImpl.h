@@ -36,6 +36,13 @@ private:
   std::set<int> drawStages;
   int activeDrawStage = DRAW_STAGE_NONE;
 
+  FrameBufferPtr screenFBO_A;
+  FrameBufferPtr screenFBO_B;
+  FrameBufferPtr multiSampledFBO;
+  std::list<FrameBufferPtr> fboStack;
+  std::list<PostProcStepHandlerPtr> postProcessingSteps;
+  uint nextPostProcStepID = 1;
+
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;
   virtual bool cleanUp() override;
@@ -74,6 +81,17 @@ public:
   virtual bool registerDrawStage(int drawStage) override;
   virtual int getActiveDrawStage() const override { return activeDrawStage; }
 
+  virtual FrameBufferPtr getTopFrameBuffer() override;
+  virtual void pushFrameBuffer(FrameBufferPtr fbo) override;
+  virtual void popFrameBuffer() override;
+  virtual void addPostProcessingStep(PostProcStepHandlerPtr handler) override;
+  virtual void removePostProcessingStep(uint id) override;
+  virtual uint getNextPostProcessingStepID() override;
+  virtual FrameBufferPtr createFrameBuffer() override;
+
 protected:
   void registerStandardDrawStages();
+  void renderDrawStage(int drawStage);
+  bool initialiseFrameBuffers(const RenderInitConfig* initConfig);
+  void clearFrameBufferActiveStack();
   };

@@ -14,13 +14,15 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
   nextRenderableID = 1;
 
   clearGLErrors();
-  window.reset(initGL(initConfig->windowName, initConfig->windowWidth, initConfig->windowHeight, initConfig->fullscreen, initConfig->antiAliasing, true));
+  window.reset(initGL(initConfig->windowName, initConfig->windowWidth, initConfig->windowHeight, initConfig->fullscreen, false, true));
   if (window)
     {
     window->setClearColour(0, 0, 0);
     renderableSet.reset(new RenderableSetImpl(getNextRenderableID()));
     registerStandardDrawStages();
     glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxNumTextureLocations);
+    if(!initialiseFrameBuffers(initConfig))
+      return false;
     ASSERT_NO_GL_ERROR();
     return true;
     }
@@ -30,6 +32,12 @@ bool RenderContextImpl::initialise(const RenderInitConfig* initConfig)
 bool RenderContextImpl::cleanUp()
   {
   reset();
+  screenFBO_A->cleanUp();
+  screenFBO_A.reset();
+  screenFBO_B->cleanUp();
+  screenFBO_B.reset();
+  multiSampledFBO->cleanUp();
+  multiSampledFBO.reset();
   window->close();
   return true;
   }
@@ -50,6 +58,7 @@ void RenderContextImpl::reset()
     });
   resourceCache.clearAll();
   texIDsToBoundLocals.clear();
+  fboStack.clear();
   drawStages.clear();
   registerStandardDrawStages();
   }
@@ -71,25 +80,76 @@ void RenderContextImpl::setCameraToClip(const Matrix4& transform)
 
 void RenderContextImpl::render()
   {
-  if (!isRendering)
+  if (isRendering)
+    return;
+
+  //  activate multi sampled FBO
+  pushFrameBuffer(multiSampledFBO);
+  multiSampledFBO->clear();
+
+  //  render world scene
+  isRendering = true;
+  boundShaderID = 0;
+  for (int stage : drawStages)
     {
-    isRendering = true;
-    window->clear();
-    boundShaderID = 0;
-    for (int stage : drawStages)
-      {
-      activeDrawStage = stage;
-      transformStack.clear();
-      pushTransform(renderableSet->getTransform());
-      setClippingPlane(*renderableSet->getClippingPlane());
-      renderableSet->render(this);
-      disableClippingPlane();
-      popTransform();
-      }
-    window->update();
-    activeDrawStage = DRAW_STAGE_NONE;
-    isRendering = false;
+    if (stage < DRAW_STAGE_POST_PROC_CUTOFF)
+      renderDrawStage(stage);
     }
+  activeDrawStage = DRAW_STAGE_POST_PROC_CUTOFF;
+
+  popFrameBuffer();
+  if (postProcessingSteps.empty())
+    {
+    window->clear();
+    multiSampledFBO->blitToScreen(window->getWidth(), window->getHeight());
+    }
+  else
+    {
+    // do post processing
+    multiSampledFBO->blitToFBO(screenFBO_A.get(), true, false);
+    bool fboAActive = true;
+    for (PostProcStepHandlerPtr postProc : postProcessingSteps)
+      {
+      FrameBufferPtr activeFBO = fboAActive ? screenFBO_B : screenFBO_A;
+      FrameBufferPtr inactiveFBO = fboAActive ? screenFBO_A : screenFBO_B;
+      fboAActive = !fboAActive;
+
+      pushFrameBuffer(activeFBO);
+      getTopFrameBuffer()->clear();
+      postProc->render(this, inactiveFBO);
+      popFrameBuffer();
+      }
+
+    // blit most recent frame buffer to screen
+    clearFrameBufferActiveStack();
+    window->clear();
+    if(fboAActive)
+      screenFBO_A->blitToScreen(window->getWidth(), window->getHeight());
+    else
+      screenFBO_B->blitToScreen(window->getWidth(), window->getHeight());
+    }
+
+  //  render overlays/ui
+  for (int stage : drawStages)
+    {
+    if (stage > DRAW_STAGE_POST_PROC_CUTOFF)
+      renderDrawStage(stage);
+    }
+  activeDrawStage = DRAW_STAGE_NONE;
+
+  window->update();
+  isRendering = false;
+  }
+
+void RenderContextImpl::renderDrawStage(int drawStage)
+  {
+  activeDrawStage = drawStage;
+  transformStack.clear();
+  pushTransform(renderableSet->getTransform());
+  setClippingPlane(*renderableSet->getClippingPlane());
+  renderableSet->render(this);
+  disableClippingPlane();
+  popTransform();
   }
 
 bool RenderContextImpl::isWindowOpen() const
@@ -310,3 +370,90 @@ void RenderContextImpl::registerStandardDrawStages()
   registerDrawStage(DRAW_STAGE_OVERLAY);
   registerDrawStage(DRAW_STAGE_UI);
   }
+
+FrameBufferPtr RenderContextImpl::getTopFrameBuffer()
+  {
+  if (fboStack.empty())
+    return nullptr;
+  return *fboStack.begin();
+  }
+
+void RenderContextImpl::pushFrameBuffer(FrameBufferPtr fbo)
+  {
+  fboStack.push_front(fbo);
+  glBindFramebuffer(GL_FRAMEBUFFER, fbo->getGLID());
+  }
+
+void RenderContextImpl::popFrameBuffer()
+  {
+  fboStack.pop_front();
+  if (fboStack.empty())
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  else
+    glBindFramebuffer(GL_FRAMEBUFFER, getTopFrameBuffer()->getGLID());
+  }
+
+void RenderContextImpl::addPostProcessingStep(PostProcStepHandlerPtr handler)
+  {
+  postProcessingSteps.push_back(handler);
+  postProcessingSteps.sort(
+    [](const PostProcStepHandlerPtr& first, const PostProcStepHandlerPtr& second) -> bool
+      {
+      return first->getStepOrder() <= second->getStepOrder();
+      });
+  }
+
+void RenderContextImpl::removePostProcessingStep(uint id)
+  {
+  postProcessingSteps.remove_if(
+    [id](const PostProcStepHandlerPtr& handler)
+      {
+      return handler->getID() == id;
+      }
+    );
+  }
+
+uint RenderContextImpl::getNextPostProcessingStepID()
+  {
+  return nextPostProcStepID++;
+  }
+
+bool RenderContextImpl::initialiseFrameBuffers(const RenderInitConfig* initConfig)
+  {
+  screenFBO_A = createFrameBuffer();
+  screenFBO_B = createFrameBuffer();
+  if (!screenFBO_A || !screenFBO_B)
+    return false;
+
+  multiSampledFBO.reset(new FrameBuffer());
+  if (initConfig->antiAliasing)
+    {
+    if (!multiSampledFBO->initialiseMultisampled(initConfig->windowWidth, initConfig->windowHeight, 4, true))
+      return false;
+    }
+  else
+    {
+    multiSampledFBO = createFrameBuffer();
+    if (!multiSampledFBO)
+      return false;
+    }
+
+  return true;
+  }
+
+FrameBufferPtr RenderContextImpl::createFrameBuffer()
+  {
+  FrameBufferPtr fbo(new FrameBuffer());
+  fbo->initialise(getWindow()->getWidth(), getWindow()->getHeight(), false, true, true);
+  return fbo;
+  }
+
+void RenderContextImpl::clearFrameBufferActiveStack()
+  {
+  while(getTopFrameBuffer())
+    popFrameBuffer();
+  }
+
+
+
+

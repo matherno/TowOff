@@ -24,7 +24,7 @@ void TOInputHandler::onAttached(GameContext* gameContext)
   Camera* camera = gameContext->getCamera();
   refreshRotationMatrix();
   refreshCamera(camera);
-  *camera->getCameraToClip() = mathernogl::matrixPerspective(1, gameContext->getRenderContext()->getWindow()->getAspectRatio(), -1, -1000);
+  *camera->getCameraToClip() = mathernogl::matrixPerspective(1, gameContext->getRenderContext()->getWindow()->getAspectRatio(), -1, -300);
   camera->setValid(false);
   }
 

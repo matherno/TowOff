@@ -3,6 +3,7 @@
 //
 
 #include <RenderSystem/RenderableMesh.h>
+#include <RenderSystem/PostProcessing.h>
 
 #include "TOGameContext.h"
 #include "Resources.h"

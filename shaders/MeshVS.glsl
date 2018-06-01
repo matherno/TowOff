@@ -17,9 +17,9 @@ uniform int inDrawStyle = DRAW_STYLE_SINGLE_COLOUR;
 uniform int inClippingEnabled = 0;
 uniform vec4 inClipPlane;
 
-out vec3 normal;
-out vec3 colour;
-out vec2 texCoords;
+centroid out vec3 normal;
+centroid out vec3 colour;
+centroid out vec2 texCoords;
 
 void performClipping(vec4 worldSpaceVert){
   gl_ClipDistance[0] = dot(worldSpaceVert, inClipPlane);

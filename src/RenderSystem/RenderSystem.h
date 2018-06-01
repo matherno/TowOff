@@ -18,13 +18,15 @@ typedef std::string string;
  *  Rendering is done in stages, each renderable has a draw stage that its render() function gets called in
  *  Stages are performed in numerical order
  *  Draw stage "DRAW_STAGE_ALL" means that the given renderable will have its render() function called in every stage
+ *  "DRAW_STAGE_POST_PROC_CUTOFF" isn't a rendered stage, it just defines the point that post processing occurs
  */
-#define DRAW_STAGE_NONE           -1
-#define DRAW_STAGE_ALL             0
-#define DRAW_STAGE_OPAQUE         10
-#define DRAW_STAGE_TRANSPARENT    20
-#define DRAW_STAGE_OVERLAY        30
-#define DRAW_STAGE_UI             40
+#define DRAW_STAGE_NONE               -1
+#define DRAW_STAGE_ALL                 0
+#define DRAW_STAGE_OPAQUE             10
+#define DRAW_STAGE_TRANSPARENT        20
+#define DRAW_STAGE_POST_PROC_CUTOFF   30
+#define DRAW_STAGE_OVERLAY            40
+#define DRAW_STAGE_UI                 50
 
 /*
 *   Renderable, represents an object or primitive that may be rendered
@@ -70,6 +72,28 @@ public:
   virtual int count() const = 0;
   };
 typedef std::shared_ptr<RenderableSet> RenderableSetPtr;
+
+typedef std::shared_ptr<mathernogl::FrameBuffer> FrameBufferPtr;
+
+/*
+*   PostProcStepHandler, represents a step in the post processing pipeline
+*     The idea is the render(..) function of eah step will be called and given the current screen frame buffer
+*     Each step is taken sequentially (according to stepOrder), with the last step being rendered to the screen
+*/
+class PostProcStepHandler
+  {
+private:
+  const uint id;
+  const int stepOrder;
+public:
+  PostProcStepHandler(uint id, int stepOrder) : id(id), stepOrder(stepOrder) {}
+  virtual uint getID() const { return id; }
+  virtual int getStepOrder() const { return stepOrder; }
+  virtual void initialise(RenderContext* renderContext) = 0;
+  virtual void cleanUp(RenderContext* renderContext) = 0;
+  virtual void render(RenderContext* renderContext, FrameBufferPtr screenFBO) = 0;
+  };
+typedef std::shared_ptr<PostProcStepHandler> PostProcStepHandlerPtr;
 
 /*
 *   RenderInitConfig, simple struct to pass the initial config parameters to the render context
@@ -124,5 +148,12 @@ public:
   virtual bool isClippingEnabled() = 0;
   virtual bool registerDrawStage(int drawStage) = 0;    // returns false if the stage already exists
   virtual int getActiveDrawStage() const = 0;
+  virtual FrameBufferPtr getTopFrameBuffer() = 0;
+  virtual void pushFrameBuffer(FrameBufferPtr fbo) = 0;
+  virtual void popFrameBuffer() = 0;
+  virtual FrameBufferPtr createFrameBuffer() = 0;
+  virtual void addPostProcessingStep(PostProcStepHandlerPtr handler) = 0;
+  virtual void removePostProcessingStep(uint id) = 0;
+  virtual uint getNextPostProcessingStepID() = 0;
   };
 typedef std::shared_ptr<RenderContext> RenderContextPtr;

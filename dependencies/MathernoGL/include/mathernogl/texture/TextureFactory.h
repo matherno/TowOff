@@ -28,6 +28,8 @@ struct TextureOptions {
 Texture* createTextureFromFile(const std::string& filePath, const TextureOptions& options = TextureOptions());
 Texture* createEmptyTexture(uint width, uint height, uint bytesPerPixel = 3, const TextureOptions& options = TextureOptions());
 Texture* createEmptyAlphaTexture(uint width, uint height, const TextureOptions& options = TextureOptions());
+Texture* createDepthTexture(uint width, uint height);
+Texture* createMultiSampleTexture(uint width, uint height, uint numSamples, bool gammaCorrect);
 void updateTexture(Texture* texture);
 
 /*
