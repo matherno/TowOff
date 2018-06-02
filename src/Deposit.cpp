@@ -49,8 +49,9 @@ void Deposit::onAttached(GameContext* gameContext)
   ambientParticles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_CRYSTALAMBIENT_SHEET2));
   ambientParticles->setTextureAtlasSize(3, 3);
   ambientParticles->setTextureColourMixFactor(0);
+  ambientParticles->setTimeAlive(2000);
+  ambientParticles->setTimeBetweenSpawns(500);
   ambientParticles->addEmitter(position, [this](){ return false; }, Vector3D(), 0.3);
-  ambientParticles->setTimeAlive(4000);
   gameContext->addActor(ambientParticles);
 
   updateTimer.setTimeOut(UPDATE_TIME);
@@ -63,10 +64,9 @@ void Deposit::onUpdate(GameContext* gameContext)
     {
     const float energyFactor = (float) storedEnergy / (float) maxEnergy;
     if (energyFactor > 0.1)
-      {
-      const long timeBetweenSpawns = mathernogl::RandomGenerator::randomInt(600, 1000);
-      ambientParticles->setTimeBetweenSpawns(timeBetweenSpawns + (1.0f - energyFactor) * 800, true);
-      }
+      ambientParticles->startEmitters();
+    else
+      ambientParticles->stopEmitters();
     modelRenderable->setDrawStyleTexture(modelTexture, (1.0f - energyFactor) * 0.9f, Vector3D(0.01, 0, 0.01));
     updateTimer.reset();
     storedEnergy += energyRegenPerSec;

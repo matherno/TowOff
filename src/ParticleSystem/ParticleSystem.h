@@ -49,6 +49,8 @@ public:
   void addEmitter(const Vector3D& position, long timeToLive, const Vector3D& colour = Vector3D(1), double particleSize = -1);
   void addEmitter(const Vector3D& position, EndEmitterCallback callback, const Vector3D& colour = Vector3D(1), double particleSize = -1);
   void clearEmitters();
+  void stopEmitters();
+  void startEmitters();
   void setGravityAccel(double gravityAccel);
   void setTimeBetweenSpawns(long timeBetweenSpawns, bool updateExisting = false);
   void setTimeAlive(long timeAlive);

@@ -278,3 +278,21 @@ void ParticleSystem::setTranslation(const Vector3D& translation)
     }
   this->translation = translation;
   }
+
+void ParticleSystem::stopEmitters()
+  {
+  for (ParticleSystemItem& item : *emitters.getList())
+    {
+    if (item.baseEmitter)
+      item.baseEmitter->setSpawningState(false);
+    }
+  }
+
+void ParticleSystem::startEmitters()
+  {
+  for (ParticleSystemItem& item : *emitters.getList())
+    {
+    if (item.baseEmitter && item.timeToLive > timeAlive)
+      item.baseEmitter->setSpawningState(true);
+    }
+  }

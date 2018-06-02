@@ -27,7 +27,7 @@ private:
   std::list<ParticlePtr> particles;
   mathernogl::RandomGenerator randomGenerator;
   Vector3D position;
-  long timeSinceStart = 0;
+  long currentTime = 0;
   long lastSpawnTime = 0;
   double gravityAccel = 0.001;
   long timeBetweenSpawns = 1000;
