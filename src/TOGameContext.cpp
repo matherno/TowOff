@@ -133,7 +133,7 @@ void TOGameContext::removeTower(uint id)
     towerBoundingBoxes.erase(id);
     }
 
-  if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
+  if (tower->getFunction() == Tower::combat || TowerFactory::canTowerRelayEnergy(tower->getFunction()))
     rebuildCombatTowerNetworksMap();
   }
 
@@ -150,7 +150,7 @@ TowerPtr TOGameContext::createTower(uint towerType, const Vector3D& position, bo
 
   if (tower->getFunction() != Tower::combat)
     connectionManager->addTower(tower);
-  if (tower->getFunction() == Tower::combat || tower->getFunction() == Tower::relay)
+  if (tower->getFunction() == Tower::combat || TowerFactory::canTowerRelayEnergy(tower->getFunction()))
     rebuildCombatTowerNetworksMap();
   fogOfWarHandler->refreshFOW(this);
 
@@ -250,7 +250,7 @@ void TOGameContext::rebuildCombatTowerNetworksMap()
 
     for (const TowerPtr& relayTower : *towers.getList())
       {
-      if (relayTower->isUnderConstruction() || relayTower->getFunction() != Tower::relay)
+      if (relayTower->isUnderConstruction() || !TowerFactory::canTowerRelayEnergy(relayTower->getFunction()))
         continue;
 
       if(isCombatTowerInRange(combatTower, relayTower))
@@ -392,7 +392,7 @@ void TOGameContext::displayAllRelayRanges()
   {
   for (TowerPtr tower : *towers.getList())
     {
-    if (!tower->isUnderConstruction() && tower->getFunction() == Tower::relay)
+    if (!tower->isUnderConstruction() && TowerFactory::canTowerRelayEnergy(tower->getFunction()))
       displayTowerRangeField(tower.get());
     }
   }

@@ -7,6 +7,7 @@
 #include "Resources.h"
 #include "TimeToLiveActor.h"
 #include "UnderConstructTower.h"
+#include "TowerFactory.h"
 
 
 ConnectionManager::ConnectionManager(uint id) : GameActor(id)
@@ -122,7 +123,7 @@ bool ConnectionManager::areTowerFunctionsCompatible(Tower::TowerFunction towerAF
     return false;
   if (towerAFunction == Tower::combat || towerBFunction == Tower::combat)
     return false;
-  if (towerAFunction == Tower::relay || towerBFunction == Tower::relay)
+  if (TowerFactory::canTowerRelayEnergy(towerAFunction) || TowerFactory::canTowerRelayEnergy(towerBFunction))
     return true;
   return towerAFunction != towerBFunction;
   }

@@ -31,6 +31,7 @@ public:
   static Tower::TowerFunction getTowerFunction(uint towerType);
   static bool canConstructTowerType(uint towerType);
   static uint getStartTowerTypeID();
+  static bool canTowerRelayEnergy(Tower::TowerFunction function);
 
   static TowerPtr createTower(uint towerType, uint id, const Vector3D& position);
   static TowerPtr createUnderConstructTower(uint towerType, uint id, const Vector3D& position);

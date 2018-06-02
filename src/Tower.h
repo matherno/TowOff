@@ -23,6 +23,7 @@ public:
     storage,
     relay,
     miner,
+    homebase,
     };
 
 protected:
@@ -51,7 +52,7 @@ public:
   virtual ~Tower() {};
 
   virtual TowerFunction getFunction() const;
-  bool isPowerSrc() const { return getFunction() == miner || getFunction() == storage; }
+  bool isPowerSrc() const { return getFunction() == miner || getFunction() == storage || getFunction() == homebase; }
   uint getTowerType() const { return towerType; }
   void setBaseModelFilePath(string filePath){ baseModelFile = filePath; }
   void setTurretModelFilePath(string filePath){ turretModelFile = filePath; }

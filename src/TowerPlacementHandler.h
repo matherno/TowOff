@@ -21,6 +21,7 @@ private:
   Vector3D highlightColourValid = Vector3D(0.1, 0.5, 0.1);
   Vector3D highlightColourInvalid = Vector3D(0.5, 0.1, 0.1);
   Vector3D previewColour = Vector3D(0.5);
+  Vector3D relayConnectionColour = Vector3D(0, 0.6, 0.7);
   float previewColourAlpha = 0.5f;
 
 public:

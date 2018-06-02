@@ -155,7 +155,11 @@ void TowerPlacementHandler::setupConnectionHighlights(GameContext* gameContext)
       continue;
     if (!ConnectionManager::areTowerFunctionsCompatible(tower->getFunction(), towerHighlightFunction))
       continue;
-    towerConnectionHighlights->addLine(towerHighlightConnectPos, tower->getConnectPosition(), previewColour, previewColourAlpha);
+
+    Vector3D colour = previewColour;
+    if (TowerFactory::canTowerRelayEnergy(tower->getFunction()) && TowerFactory::canTowerRelayEnergy(towerHighlightFunction))
+        colour = relayConnectionColour;
+    towerConnectionHighlights->addLine(towerHighlightConnectPos, tower->getConnectPosition(), colour, previewColourAlpha);
     }
 
   towerConnectionHighlights->enableRebuild();

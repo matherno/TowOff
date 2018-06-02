@@ -38,11 +38,17 @@ private:
   float energyTransferRate = 25;   // base value of how much energy per second this takes from miners
 
 public:
-  TowerFunctionalityStorage() : TowerFunctionality(Tower::storage) {}
+  TowerFunctionalityStorage(Tower::TowerFunction function = Tower::storage) : TowerFunctionality(function) {}
   void setEnergyTransferRate(float rate);
 
   virtual void onAttached(Tower* tower, GameContext* gameContext) override;
   virtual void onUpdate(Tower* tower, GameContext* gameContext) override;
+  };
+
+class TowerFunctionalityHomeBase : public TowerFunctionalityStorage
+  {
+public:
+  TowerFunctionalityHomeBase() : TowerFunctionalityStorage(Tower::homebase) {}
   };
 
 class TowerFunctionalityMiner : public TowerFunctionality
