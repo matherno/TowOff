@@ -40,15 +40,17 @@ void Deposit::onAttached(GameContext* gameContext)
   ambientParticles.reset(new ParticleSystem(gameContext->getNextActorID(), false));
   ambientParticles->setParticleDirectionRandom();
   ambientParticles->setParticleSpawnSphere(1.5);
-  ambientParticles->setInitVelocity(0.0004);
+  ambientParticles->setInitVelocity(0.0002);
   ambientParticles->setGravityAccel(0);
-  ambientParticles->setParticleSize(0.4);
+  ambientParticles->setParticleSize(0.6);
   ambientParticles->setDepthTesting(false);
   ambientParticles->setAdditiveBlending(true);
   ambientParticles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_CRYSTALAMBIENT_SHEET1));
   ambientParticles->addTextureAtlas(renderContext->getSharedTexture(IMAGE_CRYSTALAMBIENT_SHEET2));
   ambientParticles->setTextureAtlasSize(3, 3);
   ambientParticles->setTextureColourMixFactor(0);
+  ambientParticles->addEmitter(position, [this](){ return false; }, Vector3D(), 0.3);
+  ambientParticles->setTimeAlive(4000);
   gameContext->addActor(ambientParticles);
 
   updateTimer.setTimeOut(UPDATE_TIME);
@@ -62,12 +64,8 @@ void Deposit::onUpdate(GameContext* gameContext)
     const float energyFactor = (float) storedEnergy / (float) maxEnergy;
     if (energyFactor > 0.1)
       {
-      const long timeAlive = mathernogl::RandomGenerator::randomInt(1000, 2000);
-      const long timeBetweenSpawns = mathernogl::RandomGenerator::randomInt(1500, 2000);
-      const float size = mathernogl::RandomGenerator::randomFloat(0.2, 0.5);
-      ambientParticles->setTimeAlive(timeAlive);
-      ambientParticles->setTimeBetweenSpawns(timeBetweenSpawns + (1.0f - energyFactor) * 2000);
-      ambientParticles->addEmitter(position, UPDATE_TIME + timeAlive, Vector3D(), size);
+      const long timeBetweenSpawns = mathernogl::RandomGenerator::randomInt(600, 1000);
+      ambientParticles->setTimeBetweenSpawns(timeBetweenSpawns + (1.0f - energyFactor) * 800, true);
       }
     modelRenderable->setDrawStyleTexture(modelTexture, (1.0f - energyFactor) * 0.9f, Vector3D(0.01, 0, 0.01));
     updateTimer.reset();

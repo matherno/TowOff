@@ -74,9 +74,17 @@ void ParticleSystem::setGravityAccel(double gravityAccel)
   this->gravityAccel = gravityAccel;
   }
 
-void ParticleSystem::setTimeBetweenSpawns(long timeBetweenSpawns)
+void ParticleSystem::setTimeBetweenSpawns(long timeBetweenSpawns, bool updateExisting /*= false*/)
   {
   this->timeBetweenSpawns = timeBetweenSpawns > 0 ? timeBetweenSpawns : 1;
+  if (updateExisting)
+    {
+    for (ParticleSystemItem& item : *emitters.getList())
+      {
+      if (item.baseEmitter)
+        item.baseEmitter->setTimeBetweenSpawns(timeBetweenSpawns);
+      }
+    }
   }
 
 void ParticleSystem::setTimeAlive(long timeAlive)
@@ -127,6 +135,15 @@ void ParticleSystem::addEmitter(const Vector3D& position, long timeToLive, EndEm
   item.colour = colour;
   item.size = particleSize;
   emitters.add(item, item.id);
+  }
+
+void ParticleSystem::clearEmitters()
+  {
+  for (ParticleSystemItem& item : *emitters.getList())
+    {
+    if (item.timeToLive > timeAlive)
+      item.timeToLive = timeAlive;
+    }
   }
 
 void ParticleSystem::initNewRenderables(RenderContext* renderContext)
