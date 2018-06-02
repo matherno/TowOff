@@ -23,13 +23,10 @@ void ParticleEmitter::createParticle(const Vector3D& initPosOffset, const Vector
 void ParticleEmitter::updateParticles(long deltaTime)
   {
   currentTime += deltaTime;
-  int spawned = 0;
-  const int lst = lastSpawnTime;
   while (currentTime - lastSpawnTime > timeBetweenSpawns)
     {
     if (isSpawning)
       {
-      ++spawned;
       Vector3D offset(0);
       if (particleOffsetFunc)
         {
@@ -43,10 +40,6 @@ void ParticleEmitter::updateParticles(long deltaTime)
       createParticle(offset, direction * initVelocity, timeAlive);
       }
     lastSpawnTime += timeBetweenSpawns;
-    }
-  if (spawned > 0)
-    {
-    mathernogl::logInfo(std::to_string(currentTime) + " last spawn time: " + std::to_string(lst) + ", spawned #: " + std::to_string(spawned));
     }
 
   auto iter = particles.begin();
