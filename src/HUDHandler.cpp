@@ -122,6 +122,43 @@ void TowerFocusPanel::updateTowerInfo(GameContext* context)
 
 
 /*
+ *  TODebugPanel
+ */
+
+void TODebugPanel::initialise(GameContext* context)
+  {
+  UIPanel::initialise(context);
+
+  UIManager* uiManager = context->getUIManager();
+
+  textComponent.reset(new UIText(uiManager->getNextComponentID()));
+  textComponent->setPadding(10, 10);
+  textComponent->setFontSize(30);
+  textComponent->setFontColour(Vector3D(0));
+  textComponent->showBackground(false);
+  textComponent->setFontColour(Vector3D(0.1));
+  textComponent->setHeightMatchParent(true);
+  textComponent->setWidthMatchParent(true);
+  addChild(textComponent);
+  }
+
+void TODebugPanel::updateDebugInfo(GameContext* context)
+  {
+  if (textComponent)
+    {
+    TOGameContext* toGameContext = TOGameContext::cast(context);
+    string text;
+    text += "Game Time: " + std::to_string(toGameContext->getGameTime()) + "\n";
+    text += "Delta Time: " + std::to_string(toGameContext->getDeltaTime()) + "\n";
+    text += "# Towers: " + std::to_string(toGameContext->getTowers()->count()) + "\n";
+    text += "# Bots: " + std::to_string(toGameContext->getBotList()->count()) + "\n";
+    textComponent->setText(text);
+    textComponent->invalidate();
+    }
+  }
+
+
+/*
  *  HUDHandler
  */
 
@@ -139,11 +176,15 @@ void HUDHandler::initialiseUI(GameContext* context)
 
   setupTowerBuildPanel(context);
   setupTowerFocusPanel(context);
+  setupDebugPanel(context);
   }
 
 void HUDHandler::updateUI(GameContext* context)
   {
   towerFocusPanel->updateTowerInfo(context);
+#ifndef NDEBUG
+  debugPanel->updateDebugInfo(context);
+#endif
   }
 
 void HUDHandler::deselectTowerType()
@@ -212,6 +253,18 @@ void HUDHandler::setupTowerBuildPanel(GameContext* context)
     subPanel->addChild(UIComponentPtr(button));
     ++towerNum;
     }
+  }
+
+void HUDHandler::setupDebugPanel(GameContext* context)
+  {
+#ifndef NDEBUG
+  UIManager* uiManager = context->getUIManager();
+  debugPanel.reset(new TODebugPanel(uiManager->getNextComponentID()));
+  debugPanel->setHorizontalAlignment(alignmentEnd);
+  debugPanel->setSize(Vector2D(300, 150));
+  debugPanel->setColour(Vector3D(0.2));
+  uiManager->addComponent(debugPanel);
+#endif
   }
 
 void HUDHandler::endTowerPlacingMode(GameContext* gameContext)

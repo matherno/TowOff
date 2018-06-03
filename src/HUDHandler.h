@@ -30,11 +30,24 @@ private:
   virtual void initialise(GameContext* context) override;
   };
 
+class TODebugPanel : public UIPanel
+  {
+private:
+  std::shared_ptr<UIText> textComponent;
+
+public:
+  TODebugPanel(uint id) : UIPanel(id) {}
+  void updateDebugInfo(GameContext* context);
+private:
+  virtual void initialise(GameContext* context) override;
+  };
+
 class HUDHandler
   {
 private:
   std::shared_ptr<UIPanel> mainUIPanel;
   std::shared_ptr<TowerFocusPanel> towerFocusPanel;
+  std::shared_ptr<TODebugPanel> debugPanel;
   UIToggleButtonGroupPtr towerButtonGroup;
   std::shared_ptr<TowerPlacementHandler> placementHandler;
 
@@ -47,6 +60,7 @@ public:
 protected:
   void setupTowerFocusPanel(GameContext* context);
   void setupTowerBuildPanel(GameContext* context);
+  void setupDebugPanel(GameContext* context);
   void startTowerPlacingMode(GameContext* gameContext, uint towerTypeID);
   void endTowerPlacingMode(GameContext* gameContext);
   };
