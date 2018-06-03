@@ -82,9 +82,11 @@ void setCommonTowerParameters(TowerPtr tower, uint towerType)
 
 TowerPtr TowerFactory::createUnderConstructTower(uint towerType, uint id, const Vector3D& position)
   {
-  TowerPtr tower(new UnderConstructTower(id, towerType));
+  std::shared_ptr<UnderConstructTower> tower(new UnderConstructTower(id, towerType));
   tower->setPosition(position);
   setCommonTowerParameters(tower, towerType);
+  tower->setMaxEnergy(getTowerEnergyConstrCost(towerType));
+  tower->setEnergyTransferRate(10);
   return tower;
   }
 
@@ -92,6 +94,7 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
   {
   std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
   weapon->setCooldownTime(1000);
+  weapon->setEnergyPerShot(15);
   weapon->setOnShootFunction([](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
                                {
                                RenderContext* renderContext = context->getRenderContext();
@@ -109,6 +112,7 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.45, -1));
   function->setWeapon(std::move(weapon));
+  function->setEnergyTransferRate(20);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
@@ -119,11 +123,12 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
 TowerPtr TowerFactory::createHomeBase(uint id, uint towerType, const Vector3D& position)
   {
   TowerFunctionalityHomeBase* function = new TowerFunctionalityHomeBase();
+  function->setEnergyTransferRate(100);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
-  tower->setMaxEnergy(20000);
-  tower->storeEnergy(tower->getMaxEnergy());
+  tower->setMaxEnergy(5000);
+  tower->storeEnergy(2000);
   setCommonTowerParameters(tower, towerType);
   return tower;
   }
@@ -141,7 +146,7 @@ TowerPtr TowerFactory::createPylon(uint id, uint towerType, const Vector3D& posi
 TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& position)
   {
   TowerFunctionalityMiner* function = new TowerFunctionalityMiner();
-  function->setEnergyTransferRate(60);
+  function->setEnergyTransferRate(20);
   function->addMiningBeamOffset(Vector3D(0.58, 1.5, -0.19));
   function->addMiningBeamOffset(Vector3D(-0.58, 1.5, -0.19));
 
@@ -155,7 +160,8 @@ TowerPtr TowerFactory::createMachineGunTower(uint id, uint towerType, const Vect
   {
   std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
   weapon->setCooldownTime(100);
-  weapon->setDamagePerShot(3);
+  weapon->setDamagePerShot(5);
+  weapon->setEnergyPerShot(1);
   weapon->setOnShootFunction(
     [](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
      {
@@ -186,9 +192,11 @@ TowerPtr TowerFactory::createMachineGunTower(uint id, uint towerType, const Vect
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.6, -1.56));
   function->setWeapon(std::move(weapon));
+  function->setEnergyTransferRate(10);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
+  tower->setMaxEnergy(100);
   setCommonTowerParameters(tower, towerType);
   return tower;
   }
@@ -198,6 +206,7 @@ TowerPtr TowerFactory::createMortar(uint id, uint towerType, const Vector3D& pos
   std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
   weapon->setCooldownTime(3000);
   weapon->setDamagePerShot(0);
+  weapon->setEnergyPerShot(30);
   weapon->setOnShootFunction(
     [](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
       {
@@ -238,9 +247,11 @@ TowerPtr TowerFactory::createMortar(uint id, uint towerType, const Vector3D& pos
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 2.6, -1.3));
   function->setWeapon(std::move(weapon));
+  function->setEnergyTransferRate(10);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
+  tower->setMaxEnergy(100);
   setCommonTowerParameters(tower, towerType);
   return tower;
   }
@@ -249,9 +260,10 @@ TowerPtr TowerFactory::createMortar(uint id, uint towerType, const Vector3D& pos
 TowerPtr TowerFactory::createMissileLauncher(uint id, uint towerType, const Vector3D& position)
   {
   std::unique_ptr<TrackingWeapon> weapon(new TrackingWeapon());
-  weapon->setCooldownTime(1000);
+  weapon->setCooldownTime(2000);
   weapon->setBurstParams(4, 100);
   weapon->setDamagePerShot(0);
+  weapon->setEnergyPerShot(5);
   weapon->setCreateTrackerFunction(
     [](GameContext* context, const Vector3D& shootPos, TowerTargetPtr target)
       {
@@ -281,9 +293,11 @@ TowerPtr TowerFactory::createMissileLauncher(uint id, uint towerType, const Vect
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 1.8, -0.9));
   function->setWeapon(std::move(weapon));
+  function->setEnergyTransferRate(10);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
+  tower->setMaxEnergy(100);
   setCommonTowerParameters(tower, towerType);
   return tower;
   }
@@ -291,8 +305,9 @@ TowerPtr TowerFactory::createMissileLauncher(uint id, uint towerType, const Vect
 TowerPtr TowerFactory::createSniperTower(uint id, uint towerType, const Vector3D& position)
   {
   std::unique_ptr<DiscreteWeapon> weapon(new DiscreteWeapon());
-  weapon->setCooldownTime(3000);
+  weapon->setCooldownTime(2000);
   weapon->setDamagePerShot(50);
+  weapon->setEnergyPerShot(20);
   weapon->setOnShootFunction(
     [](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
       {
@@ -337,9 +352,11 @@ TowerPtr TowerFactory::createSniperTower(uint id, uint towerType, const Vector3D
   TowerFunctionalityCombat* function = new TowerFunctionalityCombat();
   function->setShootOffset(Vector3D(0, 2.48, -0.68));
   function->setWeapon(std::move(weapon));
+  function->setEnergyTransferRate(10);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
+  tower->setMaxEnergy(100);
   setCommonTowerParameters(tower, towerType);
   return tower;
   }
@@ -372,9 +389,9 @@ float TowerFactory::getCombatRange(uint towerType)
   switch (towerType)
     {
     case TOWER_BASIC:
-      return 15;
+      return 10;
     case TOWER_MACHINEGUN:
-      return 15;
+      return 13;
     case TOWER_MORTAR:
       return 35;
     case TOWER_MISSILELAUNCHER:
@@ -482,6 +499,29 @@ uint TowerFactory::getStartTowerTypeID()
 bool TowerFactory::canTowerRelayEnergy(Tower::TowerFunction function)
   {
   return function == Tower::relay || function == Tower::homebase;
+  }
+
+uint TowerFactory::getTowerEnergyConstrCost(uint towerType)
+  {
+  switch (towerType)
+    {
+    case TOWER_BASIC:
+      return 200;
+    case TOWER_MACHINEGUN:
+      return 250;
+    case TOWER_MORTAR:
+      return 400;
+    case TOWER_MISSILELAUNCHER:
+      return 500;
+    case TOWER_SNIPER:
+      return 400;
+    case TOWER_PYLON:
+      return 300;
+    case TOWER_MINER:
+      return 150;
+    default:
+      return 300;
+    }
   }
 
 

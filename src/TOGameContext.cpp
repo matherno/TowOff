@@ -313,25 +313,25 @@ TowerPtr TOGameContext::findConnectedTower(uint towerID, bool findClosest, TOGam
   return resultTower;
   }
 
-TowerPtr TOGameContext::findClosestConnectedPowerSrc(uint towerID, bool mustHaveEnergy) const
+TowerPtr TOGameContext::findClosestConnectedPowerSrc(uint towerID, uint minStoredEnergy) const
   {
-  return findConnectedTower(towerID, true, [mustHaveEnergy, this](TowerPtr tower)
+  return findConnectedTower(towerID, true, [minStoredEnergy, this](TowerPtr tower)
     {
     if (tower->isUnderConstruction())
       return false;
-    if (mustHaveEnergy && !tower->hasEnergy())
+    if (tower->getStoredEnergy() < minStoredEnergy)
       return false;
     return tower->isPowerSrc();
     });
   }
 
-TowerPtr TOGameContext::findClosestConnectedMiner(uint towerID, bool mustHaveEnergy) const
+TowerPtr TOGameContext::findClosestConnectedMiner(uint towerID, uint minStoredEnergy) const
   {
-  return findConnectedTower(towerID, true, [mustHaveEnergy, this](TowerPtr tower)
+  return findConnectedTower(towerID, true, [minStoredEnergy, this](TowerPtr tower)
     {
     if (tower->isUnderConstruction())
       return false;
-    if (mustHaveEnergy && !tower->hasEnergy())
+    if (tower->getStoredEnergy() < minStoredEnergy)
       return false;
     return tower->getFunction() == Tower::miner;
     });
@@ -339,7 +339,7 @@ TowerPtr TOGameContext::findClosestConnectedMiner(uint towerID, bool mustHaveEne
 
 void TOGameContext::transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const
   {
-  uint energyTaken = srcTower->takeEnergy(amount, false);
+  uint energyTaken = srcTower->takeEnergy(amount, true);
   uint energyLeftOver = energyTaken - targetTower->storeEnergy(energyTaken);
   if (energyLeftOver > 0)
     srcTower->storeEnergy(energyLeftOver);

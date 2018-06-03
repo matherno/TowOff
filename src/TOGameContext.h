@@ -98,8 +98,8 @@ public:
   typedef std::function<bool(TowerPtr tower)> TowerQualifyingFunc;
   TowerPtr findConnectedTower(uint towerID, bool findClosest, TowerQualifyingFunc qualifyingFunc) const;
 
-  TowerPtr findClosestConnectedPowerSrc(uint towerID, bool mustHaveEnergy = false) const;
-  TowerPtr findClosestConnectedMiner(uint towerID, bool mustHaveEnergy = false) const;
+  TowerPtr findClosestConnectedPowerSrc(uint towerID, uint minStoredEnergy = 0) const;
+  TowerPtr findClosestConnectedMiner(uint towerID, uint minStoredEnergy = 0) const;
   void transferEnergy(Tower* srcTower, Tower* targetTower, uint amount) const;
   const std::set<uint>* combatTowerGetNetworksInRange(uint towerID) const;
   long timeBetweenEnergyTransfers() const { return 1000; };

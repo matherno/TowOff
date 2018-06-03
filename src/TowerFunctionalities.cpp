@@ -17,12 +17,10 @@ void TowerFunctionalityCombat::onUpdate(Tower* tower, GameContext* gameContext)
 
   if (transferEnergyTimer.incrementTimer(gameContext->getDeltaTime()))
     {
-    TowerPtr powerSrcTower = toGameContext->findClosestConnectedPowerSrc(tower->getID(), true);
+    uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
+    TowerPtr powerSrcTower = toGameContext->findClosestConnectedPowerSrc(tower->getID(), energyAmount);
     if (powerSrcTower)
-      {
-      uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
       toGameContext->transferEnergy(powerSrcTower.get(), tower, energyAmount);
-      }
     transferEnergyTimer.setTimeOut(toGameContext->timeBetweenEnergyTransfers());
     transferEnergyTimer.reset();
     }
@@ -92,12 +90,10 @@ void TowerFunctionalityStorage::onUpdate(Tower* tower, GameContext* gameContext)
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
   if (transferEnergyTimer.incrementTimer(gameContext->getDeltaTime()))
     {
-    TowerPtr targetTower = toGameContext->findClosestConnectedMiner(tower->getID(), true);
+    uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
+    TowerPtr targetTower = toGameContext->findClosestConnectedMiner(tower->getID(), energyAmount);
     if (targetTower)
-      {
-      uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
       toGameContext->transferEnergy(targetTower.get(), tower, energyAmount);
-      }
     transferEnergyTimer.setTimeOut(toGameContext->timeBetweenEnergyTransfers());
     transferEnergyTimer.reset();
     }

@@ -26,10 +26,10 @@ void UnderConstructTower::onUpdate(GameContext* gameContext)
 
   if (isAlive() && transferEnergyTimer.incrementTimer(gameContext->getDeltaTime()))
     {
-    TowerPtr targetTower = toGameContext->findClosestConnectedPowerSrc(getID(), true);
+    uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
+    TowerPtr targetTower = toGameContext->findClosestConnectedPowerSrc(getID(), energyAmount);
     if (targetTower)
       {
-      uint energyAmount = (uint)((energyTransferRate / 1000.0f) * toGameContext->timeBetweenEnergyTransfers());
       toGameContext->transferEnergy(targetTower.get(), this, energyAmount);
       setConstructionProgress((float)getStoredEnergy() / (float)getMaxEnergy());
       }
