@@ -123,12 +123,12 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
 TowerPtr TowerFactory::createHomeBase(uint id, uint towerType, const Vector3D& position)
   {
   TowerFunctionalityHomeBase* function = new TowerFunctionalityHomeBase();
-  function->setEnergyTransferRate(100);
+  function->setEnergyTransferRate(50);
 
   TowerPtr tower(new Tower(id, towerType, std::move(TowerFunctionalityPtr(function))));
   tower->setPosition(position);
-  tower->setMaxEnergy(5000);
-  tower->storeEnergy(2000);
+  tower->setMaxEnergy(2000);
+  tower->storeEnergy(1000);
   setCommonTowerParameters(tower, towerType);
   return tower;
   }
@@ -146,7 +146,7 @@ TowerPtr TowerFactory::createPylon(uint id, uint towerType, const Vector3D& posi
 TowerPtr TowerFactory::createMiner(uint id, uint towerType, const Vector3D& position)
   {
   TowerFunctionalityMiner* function = new TowerFunctionalityMiner();
-  function->setEnergyTransferRate(20);
+  function->setEnergyTransferRate(10);
   function->addMiningBeamOffset(Vector3D(0.58, 1.5, -0.19));
   function->addMiningBeamOffset(Vector3D(-0.58, 1.5, -0.19));
 
