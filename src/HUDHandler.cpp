@@ -141,11 +141,13 @@ void TODebugPanel::initialise(GameContext* context)
   textComponent->setWidthMatchParent(true);
   textComponent->setVisible(isVisible(), true);
   addChild(textComponent);
+
+  refreshTimer.setTimeOut(1000);
   }
 
 void TODebugPanel::updateDebugInfo(GameContext* context)
   {
-  if (textComponent)
+  if (textComponent && isVisible() && refreshTimer.incrementTimer(context->getDeltaTime()))
     {
     TOGameContext* toGameContext = TOGameContext::cast(context);
     string text;
@@ -178,6 +180,7 @@ void TODebugPanel::updateDebugInfo(GameContext* context)
     textComponent->setText(text);
     textComponent->setVisible(isVisible(), true);
     textComponent->invalidate();
+    refreshTimer.reset();
     }
   }
 

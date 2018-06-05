@@ -527,18 +527,17 @@ void TOGameContext::removeBotPortal(uint id)
 
 void TOGameContext::findBotsInRange(const Vector3D& position, float range, std::vector<BotPtr>* bots)
   {
-#define USE_QUAD_TREE
-#ifdef USE_QUAD_TREE
-  const BotQTNode* botQuadTreeRoot = botManager->getBotQuadTreeRoot();
-  if (botQuadTreeRoot)
-    botQuadTreeRoot->findBotsWithinRange(position, range, botManager->getBotList(), bots);
-#else
-  for (BotPtr bot : *botManager->getBotList()->getList())
+  if (range >= 0)
     {
-    if (bot->isInRange(position, range, 0))
+    const BotQTNode* botQuadTreeRoot = botManager->getBotQuadTreeRoot();
+    if (botQuadTreeRoot)
+      botQuadTreeRoot->findBotsWithinRange(position, range, botManager->getBotList(), bots);
+    }
+  else
+    {
+    for (const BotPtr& bot : *botManager->getBotList()->getList())
       bots->push_back(bot);
     }
-#endif
   }
 
 BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range, float minRange)

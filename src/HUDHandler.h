@@ -34,6 +34,7 @@ class TODebugPanel : public UIPanel
   {
 private:
   std::shared_ptr<UIText> textComponent;
+  Timer refreshTimer;
 
 public:
   TODebugPanel(uint id) : UIPanel(id) {}

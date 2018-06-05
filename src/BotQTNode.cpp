@@ -73,7 +73,7 @@ void BotQTNode::findBotsWithinRange(const Vector3D& rangeCentre, float rangeRadi
 void BotQTNode::findBotsWithinRange(const Vector2D& rangeCentre, float rangeRadius, const BotList* botList, std::vector<BotPtr>* foundBots) const
   {
   //  don't bother if this is an empty leaf node
-  if (isLeafNode() && nodeBots.size() < 0)
+  if (isLeafNode() && nodeBots.empty())
     return;
 
   //  as long as the range is within this nodes bounds...
@@ -83,7 +83,7 @@ void BotQTNode::findBotsWithinRange(const Vector2D& rangeCentre, float rangeRadi
   if (isLeafNode())
     {
     //  check bots in this leaf node to find those in range
-    for (BotPtr bot : nodeBots)
+    for (const BotPtr& bot : nodeBots)
       {
       if (bot->isInRange(rangeCentre, rangeRadius, 0))
         foundBots->push_back(bot);

@@ -127,7 +127,7 @@ public:
   BotPtr getBot(uint id);
   void removeBot(uint id);
   const BotList* getBotList() const { return botManager->getBotList(); }
-  void findBotsInRange(const Vector3D& position, float range, std::vector<BotPtr>* bots);
+  void findBotsInRange(const Vector3D& position, float range, std::vector<BotPtr>* bots);  // range of < 0 is infinite
   BotPtr findClosestBot(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
   void doBotDamageEffect(const Bot* bot);
   void doBotExplosionEffect(const Bot* bot);
