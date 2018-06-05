@@ -64,6 +64,7 @@ public:
   virtual uint bindTexture(TexturePtr texture) override;
   virtual ShaderProgramPtr getSharedShaderProgram(const std::vector<mathernogl::Shader>* shaders) override;
   virtual MeshStoragePtr getSharedMeshStorage(const std::string& objFilePath) override;
+  virtual MeshStorageInstancedPtr createInstancedMeshStorage(const string& objFilePath, uint maxNumInstances) override;
   virtual MeshStoragePtr createEmptyMeshStorage() override;
   virtual TexturePtr getSharedTexture(const string& imageFilePath, TextureOptions options = TextureOptions()) override;
   virtual TexturePtr createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options = TextureOptions()) override;

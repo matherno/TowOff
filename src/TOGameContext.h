@@ -23,6 +23,8 @@ class TOGameContext;
 #include "Bot.h"
 #include "BotPortal.h"
 #include "Deposit.h"
+#include "BotQTNode.h"
+#include "BotManager.h"
 
 #define DRAW_STAGE_FOGOFWAR   (DRAW_STAGE_TRANSPARENT + 1)
 
@@ -37,8 +39,6 @@ class TOGameContext : public GameContextImpl
 private:
   std::shared_ptr<TOGameState> loadedGameState;
   TowerList towers;
-  BotList botList;
-  BotPortalList botPortalList;
   DepositList depositList;
   std::shared_ptr<RenderableTerrain> surfaceMesh;
   HUDHandler hudHandler;
@@ -50,6 +50,7 @@ private:
   std::shared_ptr<TOInputHandler> toInputHandler;
   std::shared_ptr<PauseMenuHandler> pauseMenuHandler;
   std::shared_ptr<FogOfWarHandler> fogOfWarHandler;
+  std::shared_ptr<BotManager> botManager;
   VisibilityMarkersList visibilityMarkers;
   uint nextVisibilityMarkerID = 1;
 
@@ -125,16 +126,23 @@ public:
   BotPtr createBot(uint botType, const Vector3D& position);
   BotPtr getBot(uint id);
   void removeBot(uint id);
-  const BotList* getBotList() const { return &botList; }
+  const BotList* getBotList() const { return botManager->getBotList(); }
+  void findBotsInRange(const Vector3D& position, float range, std::vector<BotPtr>* bots);
   BotPtr findClosestBot(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
   void doBotDamageEffect(const Bot* bot);
   void doBotExplosionEffect(const Bot* bot);
+  const BotQTNode* getBotQuadTreeRoot() const { return botManager->getBotQuadTreeRoot(); }
+  const BotManager* getBotManager() const { return botManager.get(); }
+
   BotPortalPtr createBotPortal(const Vector3D& position);
   void removeBotPortal(uint id);
-  const BotPortalList* getBotPortalList() const { return &botPortalList; }
+  const BotPortalList* getBotPortalList() const { return botManager->getBotPortalList(); }
   BotPortalPtr findClosestBotPortal(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
+
   TowerTargetPtr findClosestTowerTarget(const Vector3D& position, float range = -1, float minRange = 0);    // range of < 0 is infinite
+  void findTowerTargetsInRange(const Vector3D& position, float range, float minRange, std::vector<TowerTargetPtr>* targets);
   void forEachTowerTarget(std::function<void(TowerTargetPtr)> func);
+
 
   DepositPtr createDeposit(const Vector3D& position);
   void createDepositGroup(const Vector3D& centrePosition, float radius, uint numDeposits);

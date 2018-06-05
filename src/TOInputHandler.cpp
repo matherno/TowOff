@@ -111,6 +111,9 @@ bool TOInputHandler::onKeyPressed(GameContext* gameContext, uint key)
       fogOfWarShown = !fogOfWarShown;
       TOGameContext::cast(gameContext)->setFogOfWarState(fogOfWarShown);
       return true;
+    case 'T':
+      TOGameContext::cast(gameContext)->getHUDHandler()->toggleDebugPanel();
+      return true;
     }
   return false;
   }

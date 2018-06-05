@@ -8,6 +8,10 @@
 #define SHADER_LOCATION_NORM  1
 #define SHADER_LOCATION_COL   2
 #define SHADER_LOCATION_TEX   3
+#define SHADER_LOCATION_TRANS1   4
+#define SHADER_LOCATION_TRANS2   5
+#define SHADER_LOCATION_TRANS3   6
+#define SHADER_LOCATION_TRANS4   7
 
 using namespace mathernogl;
 
@@ -151,5 +155,58 @@ void MeshStorage::calculateMinMax()
       max.y = std::max(max.y, vert.y);
       max.z = std::max(max.z, vert.z);
       }
+    }
+  }
+
+
+/*
+ * MeshStorageInstanced
+ */
+
+#define FLOATS_PER_INSTANCE 12
+
+bool MeshStorageInstanced::initialiseVAO()
+  {
+  if(MeshStorage::initialiseVAO())
+    {
+    instanceBuffer.init();
+    instanceBuffer.allocateMemory(maxNumInstances * FLOATS_PER_INSTANCE * sizeof(float));
+    getVAO().bind();
+    getVAO().linkBufferAsFloats(instanceBuffer, 0 * sizeof(float), 9 * sizeof(float), 3, SHADER_LOCATION_TRANS1, true);
+    getVAO().linkBufferAsFloats(instanceBuffer, 3 * sizeof(float), 9 * sizeof(float), 3, SHADER_LOCATION_TRANS2, true);
+    getVAO().linkBufferAsFloats(instanceBuffer, 6 * sizeof(float), 9 * sizeof(float), 3, SHADER_LOCATION_TRANS3, true);
+    getVAO().linkBufferAsFloats(instanceBuffer, 9 * sizeof(float), 9 * sizeof(float), 3, SHADER_LOCATION_TRANS4, true);
+    getVAO().unbind();
+    return true;
+    }
+  return false;
+  }
+
+void MeshStorageInstanced::cleanUp()
+  {
+  MeshStorage::cleanUp();
+  instanceBuffer.cleanUp();
+  }
+
+void MeshStorageInstanced::updateInstanceBuffer()
+  {
+  numInstancesInBuffer = (uint)floor(bufferData.size() / FLOATS_PER_INSTANCE);
+  instanceBuffer.copyDataFloat(bufferData);
+  }
+
+void MeshStorageInstanced::clearInstances()
+  {
+  bufferData.clear();
+  }
+
+void MeshStorageInstanced::addInstance(const mathernogl::Matrix4* transform)
+  {
+  if ((uint)floor(bufferData.size() / FLOATS_PER_INSTANCE) >= maxNumInstances)
+    return;
+
+  for (int row = 0; row < 4; ++row)
+    {
+    for (int col = 0; col < 3; ++col)
+      bufferData.push_back((float)transform->getAt(row, col));
     }
   }

@@ -56,6 +56,7 @@ public:
   void updateUI(GameContext* context);
   void cleanUp(GameContext* context);
   void deselectTowerType();
+  void toggleDebugPanel();
 
 protected:
   void setupTowerFocusPanel(GameContext* context);

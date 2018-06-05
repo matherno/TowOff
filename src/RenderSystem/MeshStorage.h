@@ -28,10 +28,10 @@ public:
   std::vector<mathernogl::Vector3D> colours;
 
   MeshStorage(const uint id) : id(id) {};
-  bool initialiseVAO();
+  virtual bool initialiseVAO();
   mathernogl::VertexArray getVAO() { return vao; }
   int getNumVertices() const { return numVertices; }
-  void cleanUp();
+  virtual void cleanUp();
   void setUseIndices(bool use){ useIndices = use; }
   mathernogl::Vector3D getMin() const;
   mathernogl::Vector3D getMax() const;
@@ -44,4 +44,24 @@ protected:
   bool initVAOWithColours(std::vector<int>* indicesPtr);
   };
 
+class MeshStorageInstanced : public MeshStorage
+  {
+private:
+  const uint maxNumInstances;
+  mathernogl::GPUBufferDynamic instanceBuffer;
+  uint numInstancesInBuffer = 0;
+  std::vector<float> bufferData;
+
+public:
+  MeshStorageInstanced(const uint id, uint maxNumInstances) : MeshStorage(id), maxNumInstances(maxNumInstances) {};
+  virtual bool initialiseVAO() override;
+  virtual void cleanUp() override;
+  void updateInstanceBuffer();
+  void clearInstances();
+  void addInstance(const mathernogl::Matrix4* transform);
+  uint getNumInstances() { return numInstancesInBuffer; }
+  };
+
 typedef std::shared_ptr<MeshStorage> MeshStoragePtr;
+typedef std::shared_ptr<MeshStorageInstanced> MeshStorageInstancedPtr;
+

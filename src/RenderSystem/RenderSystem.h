@@ -134,6 +134,7 @@ public:
   virtual ShaderProgramPtr getSharedShaderProgram(const std::vector<mathernogl::Shader>* shaders) = 0;
   virtual MeshStoragePtr getSharedMeshStorage(const string& objFilePath) = 0;
   virtual MeshStoragePtr createEmptyMeshStorage() = 0;
+  virtual MeshStorageInstancedPtr createInstancedMeshStorage(const string& objFilePath, uint maxNumInstances) = 0;
   virtual TexturePtr getSharedTexture(const string& imageFilePath, TextureOptions options = TextureOptions()) = 0;
   virtual TexturePtr createEmptyTexture(uint width, uint height, uint bytesPerPixel, TextureOptions options = TextureOptions()) = 0;
   virtual RenderableSetPtr createRenderableSet() = 0;

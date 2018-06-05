@@ -217,7 +217,8 @@ void UIText::setVisible(bool visible, bool recurseChildren)
   if (visible)
     {
     UIPanel::setVisible(useBackground, false);
-    caretComponent->setVisible(caretVisible, true);
+    if (caretComponent)
+      caretComponent->setVisible(caretVisible, true);
     }
   }
 

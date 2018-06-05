@@ -34,6 +34,7 @@ public:
   uint getMaxHealthPoints() const { return maxHealthPoints; }
   bool isAlive() const { return healthPoints > 0; }
   bool isInRange(const Vector3D& rangeCentre, float maxRange, float minRange) const;
+  bool isInRange(const Vector2D& rangeCentre2D, float maxRange, float minRange) const;
 
   //  returns true if this targets health is all gone
   virtual bool doDamage(uint damagePoints);

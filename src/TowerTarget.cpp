@@ -51,3 +51,8 @@ bool TowerTarget::isInRange(const Vector3D& rangeCentre, float maxRange, float m
   const float distanceToTarget = (float)getPosition().distanceToPoint(rangeCentre);
   return distanceToTarget <= maxRange && distanceToTarget >= minRange;
   }
+
+bool TowerTarget::isInRange(const Vector2D& rangeCentre, float maxRange, float minRange) const
+  {
+  return isInRange(Vector3D(rangeCentre.x, 0, rangeCentre.y), maxRange, minRange);
+  }

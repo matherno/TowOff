@@ -8,11 +8,8 @@
 #include "TOGameContext.h"
 #include "Resources.h"
 #include "TowerFactory.h"
-#include "BotFactory.h"
 
 #define LAND_HEIGHT 0
-#define WATER_HEIGHT -1
-#define WATER_FLOOR_HEIGHT -5
 
 bool TOGameContext::initialise()
   {
@@ -38,6 +35,8 @@ bool TOGameContext::initialise()
   addActor(selectionManager);
   fogOfWarHandler.reset(new FogOfWarHandler(getNextActorID(), 52));
   addActor(fogOfWarHandler);
+  botManager.reset(new BotManager(getNextActorID()));
+  addActor(botManager);
 
   if (loadedGameState)
     addInitialTowers();
@@ -60,6 +59,7 @@ void TOGameContext::cleanUp()
     removeActor(rangeFieldManager->getID());
     removeActor(pauseMenuHandler->getID());
     removeActor(fogOfWarHandler->getID());
+    removeActor(botManager->getID());
     }
   GameContextImpl::cleanUp();
   }
@@ -73,6 +73,8 @@ void TOGameContext::processUpdateStage()
   {
   hudHandler.updateUI(this);
   specialEffectsHandler.update(this);
+
+
   GameContextImpl::processUpdateStage();
   }
 
@@ -482,29 +484,19 @@ void TOGameContext::removeVisibilityMarker(uint id)
 
 BotPtr TOGameContext::createBot(uint botType, const Vector3D& position)
   {
-  BotPtr bot = BotFactory::createBot(botType, getNextActorID(), position);
-  if (!bot)
-    return nullptr;
-
-  botList.add(bot, bot->getID());
-  addActor(bot);
-  return bot;
+  return botManager->createBot(this, botType, position);
   }
 
 BotPtr TOGameContext::getBot(uint id)
   {
-  if (botList.contains(id))
-    return botList.get(id);
+  if (botManager->getBotList()->contains(id))
+    return botManager->getBotList()->get(id);
   return nullptr;
   }
 
 void TOGameContext::removeBot(uint id)
   {
-  if (botList.contains(id))
-    {
-    botList.remove(id);
-    removeActor(id);
-    }
+  botManager->removeBot(this, id);
   }
 
 void TOGameContext::doBotDamageEffect(const Bot* bot)
@@ -525,31 +517,39 @@ void TOGameContext::setFogOfWarState(bool isOn)
 
 BotPortalPtr TOGameContext::createBotPortal(const Vector3D& position)
   {
-  BotPortalPtr portal = BotFactory::createBotPortal(getNextActorID(), position);
-  if (!portal)
-    return nullptr;
-
-  botPortalList.add(portal, portal->getID());
-  addActor(portal);
-  return portal;
+  return botManager->createBotPortal(this, position);
   }
 
 void TOGameContext::removeBotPortal(uint id)
   {
-  if (botPortalList.contains(id))
-    {
-    botPortalList.remove(id);
-    removeActor(id);
-    }
+  botManager->removeBotPortal(this, id);
   }
 
+void TOGameContext::findBotsInRange(const Vector3D& position, float range, std::vector<BotPtr>* bots)
+  {
+#define USE_QUAD_TREE
+#ifdef USE_QUAD_TREE
+  const BotQTNode* botQuadTreeRoot = botManager->getBotQuadTreeRoot();
+  if (botQuadTreeRoot)
+    botQuadTreeRoot->findBotsWithinRange(position, range, botManager->getBotList(), bots);
+#else
+  for (BotPtr bot : *botManager->getBotList()->getList())
+    {
+    if (bot->isInRange(position, range, 0))
+      bots->push_back(bot);
+    }
+#endif
+  }
 
 BotPtr TOGameContext::findClosestBot(const Vector3D& position, float range, float minRange)
   {
+  std::vector<BotPtr> botsInRange;
+  findBotsInRange(position, range, &botsInRange);
+
   BotPtr closestTarget;
   float closestDistance = range;
   bool infiniteRange = range < 0;
-  for (BotPtr& target : *botList.getList())
+  for (BotPtr& target : botsInRange)
     {
     const float distance = (float) position.distanceToPoint(target->getPosition());
     if ((infiniteRange && !closestTarget) || target->isInRange(position, closestDistance, minRange))
@@ -566,7 +566,7 @@ BotPortalPtr TOGameContext::findClosestBotPortal(const Vector3D& position, float
   BotPortalPtr closestTarget;
   float closestDistance = range;
   bool infiniteRange = range < 0;
-  for (BotPortalPtr& target : *botPortalList.getList())
+  for (const BotPortalPtr& target : *botManager->getBotPortalList()->getList())
     {
     const float distance = (float) position.distanceToPoint(target->getPosition());
     if ((infiniteRange && !closestTarget) || target->isInRange(position, closestDistance, minRange))
@@ -595,11 +595,27 @@ TowerTargetPtr TOGameContext::findClosestTowerTarget(const Vector3D& position, f
   return closestPortal;
   }
 
+void TOGameContext::findTowerTargetsInRange(const Vector3D& position, float range, float minRange, std::vector<TowerTargetPtr>* targets)
+  {
+  std::vector<BotPtr> botsInRange;
+  findBotsInRange(position, range, &botsInRange);
+  for (auto bot : botsInRange)
+    {
+    if (bot->getPosition().distanceToPoint(position) > minRange)
+      targets->push_back(bot);
+    }
+  for (auto portal : *getBotPortalList()->getList())
+    {
+    if (portal->isInRange(position, range, minRange))
+      targets->push_back(portal);
+    }
+  }
+
 void TOGameContext::forEachTowerTarget(std::function<void(TowerTargetPtr)> func)
   {
-  for (BotPtr bot : *botList.getList())
+  for (BotPtr bot : *botManager->getBotList()->getList())
     func(bot);
-  for (BotPortalPtr portal : *botPortalList.getList())
+  for (BotPortalPtr portal : *botManager->getBotPortalList()->getList())
     func(portal);
   }
 
@@ -656,3 +672,4 @@ DepositPtr TOGameContext::findClosestDeposit(const Vector3D& position, uint minE
     }
   return closestDepo;
   }
+

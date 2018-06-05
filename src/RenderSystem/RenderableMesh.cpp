@@ -51,7 +51,21 @@ void RenderableMesh::render(RenderContext* renderContext)
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
       glLineWidth(1);
       }
-    glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
+
+    MeshStorageInstanced* instancedMeshStorage = dynamic_cast<MeshStorageInstanced*>(meshStorage.get());
+    if (instancedMeshStorage)
+      {
+      //  instanced rendering...
+      shaderProgram->setVarInt("inUseInstanceTransforms", 1, true);
+      glDrawArraysInstanced(GL_TRIANGLES, 0, instancedMeshStorage->getNumVertices(), instancedMeshStorage->getNumInstances());
+      }
+    else
+      {
+      //  singular rendering...
+      shaderProgram->setVarInt("inUseInstanceTransforms", 0, true);
+      glDrawArrays(GL_TRIANGLES, 0, meshStorage->getNumVertices());
+      }
+
     if (wireframeMode)
       glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     ASSERT_NO_GL_ERROR();

@@ -62,6 +62,7 @@ void BotPortal::doSpawning(GameContext* gameContext)
   {
   if (spawnDef && spawnTimer.incrementTimer(gameContext->getDeltaTime()))
     {
+
     if (spawnIndex == -1)
       {
       //  start spawning units
@@ -70,10 +71,15 @@ void BotPortal::doSpawning(GameContext* gameContext)
       }
     else if (spawnIndex < spawnDef->spawnsIDs.size())
       {
-      //  spawn the next unit
-      Vector3D spawnPos = getPosition() + Vector3D(0, 0, 0.5);
-      TOGameContext::cast(gameContext)->createBot(spawnDef->spawnsIDs[spawnIndex], spawnPos);
-      ++spawnIndex;
+      const uint spawnBotType = spawnDef->spawnsIDs[spawnIndex];
+      TOGameContext* toGameContext = TOGameContext::cast(gameContext);
+      if (toGameContext->getBotManager()->canCreateBot(spawnBotType))
+        {
+        //  spawn the next unit
+        Vector3D spawnPos = getPosition() + Vector3D(0, 0, 0.5);
+        toGameContext->createBot(spawnBotType, spawnPos);
+        ++spawnIndex;
+        }
       }
     else
       {

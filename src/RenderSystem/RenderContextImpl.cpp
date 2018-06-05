@@ -232,6 +232,19 @@ MeshStoragePtr RenderContextImpl::createEmptyMeshStorage()
   return std::make_shared<MeshStorage>(nextMeshStorageID++);
   }
 
+MeshStorageInstancedPtr RenderContextImpl::createInstancedMeshStorage(const string& objFilePath, uint maxNumInstances)
+  {
+  MeshStorageInstancedPtr meshStorage(new MeshStorageInstanced(nextMeshStorageID++, maxNumInstances));
+  loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords);
+  meshStorage->calculateMinMax();
+  if(!meshStorage->initialiseVAO())
+    {
+    logWarning("Failed to create mesh storage!: " + std::to_string(meshStorage->getID()) + ", '" + objFilePath + "'");
+    return nullptr;
+    }
+  return meshStorage;
+  }
+
 void RenderContextImpl::pushTransform(const mathernogl::Transform* transform)
   {
   transformStack.push(transform);
@@ -453,7 +466,5 @@ void RenderContextImpl::clearFrameBufferActiveStack()
   while(getTopFrameBuffer())
     popFrameBuffer();
   }
-
-
 
 

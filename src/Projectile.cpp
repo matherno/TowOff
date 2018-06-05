@@ -56,13 +56,15 @@ void Projectile::updateRenderable(Vector3D direction)
 
 void Projectile::doAreaEffectDamage(GameContext* gameContext, const Vector3D& position, float radius, uint maxDamage)
   {
-  TOGameContext::cast(gameContext)->forEachTowerTarget ([position, radius, maxDamage](TowerTargetPtr towerTarget)
+  std::vector<TowerTargetPtr> targets;
+  TOGameContext::cast(gameContext)->findTowerTargetsInRange (position, radius, 0, &targets);
+  for (TowerTargetPtr target : targets)
     {
-    const float distance = (float) position.distanceToPoint(towerTarget->getTargetPosition());
+    const float distance = (float) position.distanceToPoint(target->getTargetPosition());
     float damage = 1 - (distance / radius);
     if (damage > 0)
-      towerTarget->doDamage((uint)std::pow(damage * maxDamage, 2));
-    });
+      target->doDamage((uint)std::pow(damage * maxDamage, 2));
+    }
   }
 
 

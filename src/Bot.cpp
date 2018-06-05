@@ -6,20 +6,12 @@
 #include "Resources.h"
 #include "TOGameContext.h"
 
-Bot::Bot(uint id, uint botType, const string& meshFilePath) : TowerTarget(id), typeID(botType), meshFilePath(meshFilePath)
+Bot::Bot(uint id, uint botType) : TowerTarget(id), typeID(botType)
   {}
 
 void Bot::onAttached(GameContext* gameContext)
   {
   TowerTarget::onAttached(gameContext);
-
-  RenderContext* renderContext = gameContext->getRenderContext();
-  renderable.reset(new RenderableMesh(renderContext->getNextRenderableID()));
-  renderable->setMeshStorage(renderContext->getSharedMeshStorage(meshFilePath));
-  renderable->setDrawStyleTexture(renderContext->getSharedTexture(IMAGE_TEXTURE_PALETTE));
-  renderable->getTransform()->setTransformMatrix(mathernogl::matrixTranslate(getPosition()));
-  renderable->initialise(renderContext);
-  renderContext->getRenderableSet()->addRenderable(renderable);
   }
 
 void Bot::onUpdate(GameContext* gameContext)
@@ -43,11 +35,6 @@ void Bot::onUpdate(GameContext* gameContext)
 void Bot::onDetached(GameContext* gameContext)
   {
   TowerTarget::onDetached(gameContext);
-
-  RenderContext* renderContext = gameContext->getRenderContext();
-  renderable->cleanUp(renderContext);
-  renderContext->getRenderableSet()->removeRenderable(renderable->getID());
-  renderable.reset();
   }
 
 bool Bot::doDamage(uint damagePoints)
@@ -57,14 +44,15 @@ bool Bot::doDamage(uint damagePoints)
   return TowerTarget::doDamage(damagePoints);
   }
 
-#define NEIGHBOUR_RADIUS 10
-#define SEPARATION_RADIUS 7
-#define TOWER_ATTACK_RADIUS 7
+#define NEIGHBOUR_RADIUS 7
+#define SEPARATION_RADIUS 4
+#define TOWER_ATTACK_RADIUS 15
 
 void Bot::doSwarmMovement(GameContext* gameContext)
   {
   TOGameContext* toGameContext = TOGameContext::cast(gameContext);
-  const BotList* botList = toGameContext->getBotList();
+  std::vector<BotPtr> botList;
+  toGameContext->findBotsInRange(getPosition(), NEIGHBOUR_RADIUS, &botList);
   const BotPortalList* botPortalList = toGameContext->getBotPortalList();
 
   //  get swarm vectors based on neighbour bots => alignment, cohesion, separation
@@ -72,9 +60,9 @@ void Bot::doSwarmMovement(GameContext* gameContext)
   const Vector2D previousVelocity = getVelocity2D();
   Vector2D alignment, cohesion, separation;
   Vector2D neighbourPos, thisToNeighbour;
-  uint numNeighbours = 0;
+  uint numNeighbours = botList.size();
   const float hitRadius = getHitRadius();
-  for (const BotPtr& bot : *botList->getList())
+  for (const BotPtr& bot : botList)
     {
     if (bot->getID() == getID())
       continue;
@@ -82,17 +70,13 @@ void Bot::doSwarmMovement(GameContext* gameContext)
     neighbourPos = bot->getPosition2D();
     thisToNeighbour = neighbourPos - position;
     const float distance = thisToNeighbour.magnitude() - hitRadius - bot->getHitRadius();
-    if (distance < NEIGHBOUR_RADIUS)
+    alignment += bot->getVelocity2D();
+    cohesion += neighbourPos;
+    if (distance < SEPARATION_RADIUS)
       {
-      ++numNeighbours;
-      alignment += bot->getVelocity2D();
-      cohesion += neighbourPos;
-      if (distance < SEPARATION_RADIUS)
-        {
-        thisToNeighbour.makeUniform();
-        thisToNeighbour *= 1.0f - (distance / SEPARATION_RADIUS);
-        separation -= thisToNeighbour;
-        }
+      thisToNeighbour.makeUniform();
+      thisToNeighbour *= 1.0f - (distance / SEPARATION_RADIUS);
+      separation -= thisToNeighbour;
       }
     }
 
@@ -153,8 +137,7 @@ void Bot::doSwarmMovement(GameContext* gameContext)
 
   //  update the renderables transform
   double angleBetween = mathernogl::ccwAngleBetween(Vector2D(0, -1), velocity.getUniform());
-  mathernogl::Matrix4 transform = mathernogl::matrixRotate(Vector3D(0, 1, 0), angleBetween) * mathernogl::matrixTranslate(getPosition());
-  renderable->getTransform()->setTransformMatrix(transform);
+  botTransform = mathernogl::matrixRotate(Vector3D(0, 1, 0), angleBetween) * mathernogl::matrixTranslate(getPosition());
 
   //  check if colliding with closest tower, and blow up if so
   if (targetTower)

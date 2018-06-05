@@ -30,9 +30,9 @@ public:
   virtual void render(RenderContext* renderContext) override;
 
   void setMeshStorage(MeshStoragePtr meshStorage) { this->meshStorage = meshStorage; }
-  MeshStoragePtr getMeshStorage(MeshStoragePtr meshStorage) const { return meshStorage; }
+  MeshStoragePtr getMeshStorage() const { return meshStorage; }
   void setTransparency(float transparency) { this->transparency = transparency; }
-  void setBackFaceCulling(float backFaceCulling) { this->backFaceCulling = backFaceCulling; }
+  void setBackFaceCulling(bool backFaceCulling) { this->backFaceCulling = backFaceCulling; }
   void setWireframeMode(bool enable) { wireframeMode = enable; }
   void setLightShaded(bool lightShaded){ this->lightShaded = lightShaded; }
 

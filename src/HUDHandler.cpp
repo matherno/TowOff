@@ -133,12 +133,13 @@ void TODebugPanel::initialise(GameContext* context)
 
   textComponent.reset(new UIText(uiManager->getNextComponentID()));
   textComponent->setPadding(10, 10);
-  textComponent->setFontSize(30);
+  textComponent->setFontSize(20);
   textComponent->setFontColour(Vector3D(0));
   textComponent->showBackground(false);
   textComponent->setFontColour(Vector3D(0.1));
   textComponent->setHeightMatchParent(true);
   textComponent->setWidthMatchParent(true);
+  textComponent->setVisible(isVisible(), true);
   addChild(textComponent);
   }
 
@@ -148,11 +149,34 @@ void TODebugPanel::updateDebugInfo(GameContext* context)
     {
     TOGameContext* toGameContext = TOGameContext::cast(context);
     string text;
-    text += "Game Time: " + std::to_string(toGameContext->getGameTime()) + "\n";
-    text += "Delta Time: " + std::to_string(toGameContext->getDeltaTime()) + "\n";
-    text += "# Towers: " + std::to_string(toGameContext->getTowers()->count()) + "\n";
-    text += "# Bots: " + std::to_string(toGameContext->getBotList()->count()) + "\n";
+    text += "Game Time: " + mathernogl::formatTime(context->getGameTime()) + "\n";
+    text += "Delta Time: " + std::to_string(toGameContext->getDeltaTime()) + " ms\n";
+    text += "FPS: " + std::to_string(int(1.0f / ((float)toGameContext->getDeltaTime() / 1000.0f))) + "\n";
+    text += "Num Towers: " + std::to_string(toGameContext->getTowers()->count()) + "\n";
+    text += "Num Bots (Total): " + std::to_string(toGameContext->getBotList()->count()) + "\n";
+
+    const BotManager* botManager = toGameContext->getBotManager();
+    for (const auto type : *BotFactory::getBotTypes())
+      {
+      uint count = botManager->getBotTypeCount(type.first);
+      text += "Num Bots (" + type.second.name + "): " + std::to_string(count) + "\n";
+      }
+
+    text += "Num Bot Portals: " + std::to_string(toGameContext->getBotPortalList()->count()) + "\n";
+
+    uint maxQTDepth = 0, qtNodeCount = 0, qtLeafCount = 0;
+    if (toGameContext->getBotQuadTreeRoot())
+      {
+      maxQTDepth = toGameContext->getBotQuadTreeRoot()->getMaxTreeDepth();
+      qtNodeCount = toGameContext->getBotQuadTreeRoot()->getNodeCount();
+      qtLeafCount = toGameContext->getBotQuadTreeRoot()->getLeafCount();
+      }
+    text += "Bot QT Depth: " + std::to_string(maxQTDepth) + "\n";
+    text += "Bot QT Nodes: " + std::to_string(qtNodeCount) + "\n";
+    text += "Bot QT Leaves: " + std::to_string(qtLeafCount) + "\n";
+
     textComponent->setText(text);
+    textComponent->setVisible(isVisible(), true);
     textComponent->invalidate();
     }
   }
@@ -182,14 +206,19 @@ void HUDHandler::initialiseUI(GameContext* context)
 void HUDHandler::updateUI(GameContext* context)
   {
   towerFocusPanel->updateTowerInfo(context);
-#ifndef NDEBUG
   debugPanel->updateDebugInfo(context);
-#endif
   }
 
 void HUDHandler::deselectTowerType()
   {
   towerButtonGroup->forceDeselectAll();
+  }
+
+void HUDHandler::toggleDebugPanel()
+  {
+  if (!debugPanel)
+    return;
+  debugPanel->setVisible(!debugPanel->isVisible(), true);
   }
 
 void HUDHandler::setupTowerFocusPanel(GameContext* context)
@@ -257,13 +286,14 @@ void HUDHandler::setupTowerBuildPanel(GameContext* context)
 
 void HUDHandler::setupDebugPanel(GameContext* context)
   {
-#ifndef NDEBUG
   UIManager* uiManager = context->getUIManager();
   debugPanel.reset(new TODebugPanel(uiManager->getNextComponentID()));
   debugPanel->setHorizontalAlignment(alignmentEnd);
-  debugPanel->setSize(Vector2D(300, 150));
+  debugPanel->setSize(Vector2D(260, 260));
   debugPanel->setColour(Vector3D(0.2));
   uiManager->addComponent(debugPanel);
+#ifdef NDEBUG
+  debugPanel->setVisible(false, true);
 #endif
   }
 
