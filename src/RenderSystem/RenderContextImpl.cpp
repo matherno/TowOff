@@ -61,6 +61,7 @@ void RenderContextImpl::reset()
   fboStack.clear();
   drawStages.clear();
   registerStandardDrawStages();
+  postProcessingSteps.clear();
   }
 
 uint RenderContextImpl::getNextRenderableID()
@@ -71,11 +72,18 @@ uint RenderContextImpl::getNextRenderableID()
 void RenderContextImpl::setWorldToCamera(const Matrix4& transform)
   {
   worldToCameraTransform = transform;
+
+  viewDirection = Vector3D(0, 0, 1) * matrixInverse(worldToCameraTransform);
+  viewDirection.makeUniform();
   }
 
 void RenderContextImpl::setCameraToClip(const Matrix4& transform)
   {
   cameraToClipTransform = transform;
+
+  Matrix4 clipToCamera = mathernogl::matrixInverse(cameraToClipTransform);
+  viewZNearPlane = (Vector3D(0, 0, -1) * clipToCamera).z;
+  viewZFarPlane = (Vector3D(0, 0, 1) * clipToCamera).z;
   }
 
 void RenderContextImpl::render()
@@ -87,55 +95,21 @@ void RenderContextImpl::render()
   pushFrameBuffer(multiSampledFBO);
   multiSampledFBO->clear();
 
-  //  render world scene
+  //  render each stage
   isRendering = true;
   boundShaderID = 0;
   for (int stage : drawStages)
     {
-    if (stage < DRAW_STAGE_POST_PROC_CUTOFF)
-      renderDrawStage(stage);
-    }
-  activeDrawStage = DRAW_STAGE_POST_PROC_CUTOFF;
-
-  popFrameBuffer();
-  if (postProcessingSteps.empty())
-    {
-    window->clear();
-    multiSampledFBO->blitToScreen(window->getWidth(), window->getHeight());
-    }
-  else
-    {
-    // do post processing
-    multiSampledFBO->blitToFBO(screenFBO_A.get(), true, false);
-    bool fboAActive = true;
-    for (PostProcStepHandlerPtr postProc : postProcessingSteps)
-      {
-      FrameBufferPtr activeFBO = fboAActive ? screenFBO_B : screenFBO_A;
-      FrameBufferPtr inactiveFBO = fboAActive ? screenFBO_A : screenFBO_B;
-      fboAActive = !fboAActive;
-
-      pushFrameBuffer(activeFBO);
-      getTopFrameBuffer()->clear();
-      postProc->render(this, inactiveFBO);
-      popFrameBuffer();
-      }
-
-    // blit most recent frame buffer to screen
-    clearFrameBufferActiveStack();
-    window->clear();
-    if(fboAActive)
-      screenFBO_A->blitToScreen(window->getWidth(), window->getHeight());
-    else
-      screenFBO_B->blitToScreen(window->getWidth(), window->getHeight());
-    }
-
-  //  render overlays/ui
-  for (int stage : drawStages)
-    {
-    if (stage > DRAW_STAGE_POST_PROC_CUTOFF)
-      renderDrawStage(stage);
+    if (stage >= DRAW_STAGE_OVERLAY)
+      glClear(GL_DEPTH_BUFFER_BIT);
+    renderDrawStage(stage);
     }
   activeDrawStage = DRAW_STAGE_NONE;
+
+  //  blit multi sampled fbo to screen
+  popFrameBuffer();
+  window->clear();
+  multiSampledFBO->blitToScreen(window->getWidth(), window->getHeight());
 
   window->update();
   isRendering = false;
@@ -150,6 +124,39 @@ void RenderContextImpl::renderDrawStage(int drawStage)
   renderableSet->render(this);
   disableClippingPlane();
   popTransform();
+
+  if (postProcessingSteps.count(drawStage) > 0)
+    performPostProcessing(postProcessingSteps[drawStage]);
+  }
+
+void RenderContextImpl::performPostProcessing(std::list<PostProcStepHandlerPtr>& ppSteps)
+  {
+  popFrameBuffer();
+
+  // do post processing
+  multiSampledFBO->blitToFBO(screenFBO_A.get(), true, false);
+  bool fboAActive = true;
+  for (PostProcStepHandlerPtr postProc : ppSteps)
+    {
+    FrameBufferPtr activeFBO = fboAActive ? screenFBO_B : screenFBO_A;
+    FrameBufferPtr inactiveFBO = fboAActive ? screenFBO_A : screenFBO_B;
+    fboAActive = !fboAActive;
+
+    pushFrameBuffer(activeFBO);
+    getTopFrameBuffer()->clear();
+    postProc->render(this, inactiveFBO);
+    popFrameBuffer();
+    }
+
+  // blit most recent frame buffer back to multi sampled fbo
+  clearFrameBufferActiveStack();
+  window->clear();
+  if(fboAActive)
+    screenFBO_A->blitToFBO(multiSampledFBO.get(), false, false);
+  else
+    screenFBO_B->blitToFBO(multiSampledFBO.get(), false, false);
+
+  pushFrameBuffer(multiSampledFBO);
   }
 
 bool RenderContextImpl::isWindowOpen() const
@@ -174,6 +181,11 @@ void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
     shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, *getStackedTransform()->getTransformMatrix(), true);
   else
     shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, Matrix4(1), true);
+
+  //  viewing stuff
+  shaderProgram->setVarVec3(SHADER_VAR_VIEW_DIR, viewDirection, true);
+  shaderProgram->setVarFloat(SHADER_VAR_VIEW_NEAR, (float) viewZNearPlane, true);
+  shaderProgram->setVarFloat(SHADER_VAR_VIEW_FAR, (float) viewZFarPlane, true);
 
   //  clipping
   bool enableClipping = clipPlane.x != 0 || clipPlane.y != 0 || clipPlane.z != 0;
@@ -408,22 +420,23 @@ void RenderContextImpl::popFrameBuffer()
 
 void RenderContextImpl::addPostProcessingStep(PostProcStepHandlerPtr handler)
   {
-  postProcessingSteps.push_back(handler);
-  postProcessingSteps.sort(
-    [](const PostProcStepHandlerPtr& first, const PostProcStepHandlerPtr& second) -> bool
-      {
-      return first->getStepOrder() <= second->getStepOrder();
-      });
+  const int drawStage = handler->getDrawStage();
+  if (postProcessingSteps.count(drawStage) == 0)
+    postProcessingSteps[drawStage] = std::list<PostProcStepHandlerPtr>();
+  postProcessingSteps[drawStage].push_back(handler);
   }
 
 void RenderContextImpl::removePostProcessingStep(uint id)
   {
-  postProcessingSteps.remove_if(
+  for (auto& pair : postProcessingSteps)
+    {
+    pair.second.remove_if(
     [id](const PostProcStepHandlerPtr& handler)
       {
       return handler->getID() == id;
       }
     );
+    }
   }
 
 uint RenderContextImpl::getNextPostProcessingStepID()
@@ -466,5 +479,6 @@ void RenderContextImpl::clearFrameBufferActiveStack()
   while(getTopFrameBuffer())
     popFrameBuffer();
   }
+
 
 

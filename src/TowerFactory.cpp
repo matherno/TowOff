@@ -11,6 +11,7 @@
 #include "UnderConstructTower.h"
 #include "TimeToLiveActor.h"
 #include "Projectile.h"
+#include "TOGameContext.h"
 
 #define TOWER_HOMEBASE        0
 #define TOWER_BASIC           1
@@ -98,7 +99,7 @@ TowerPtr TowerFactory::createBasicTower(uint id, uint towerType, const Vector3D&
   weapon->setOnShootFunction([](GameContext* context, const Vector3D& shootPos, const Vector3D& targetPos)
                                {
                                RenderContext* renderContext = context->getRenderContext();
-                               RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID());
+                               RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID(), DRAW_STAGE_OPAQUE_AFTER_EDGE);
                                line->initialise(renderContext);
                                line->addLine(shootPos, targetPos, Vector3D(0.7, 0.1, 0.1));
 
@@ -172,7 +173,7 @@ TowerPtr TowerFactory::createMachineGunTower(uint id, uint towerType, const Vect
      static const Vector3D beamColour = Vector3D(0.3, 0.2, 0.8);
 
      RenderContext* renderContext = context->getRenderContext();
-     RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID());
+     RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID(), DRAW_STAGE_OPAQUE_AFTER_EDGE);
      line->initialise(renderContext);
      line->addLine(
        shootPos + turretRight * gunsOffset,
@@ -313,7 +314,7 @@ TowerPtr TowerFactory::createSniperTower(uint id, uint towerType, const Vector3D
       {
       const Vector3D beamColour = Vector3D(0.0, 0.1, 0.3);
       RenderContext* renderContext = context->getRenderContext();
-      RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID());
+      RenderableLines* line = new RenderableLines(renderContext->getNextRenderableID(), DRAW_STAGE_OPAQUE_AFTER_EDGE);
       line->initialise(renderContext);
       line->addLine(shootPos, targetPos, beamColour);
       line->setLineWidth(3);

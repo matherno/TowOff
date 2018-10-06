@@ -30,6 +30,7 @@ void RenderableMesh::render(RenderContext* renderContext)
 
     renderContext->activateShaderProgram(shaderProgram);
     shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0, true);
+    shaderProgram->setVarInt("inCellShadeGrades", cellShadedGrades, true);
     shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1), true);
     shaderProgram->setVarFloat("inTextureColourMix", textureColourMix, true);
 

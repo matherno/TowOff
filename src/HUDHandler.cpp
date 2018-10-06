@@ -295,9 +295,9 @@ void HUDHandler::setupDebugPanel(GameContext* context)
   debugPanel->setSize(Vector2D(260, 260));
   debugPanel->setColour(Vector3D(0.2));
   uiManager->addComponent(debugPanel);
-#ifdef NDEBUG
+//#ifdef NDEBUG
   debugPanel->setVisible(false, true);
-#endif
+//#endif
   }
 
 void HUDHandler::endTowerPlacingMode(GameContext* gameContext)

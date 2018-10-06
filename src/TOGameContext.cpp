@@ -14,7 +14,13 @@
 bool TOGameContext::initialise()
   {
   bool success = GameContextImpl::initialise();
+  getRenderContext()->registerDrawStage(DRAW_STAGE_POST_PROC_EDGE);
+  getRenderContext()->registerDrawStage(DRAW_STAGE_OPAQUE_AFTER_EDGE);
   getRenderContext()->registerDrawStage(DRAW_STAGE_FOGOFWAR);
+
+  PostProcStepHandlerPtr postProcSilhoutting(new PostProcSimpleBase(getRenderContext()->getNextPostProcessingStepID(), DRAW_STAGE_POST_PROC_EDGE, "shaders/SilhouttingFS.glsl"));
+  postProcSilhoutting->initialise(getRenderContext());
+  getRenderContext()->addPostProcessingStep(postProcSilhoutting);
 
   if (loadedGameState)
     toInputHandler.reset(new TOInputHandler(getInputManager()->getNextHandlerID(), loadedGameState->cameraFocalPos, loadedGameState->cameraZoomFactor, loadedGameState->cameraRotation, -45));
@@ -205,7 +211,7 @@ void TOGameContext::initSurface()
   const float cellSize = 0.75f;
   const uint numCells = 200;
   const float translation = (float)numCells*cellSize*-0.5f;
-  surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize));
+  surfaceMesh.reset(new RenderableTerrain(renderContext->getNextRenderableID(), numCells, cellSize, DRAW_STAGE_OPAQUE_AFTER_EDGE));
   surfaceMesh->setMultiColour(Vector3D(pow(0.2, 2.2), pow(0.4, 2.2), pow(0.2, 2.2)), Vector3D(pow(0.15, 2.2), pow(0.3, 2.2), pow(0.15, 2.2)));
   surfaceMesh->getTransform()->translate(Vector3D(translation, LAND_HEIGHT, translation));
   surfaceMesh->initialise(renderContext);

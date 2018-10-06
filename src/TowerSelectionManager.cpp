@@ -13,7 +13,7 @@ TowerSelectionManager::TowerSelectionManager(uint id) : GameActor(id)
 
 void TowerSelectionManager::onAttached(GameContext* gameContext)
   {
-  selectionBoxRenderables.reset(new RenderableLineBoxes(gameContext->getRenderContext()->getNextRenderableID()));
+  selectionBoxRenderables.reset(new RenderableLineBoxes(gameContext->getRenderContext()->getNextRenderableID(), DRAW_STAGE_OPAQUE_AFTER_EDGE));
   selectionBoxRenderables->setLineColour(selectionColour);
   selectionBoxRenderables->setAlpha(selectionAlpha);
   selectionBoxRenderables->setLineWidth(selectionBoxLineWidth);

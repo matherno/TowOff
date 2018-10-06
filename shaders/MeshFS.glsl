@@ -11,10 +11,13 @@ centroid in vec2 texCoords;
 out vec4 outputColour;
 
 uniform int inLightShaded = 1;
+uniform int inCellShadeGrades = 0;    // zero is no cell shading
 uniform float inAlpha = 1;
 uniform sampler2D inTexture;
 uniform float inTextureColourMix = 0;
 uniform int inDrawStyle = DRAW_STYLE_SINGLE_COLOUR;
+uniform vec3 inLightDir = vec3(-0.5, -0.2, -0.3);
+uniform vec3 inViewDir = vec3(0, 0, -1);
 
 vec3 getColour(){
   if (inDrawStyle == DRAW_STYLE_TEXTURE){
@@ -27,12 +30,38 @@ vec3 getColour(){
     return colour;
 }
 
-void main(){
-    float lightFactor = 1;
-    if (inLightShaded > 0){
-        lightFactor = dot(normal, normalize(vec3(0.5, 0.2, 0.3)));
-        lightFactor *= 0.5;
-        lightFactor += 0.5;
+float cellShadeClamp(float lightFactor)
+  {
+  int numCellShades = inCellShadeGrades;
+  lightFactor *= numCellShades;
+  lightFactor = round(lightFactor);
+  lightFactor /= numCellShades;
+  if (lightFactor == 0)
+    lightFactor += (1.0 / numCellShades) * 0.1;
+  return lightFactor;
+  }
+
+void main()
+  {
+  if (inLightShaded > 0)
+    {
+    vec3 normalizedLight = normalize(inLightDir * -1);
+    vec3 normalizedView = normalize(inViewDir * -1);
+
+    float lightFactor = dot(normal, normalizedLight);
+    lightFactor *= 0.5;
+    lightFactor += 0.5;
+    if (inCellShadeGrades > 0)
+      lightFactor = cellShadeClamp(lightFactor);
+    vec3 diffuseCol = getColour() * clamp(lightFactor, 0, 1);
+
+//    vec3 halfwayVector = normalize((normalizedLight + normalizedView) * 0.5);
+//    vec3 specularCol = vec3(1, 1, 1) * 0.1 * pow(clamp(dot(halfwayVector, normal), 0, 1), 6);
+
+	  outputColour = vec4(diffuseCol, inAlpha);
     }
-	outputColour = vec4(getColour() * max(lightFactor, 0), inAlpha);
-}
+  else
+    {
+    outputColour = vec4(getColour(), inAlpha);
+    }
+  }

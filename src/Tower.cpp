@@ -28,6 +28,7 @@ void Tower::onAttached(GameContext* gameContext)
       renderable->initialise(renderContext);
       renderable->getTransform()->translate(position);
       renderable->setDrawStyleTexture(paletteTexture);
+      renderable->setCellShaded(true);
       towerBase = RenderablePtr(renderable);
       renderContext->getRenderableSet()->addRenderable(towerBase);
       }
@@ -44,6 +45,7 @@ void Tower::onAttached(GameContext* gameContext)
       renderable->initialise(renderContext);
       renderable->getTransform()->translate(position);
       renderable->setDrawStyleTexture(paletteTexture);
+      renderable->setCellShaded(true);
       towerTurret = RenderablePtr(renderable);
       renderContext->getRenderableSet()->addRenderable(towerTurret);
       }

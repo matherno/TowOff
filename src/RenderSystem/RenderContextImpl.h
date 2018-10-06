@@ -14,6 +14,9 @@
 #define SHADER_VAR_CLIPPING_ENABLED "inClippingEnabled"
 #define SHADER_VAR_CLIP_PLANE "inClipPlane"
 #define SHADER_VAR_TIME_MS "inTimeMS"
+#define SHADER_VAR_VIEW_DIR "inViewDir"
+#define SHADER_VAR_VIEW_NEAR "inViewNear"
+#define SHADER_VAR_VIEW_FAR "inViewFar"
 
 class RenderContextImpl : public RenderContext
   {
@@ -25,6 +28,9 @@ private:
   RenderableSetPtr renderableSet;
   Matrix4 worldToCameraTransform;
   Matrix4 cameraToClipTransform;
+  Vector3D viewDirection;
+  double viewZNearPlane = 0;
+  double viewZFarPlane = 1;
   TransformStack transformStack;
   std::map<uint, uint> texIDsToBoundLocals;
   uint nextTexBoundLocal = 1;
@@ -40,7 +46,7 @@ private:
   FrameBufferPtr screenFBO_B;
   FrameBufferPtr multiSampledFBO;
   std::list<FrameBufferPtr> fboStack;
-  std::list<PostProcStepHandlerPtr> postProcessingSteps;
+  std::map<int, std::list<PostProcStepHandlerPtr>> postProcessingSteps;
   uint nextPostProcStepID = 1;
 
 public:
@@ -93,6 +99,7 @@ public:
 protected:
   void registerStandardDrawStages();
   void renderDrawStage(int drawStage);
+  void performPostProcessing(std::list<PostProcStepHandlerPtr>& ppSteps);
   bool initialiseFrameBuffers(const RenderInitConfig* initConfig);
   void clearFrameBufferActiveStack();
   };

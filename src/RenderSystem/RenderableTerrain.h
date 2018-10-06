@@ -21,7 +21,7 @@ private:
   std::shared_ptr<HeightMap> heightMap;
 
 public:
-  RenderableTerrain(uint id, uint numCells, float cellSize);
+  RenderableTerrain(uint id, uint numCells, float cellSize, int drawStage = DRAW_STAGE_OPAQUE);
   RenderableTerrain(uint id, std::shared_ptr<HeightMap>& heightMap, float cellSize);
 
   virtual void initialise(RenderContext* renderContext) override;

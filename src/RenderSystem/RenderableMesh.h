@@ -21,6 +21,7 @@ protected:
   bool backFaceCulling = true;
   bool wireframeMode = false;
   int drawStyle;
+  int cellShadedGrades = 0;
 
 public:
   RenderableMesh(uint id, int drawStage = DRAW_STAGE_OPAQUE);
@@ -35,6 +36,7 @@ public:
   void setBackFaceCulling(bool backFaceCulling) { this->backFaceCulling = backFaceCulling; }
   void setWireframeMode(bool enable) { wireframeMode = enable; }
   void setLightShaded(bool lightShaded){ this->lightShaded = lightShaded; }
+  void setCellShaded(bool flatShaded, int numCellGrades = 6){ this->cellShadedGrades = flatShaded ? numCellGrades : 0; }
 
   void setDrawStyleSingleColour(Vector3D colour);
   void setDrawStyleTexture(TexturePtr texture);

@@ -26,7 +26,9 @@ class TOGameContext;
 #include "BotQTNode.h"
 #include "BotManager.h"
 
-#define DRAW_STAGE_FOGOFWAR   (DRAW_STAGE_TRANSPARENT + 1)
+#define DRAW_STAGE_POST_PROC_EDGE     (DRAW_STAGE_OPAQUE + 1)
+#define DRAW_STAGE_OPAQUE_AFTER_EDGE  (DRAW_STAGE_POST_PROC_EDGE + 1)
+#define DRAW_STAGE_FOGOFWAR           (DRAW_STAGE_TRANSPARENT + 1)
 
 /*
 *   Sub-class of Game Context to capture the central state of the TowOff game

@@ -6,8 +6,8 @@
 
 using namespace mathernogl;
 
-RenderableTerrain::RenderableTerrain(uint id, uint numCells, float cellSize)
-    : Renderable(id), numCells(numCells), cellSize(cellSize)
+RenderableTerrain::RenderableTerrain(uint id, uint numCells, float cellSize, int drawStage)
+    : Renderable(id, drawStage), numCells(numCells), cellSize(cellSize)
   {
 
   }

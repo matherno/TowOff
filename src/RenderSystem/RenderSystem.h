@@ -22,11 +22,10 @@ typedef std::string string;
  */
 #define DRAW_STAGE_NONE               -1
 #define DRAW_STAGE_ALL                 0
-#define DRAW_STAGE_OPAQUE             10
-#define DRAW_STAGE_TRANSPARENT        20
-#define DRAW_STAGE_POST_PROC_CUTOFF   30
-#define DRAW_STAGE_OVERLAY            40
-#define DRAW_STAGE_UI                 50
+#define DRAW_STAGE_OPAQUE             100
+#define DRAW_STAGE_TRANSPARENT        200
+#define DRAW_STAGE_OVERLAY            300
+#define DRAW_STAGE_UI                 400
 
 /*
 *   Renderable, represents an object or primitive that may be rendered
@@ -78,17 +77,17 @@ typedef std::shared_ptr<mathernogl::FrameBuffer> FrameBufferPtr;
 /*
 *   PostProcStepHandler, represents a step in the post processing pipeline
 *     The idea is the render(..) function of eah step will be called and given the current screen frame buffer
-*     Each step is taken sequentially (according to stepOrder), with the last step being rendered to the screen
+*     Each step in a draw stage is taken sequentially (after renderables of that draw stage rendered ), with the last step being rendered to the screen
 */
 class PostProcStepHandler
   {
 private:
   const uint id;
-  const int stepOrder;
+  const int drawStage;
 public:
-  PostProcStepHandler(uint id, int stepOrder) : id(id), stepOrder(stepOrder) {}
+  PostProcStepHandler(uint id, int drawStage) : id(id), drawStage(drawStage) {}
   virtual uint getID() const { return id; }
-  virtual int getStepOrder() const { return stepOrder; }
+  virtual int getDrawStage() const { return drawStage; }
   virtual void initialise(RenderContext* renderContext) = 0;
   virtual void cleanUp(RenderContext* renderContext) = 0;
   virtual void render(RenderContext* renderContext, FrameBufferPtr screenFBO) = 0;
