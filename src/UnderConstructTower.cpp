@@ -87,7 +87,7 @@ Tower::TowerFunction UnderConstructTower::getFunction() const
 
 RenderablePtr UnderConstructTower::createTowerMesh(MeshStoragePtr& meshStorage, RenderContext* context)
   {
-  PhasingMesh* towerMesh = new PhasingMesh(context->getNextRenderableID(), false);
+  PhasingMesh* towerMesh = new PhasingMesh(context->getNextRenderableID(), DRAW_STAGE_OPAQUE_AFTER_EDGE);
   towerMesh->setMeshStorage(meshStorage);
   towerMesh->getTransform()->translate(position);
   towerMesh->setPhaseSpeed(-0.007f);

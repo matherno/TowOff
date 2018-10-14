@@ -12,7 +12,7 @@ private:
   float phaseSpeed = 0.005f;
 
 public:
-  PhasingMesh(uint id, bool isOverlay);
+  PhasingMesh(uint id, int drawStage);
 
   virtual void initialise(RenderContext* renderContext) override;
   virtual void render(RenderContext* renderContext) override;

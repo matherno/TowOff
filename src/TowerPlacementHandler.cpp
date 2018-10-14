@@ -23,7 +23,7 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
 
   if (!type->baseMeshFilePath.empty())
     {
-    PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID(), false);
+    PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID(), DRAW_STAGE_OVERLAY);
     mesh->setMeshStorage(renderContext->getSharedMeshStorage(type->baseMeshFilePath));
     mesh->initialise(renderContext);
     towerHighlight->addRenderable(RenderablePtr(mesh));
@@ -31,17 +31,17 @@ void TowerPlacementHandler::onAttached(GameContext* gameContext)
 
   if (!type->turretMeshFilePath.empty())
     {
-    PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID(), false);
+    PhasingMesh* mesh = new PhasingMesh(renderContext->getNextRenderableID(), DRAW_STAGE_OVERLAY);
     mesh->setMeshStorage(renderContext->getSharedMeshStorage(type->turretMeshFilePath));
     mesh->initialise(renderContext);
     towerHighlight->addRenderable(RenderablePtr(mesh));
     }
 
-  towerConnectionHighlights.reset(new RenderableLines(renderContext->getNextRenderableID()));
+  towerConnectionHighlights.reset(new RenderableLines(renderContext->getNextRenderableID(), DRAW_STAGE_OPAQUE_AFTER_EDGE));
   towerConnectionHighlights->initialise(renderContext);
   renderContext->getRenderableSet()->addRenderable(towerConnectionHighlights);
 
-  towerRangeHighlight.reset(new RenderableLineStrips(renderContext->getNextRenderableID()));
+  towerRangeHighlight.reset(new RenderableLineStrips(renderContext->getNextRenderableID(), false, DRAW_STAGE_OPAQUE_AFTER_EDGE));
   towerRangeHighlight->initialise(renderContext);
   towerRangeHighlight->setLineWidth(3);
   renderContext->getRenderableSet()->addRenderable(towerRangeHighlight);
