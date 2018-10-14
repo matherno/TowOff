@@ -18,8 +18,8 @@ typedef std::string string;
  *  Rendering is done in stages, each renderable has a draw stage that its render() function gets called in
  *  Stages are performed in numerical order
  *  Draw stage "DRAW_STAGE_ALL" means that the given renderable will have its render() function called in every stage
- *  "DRAW_STAGE_POST_PROC_CUTOFF" isn't a rendered stage, it just defines the point that post processing occurs
  */
+
 #define DRAW_STAGE_NONE               -1
 #define DRAW_STAGE_ALL                 0
 #define DRAW_STAGE_OPAQUE             100
@@ -46,6 +46,7 @@ public:
   virtual void initialise(RenderContext* renderContext) = 0;
   virtual void cleanUp(RenderContext* renderContext) = 0;
   virtual void render(RenderContext* renderContext) = 0;
+  virtual void renderShadowMap(RenderContext* renderContext) {}
   virtual Transform* getTransform() { return &transform; }
   virtual const Transform* getTransform() const { return &transform; }
   virtual const Vector4D* getClippingPlane() const { return &clipPlane; }
@@ -155,5 +156,8 @@ public:
   virtual void addPostProcessingStep(PostProcStepHandlerPtr handler) = 0;
   virtual void removePostProcessingStep(uint id) = 0;
   virtual uint getNextPostProcessingStepID() = 0;
+  virtual void configureShadowMap(bool enable, Vector3D position = Vector3D(0), Vector3D direction = Vector3D(1,-1,-1), double fov = 1, double zDistance = 100, uint width = 500, uint height = 500) = 0;
+  virtual void setShadowMapDrawStage(int drawStage) = 0;
+  virtual void invalidateShadowMap() = 0;
   };
 typedef std::shared_ptr<RenderContext> RenderContextPtr;

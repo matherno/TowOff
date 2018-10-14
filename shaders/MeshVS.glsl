@@ -21,7 +21,10 @@ uniform int inDrawStyle = DRAW_STYLE_SINGLE_COLOUR;
 uniform int inClippingEnabled = 0;
 uniform vec4 inClipPlane;
 uniform int inUseInstanceTransforms = 0;
+uniform mat4 inShadowMapProjection;
+uniform int inUseShadowMap = 0;
 
+centroid out vec4 shadowMapPos;
 centroid out vec3 normal;
 centroid out vec3 colour;
 centroid out vec2 texCoords;
@@ -53,5 +56,7 @@ void main(){
     if (inClippingEnabled > 0)
       performClipping(worldVertex);
 
+    if (inUseShadowMap >= 1)
+      shadowMapPos = worldVertex * inShadowMapProjection;
     gl_Position = worldVertex * inWorldToCamera * inCameraToClip;
 }

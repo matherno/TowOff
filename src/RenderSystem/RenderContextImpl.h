@@ -17,6 +17,10 @@
 #define SHADER_VAR_VIEW_DIR "inViewDir"
 #define SHADER_VAR_VIEW_NEAR "inViewNear"
 #define SHADER_VAR_VIEW_FAR "inViewFar"
+#define SHADER_VAR_USE_SHADOW_MAP "inUseShadowMap"
+#define SHADER_VAR_SHADOW_MAP "inShadowMap"
+#define SHADER_VAR_SHADOW_MAP_PROJ "inShadowMapProjection"
+#define SHADER_VAR_LIGHT_DIR "inLightDir"
 
 class RenderContextImpl : public RenderContext
   {
@@ -48,6 +52,15 @@ private:
   std::list<FrameBufferPtr> fboStack;
   std::map<int, std::list<PostProcStepHandlerPtr>> postProcessingSteps;
   uint nextPostProcStepID = 1;
+
+  FrameBufferPtr shadowMapFBO;
+  bool shadowMapEnabled = false, shadowMapValid = false, renderingShadowMap = false;
+  Matrix4 shadowMapWorldToCamera;
+  Matrix4 shadowMapCameraToClip;
+  Matrix4 shadowMapProjection;
+  uint shadowMapWidth = 0, shadowMapHeight = 0;
+  int shadowMapDrawStage = DRAW_STAGE_TRANSPARENT;
+  Vector3D lightDirection;
 
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;
@@ -96,9 +109,15 @@ public:
   virtual uint getNextPostProcessingStepID() override;
   virtual FrameBufferPtr createFrameBuffer() override;
 
+  virtual void configureShadowMap(bool enable, Vector3D position = Vector3D(0), Vector3D direction = Vector3D(1,-1,-1), double fov = 1, double zDistance = 100, uint width = 500, uint height = 500) override;
+  virtual void invalidateShadowMap() override;
+  virtual void setShadowMapDrawStage(int drawStage) override;
+  void renderShadowMap();
+  void setupShadowMapFBO();
+
 protected:
   void registerStandardDrawStages();
-  void renderDrawStage(int drawStage);
+  void renderDrawStage(int drawStage, bool shadowMap);
   void performPostProcessing(std::list<PostProcStepHandlerPtr>& ppSteps);
   bool initialiseFrameBuffers(const RenderInitConfig* initConfig);
   void clearFrameBufferActiveStack();

@@ -73,6 +73,13 @@ void TOGameContext::cleanUp()
 void TOGameContext::processInputStage()
   {
   GameContextImpl::processInputStage();
+
+  static const Vector3D lightDir = Vector3D(0.2, -0.5, -0.5).getUniform();
+  double shadowMapOffset = toInputHandler->getZoomOffset();
+  double shadowMapFOV = shadowMapOffset * 1.5;
+  Vector3D shadowMapPos = toInputHandler->getFocalPosition() - lightDir * shadowMapOffset;
+  static const uint shadowMapWidth = 1500;
+  getRenderContext()->configureShadowMap(true, shadowMapPos, lightDir, shadowMapFOV, shadowMapOffset * 1.5, shadowMapWidth, shadowMapWidth);
   }
 
 void TOGameContext::processUpdateStage()
@@ -80,12 +87,12 @@ void TOGameContext::processUpdateStage()
   hudHandler.updateUI(this);
   specialEffectsHandler.update(this);
 
-
   GameContextImpl::processUpdateStage();
   }
 
 void TOGameContext::processDrawStage()
   {
+  getRenderContext()->invalidateShadowMap();
   GameContextImpl::processDrawStage();
   }
 

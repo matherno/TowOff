@@ -90,19 +90,21 @@ void RenderContextImpl::render()
   {
   if (isRendering)
     return;
+  isRendering = true;
+  boundShaderID = 0;
+
+  renderShadowMap();
 
   //  activate multi sampled FBO
   pushFrameBuffer(multiSampledFBO);
   multiSampledFBO->clear();
 
   //  render each stage
-  isRendering = true;
-  boundShaderID = 0;
   for (int stage : drawStages)
     {
     if (stage >= DRAW_STAGE_OVERLAY)
       glClear(GL_DEPTH_BUFFER_BIT);
-    renderDrawStage(stage);
+    renderDrawStage(stage, false);
     }
   activeDrawStage = DRAW_STAGE_NONE;
 
@@ -115,17 +117,20 @@ void RenderContextImpl::render()
   isRendering = false;
   }
 
-void RenderContextImpl::renderDrawStage(int drawStage)
+void RenderContextImpl::renderDrawStage(int drawStage, bool shadowMap)
   {
   activeDrawStage = drawStage;
   transformStack.clear();
   pushTransform(renderableSet->getTransform());
   setClippingPlane(*renderableSet->getClippingPlane());
-  renderableSet->render(this);
+  if (shadowMap)
+    renderableSet->renderShadowMap(this);
+  else
+    renderableSet->render(this);
   disableClippingPlane();
   popTransform();
 
-  if (postProcessingSteps.count(drawStage) > 0)
+  if (!shadowMap && postProcessingSteps.count(drawStage) > 0)
     performPostProcessing(postProcessingSteps[drawStage]);
   }
 
@@ -175,8 +180,16 @@ void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
   //todo: keep state of whether or not each shader program has already been given these variables that frame (not for clipping uniforms)
 
   //  transform matrices
-  shaderProgram->setVarMat4(SHADER_VAR_WORLD_TO_CAMERA, worldToCameraTransform, true);
-  shaderProgram->setVarMat4(SHADER_VAR_CAMERA_TO_CLIP, cameraToClipTransform, true);
+  if (renderingShadowMap)
+    {
+    shaderProgram->setVarMat4(SHADER_VAR_WORLD_TO_CAMERA, shadowMapWorldToCamera, true);
+    shaderProgram->setVarMat4(SHADER_VAR_CAMERA_TO_CLIP, shadowMapCameraToClip, true);
+    }
+  else
+    {
+    shaderProgram->setVarMat4(SHADER_VAR_WORLD_TO_CAMERA, worldToCameraTransform, true);
+    shaderProgram->setVarMat4(SHADER_VAR_CAMERA_TO_CLIP, cameraToClipTransform, true);
+    }
   if (getStackedTransform())
     shaderProgram->setVarMat4(SHADER_VAR_VERT_TO_WORLD, *getStackedTransform()->getTransformMatrix(), true);
   else
@@ -196,7 +209,15 @@ void RenderContextImpl::activateShaderProgram(ShaderProgramPtr shaderProgram)
   //  misc
   shaderProgram->setVarVec2(SHADER_VAR_SCREEN_SIZE, getWindow()->getSize(), true);
   shaderProgram->setVarInt(SHADER_VAR_TIME_MS, (int)(getTimeMS() - startTime), true);
-
+  shaderProgram->setVarVec3(SHADER_VAR_LIGHT_DIR, lightDirection, true);
+  if (!renderingShadowMap && shadowMapEnabled)
+    {
+    shaderProgram->setVarInt(SHADER_VAR_SHADOW_MAP, bindTexture(shadowMapFBO->getDepthTexture()), true);
+    shaderProgram->setVarInt(SHADER_VAR_USE_SHADOW_MAP, 1, true);
+    shaderProgram->setVarMat4(SHADER_VAR_SHADOW_MAP_PROJ, shadowMapProjection, true);
+    }
+  else
+    shaderProgram->setVarInt(SHADER_VAR_USE_SHADOW_MAP, 0, true);
   }
 
 void logCreateShaderProgram(ShaderProgramPtr shaderProgram, const std::vector<mathernogl::Shader>* shaders)
@@ -478,6 +499,83 @@ void RenderContextImpl::clearFrameBufferActiveStack()
   {
   while(getTopFrameBuffer())
     popFrameBuffer();
+  }
+
+void RenderContextImpl::renderShadowMap()
+  {
+  if (!shadowMapEnabled || shadowMapValid)
+    return;
+
+  renderingShadowMap = true;
+  pushFrameBuffer(shadowMapFBO);
+  shadowMapFBO->clear();
+  glPolygonOffset(1.5, -5);
+  glEnable(GL_POLYGON_OFFSET_FILL);
+  glViewport(0, 0, shadowMapWidth, shadowMapHeight);
+  for (int stage : drawStages)
+    {
+    if (stage <= shadowMapDrawStage)
+      renderDrawStage(stage, true);
+    }
+  popFrameBuffer();
+  glViewport(0, 0, window->getWidth(), window->getHeight());
+  glDisable(GL_POLYGON_OFFSET_FILL);
+  renderingShadowMap = false;
+  shadowMapValid = true;
+  }
+
+
+void RenderContextImpl::configureShadowMap(bool enable, Vector3D position, Vector3D direction, double fov, double zDistance, uint width, uint height)
+  {
+  shadowMapEnabled = enable;
+  if (!shadowMapEnabled)
+    return;
+
+  if (direction.x == 0 && direction.z == 0)
+    direction.x = 0.1;
+  direction.makeUniform();
+
+  double yaw = ccwAngleBetween(Vector2D(0, -1), Vector2D(direction.x, direction.z).getUniform());
+  Matrix4 yawRotation = matrixYaw(yaw);
+  double pitch = 0;
+  if (direction.y != 0)
+    {
+    Vector3D yawedZAxis = Vector3D(0, 0, -1) * yawRotation;
+    pitch = angleBetween(yawedZAxis, direction);
+    if (direction.y < 0)
+      pitch *= -1;
+    }
+
+  shadowMapWorldToCamera = matrixTranslate(position * -1) * matrixYaw(-yaw) * matrixPitch(-pitch);
+  shadowMapCameraToClip = matrixOrthogonal(fov, (double)width / (double)height, -1 * zDistance);
+  shadowMapProjection = shadowMapWorldToCamera * shadowMapCameraToClip * matrixScale(0.5) * matrixTranslate(0.5, 0.5, 0.5);
+  lightDirection = direction;
+
+  if (shadowMapWidth != width || shadowMapHeight != height)
+    {
+    shadowMapWidth = width;
+    shadowMapHeight = height;
+    setupShadowMapFBO();
+    }
+  invalidateShadowMap();
+  }
+
+void RenderContextImpl::invalidateShadowMap()
+  {
+  shadowMapValid = false;
+  }
+
+void RenderContextImpl::setupShadowMapFBO()
+  {
+  if (shadowMapFBO)
+    shadowMapFBO->cleanUp();
+  shadowMapFBO.reset(new FrameBuffer());
+  shadowMapFBO->initialiseForShadowMapping(shadowMapWidth, shadowMapHeight);
+  }
+
+void RenderContextImpl::setShadowMapDrawStage(int drawStage)
+  {
+  shadowMapDrawStage = drawStage;
   }
 
 

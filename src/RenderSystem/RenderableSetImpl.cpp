@@ -18,25 +18,12 @@ void RenderableSetImpl::cleanUp(RenderContext* renderContext)
 
 void RenderableSetImpl::render(RenderContext* renderContext)
   {
-  const Vector4D* clipPlane = getClippingPlane();
-  bool usingParentClipPlane = clipPlane->x != 0 || clipPlane->y != 0 || clipPlane->z != 0;
-  const int activeDrawStage = renderContext->getActiveDrawStage();
+  render(renderContext, false);
+  }
 
-  for (RenderablePtr renderable : *renderables.getList())
-    {
-    if (renderable->getDrawStage() == DRAW_STAGE_ALL || renderable->getDrawStage() == activeDrawStage)
-      {
-      if (!usingParentClipPlane)
-        renderContext->setClippingPlane(*renderable->getClippingPlane());
-
-      renderContext->pushTransform(renderable->getTransform());
-      renderable->render(renderContext);
-      renderContext->popTransform();
-
-      if (!usingParentClipPlane)
-        renderContext->disableClippingPlane();
-      }
-    }
+void RenderableSetImpl::renderShadowMap(RenderContext* renderContext)
+  {
+  render(renderContext, true);
   }
 
 void RenderableSetImpl::addRenderable(RenderablePtr renderable)
@@ -66,4 +53,30 @@ void RenderableSetImpl::forEachChild(std::function<void(RenderablePtr)> function
   {
   for (RenderablePtr& child : *renderables.getList())
     function(child);
+  }
+
+void RenderableSetImpl::render(RenderContext* renderContext, bool shadowMap)
+  {
+  const Vector4D* clipPlane = getClippingPlane();
+  bool usingParentClipPlane = clipPlane->x != 0 || clipPlane->y != 0 || clipPlane->z != 0;
+  const int activeDrawStage = renderContext->getActiveDrawStage();
+
+  for (RenderablePtr renderable : *renderables.getList())
+    {
+    if (renderable->getDrawStage() == DRAW_STAGE_ALL || renderable->getDrawStage() == activeDrawStage)
+      {
+      if (!usingParentClipPlane)
+        renderContext->setClippingPlane(*renderable->getClippingPlane());
+
+      renderContext->pushTransform(renderable->getTransform());
+      if (shadowMap)
+        renderable->renderShadowMap(renderContext);
+      else
+        renderable->render(renderContext);
+      renderContext->popTransform();
+
+      if (!usingParentClipPlane)
+        renderContext->disableClippingPlane();
+      }
+    }
   }

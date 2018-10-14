@@ -23,30 +23,55 @@ void RenderableMesh::cleanUp(RenderContext* renderContext)
 
 void RenderableMesh::render(RenderContext* renderContext)
   {
+  render(renderContext, false);
+  }
+
+void RenderableMesh::renderShadowMap(RenderContext* renderContext)
+  {
+  render(renderContext, true);
+  }
+
+void RenderableMesh::render(RenderContext* renderContext, bool shadowMap)
+  {
+  if (shadowMap && wireframeMode)
+    return;
+
   if (meshStorage)
     {
     clearGLErrors();
     meshStorage->getVAO().bind();
 
     renderContext->activateShaderProgram(shaderProgram);
-    shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0, true);
-    shaderProgram->setVarInt("inCellShadeGrades", cellShadedGrades, true);
-    shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1), true);
-    shaderProgram->setVarFloat("inTextureColourMix", textureColourMix, true);
 
-    shaderProgram->setVarInt("inDrawStyle", drawStyle, true);
-    if (drawStyle == MESH_DRAW_STYLE_TEXTURE && texture)
+    if (shadowMap)
       {
-      shaderProgram->setVarInt("inTexture", renderContext->bindTexture(texture), true);
-      if (textureColourMix > 0)
-        shaderProgram->setVarVec3("inColour", colour, true);
+      shaderProgram->setVarInt("inDrawStyle", MESH_DRAW_STYLE_SINGLE_COLOUR, true);
+      shaderProgram->setVarInt("inLightShaded", 0, true);
+      shaderProgram->setVarInt("inCellShadeGrades", 0, true);
+      shaderProgram->setVarFloat("inAlpha", 1, true);
+      shaderProgram->setVarVec3("inColour", Vector3D(0, 1, 0), true);
+      setFaceCulling(false);
       }
-    if (drawStyle == MESH_DRAW_STYLE_SINGLE_COLOUR)
-      shaderProgram->setVarVec3("inColour", colour, true);
+    else
+      {
+      shaderProgram->setVarInt("inLightShaded", lightShaded ? 1 : 0, true);
+      shaderProgram->setVarInt("inCellShadeGrades", cellShadedGrades, true);
+      shaderProgram->setVarFloat("inAlpha", clampf(1.0f - transparency, 0, 1), true);
+      shaderProgram->setVarFloat("inTextureColourMix", textureColourMix, true);
+      shaderProgram->setVarInt("inDrawStyle", drawStyle, true);
+      if (drawStyle == MESH_DRAW_STYLE_TEXTURE && texture)
+        {
+        shaderProgram->setVarInt("inTexture", renderContext->bindTexture(texture), true);
+        if (textureColourMix > 0)
+          shaderProgram->setVarVec3("inColour", colour, true);
+        }
+      if (drawStyle == MESH_DRAW_STYLE_SINGLE_COLOUR)
+        shaderProgram->setVarVec3("inColour", colour, true);
+      setFaceCulling(backFaceCulling);
+      }
 
     setDepthTest(true);
     setAlphaBlending(transparency > 0.00001f);
-    setFaceCulling(backFaceCulling);
     if (wireframeMode)
       {
       glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

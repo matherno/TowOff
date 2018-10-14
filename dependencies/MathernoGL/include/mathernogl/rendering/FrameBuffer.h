@@ -26,6 +26,7 @@ public:
   const std::shared_ptr<Texture> getDepthTexture() const;
   bool initialise(uint width, uint height, bool needAlphaChannel, bool useDepthTexture, bool gammaCorrect, int numColourOutputs = 1);
   bool initialiseMultisampled(uint width, uint height, uint numSamples, bool gammaCorrect, int numColourOutputs = 1);
+  bool initialiseForShadowMapping(uint width, uint height);
   void cleanUp();
   void clear();
   void blitToScreen(uint screenWidth, uint screenHeight);

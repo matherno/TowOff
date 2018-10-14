@@ -29,6 +29,8 @@ public:
   virtual void initialise(RenderContext* renderContext) override;
   virtual void cleanUp(RenderContext* renderContext) override;
   virtual void render(RenderContext* renderContext) override;
+  virtual void renderShadowMap(RenderContext* renderContext) override;
+  void render(RenderContext* renderContext, bool shadowMap);
 
   void setMeshStorage(MeshStoragePtr meshStorage) { this->meshStorage = meshStorage; }
   MeshStoragePtr getMeshStorage() const { return meshStorage; }
