@@ -79,8 +79,11 @@ void GameContextImpl::processUpdateStage()
   stage = stageUpdate;
   if (!paused && !getUIManager()->isModalModeActive())
     {
-    for (GameActorPtr actor : *actors.getList())
-      actor->onUpdate(this);
+    for (int i = 0; i < speed; ++i)
+      {
+      for (GameActorPtr actor : *actors.getList())
+        actor->onUpdate(this);
+      }
     }
   uiManager.update(this);
   stage = stageNone;
@@ -119,7 +122,7 @@ void GameContextImpl::removeInputHandler(InputHandlerPtr handler)
 void GameContextImpl::startFrame()
   {
   if (!paused)
-    gameTime += deltaTime;
+    gameTime += deltaTime * speed;
   startFrameTime = mathernogl::getTimeMS();
   }
 

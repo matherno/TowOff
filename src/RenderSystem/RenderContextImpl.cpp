@@ -245,8 +245,9 @@ MeshStoragePtr RenderContextImpl::getSharedMeshStorage(const std::string& objFil
     return cachedMeshStorage;
 
   MeshStoragePtr meshStorage(new MeshStorage(nextMeshStorageID++));
-  loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords);
+  loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords, &meshStorage->colours, false);
   meshStorage->calculateMinMax();
+  meshStorage->setColoursPerFace(true);
   if(meshStorage->initialiseVAO())
     {
     resourceCache.addMeshStorage(meshStorage, objFilePath);
@@ -523,7 +524,6 @@ void RenderContextImpl::renderShadowMap()
   renderingShadowMap = false;
   shadowMapValid = true;
   }
-
 
 void RenderContextImpl::configureShadowMap(bool enable, Vector3D position, Vector3D direction, double fov, double zDistance, uint width, uint height)
   {

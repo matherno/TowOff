@@ -89,13 +89,19 @@ bool MeshStorage::initVAOWithTexCoords(std::vector<int>* indicesPtr)
 bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
   {
   std::vector<float> bufferData;
+  int idxNum = 0;
   for (const int& index : *indicesPtr)
     {
     Vector3D& vert = vertices[index];
     Vector3D& norm = normals[index];
     Vector3D col(0.8, 0.2, 0.6);
     if (!colours.empty())
-      col = colours[index];
+      {
+      if (coloursPerFace)
+        col = colours[(int)((float)idxNum / 3)];
+      else
+        col = colours[index];
+      }
     bufferData.emplace_back(vert.x);
     bufferData.emplace_back(vert.y);
     bufferData.emplace_back(vert.z);
@@ -106,6 +112,7 @@ bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
     bufferData.emplace_back(col.y);
     bufferData.emplace_back(col.z);
     ++numVertices;
+    ++idxNum;
     }
 
   mathernogl::clearGLErrors();

@@ -60,7 +60,7 @@ private:
   Matrix4 shadowMapProjection;
   uint shadowMapWidth = 0, shadowMapHeight = 0;
   int shadowMapDrawStage = DRAW_STAGE_TRANSPARENT;
-  Vector3D lightDirection;
+  Vector3D lightDirection = Vector3D(-1, -2, -1);
 
 public:
   virtual bool initialise(const RenderInitConfig* initConfig) override;

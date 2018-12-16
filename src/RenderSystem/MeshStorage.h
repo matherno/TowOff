@@ -19,6 +19,7 @@ private:
   mathernogl::Vector3D min;
   mathernogl::Vector3D max;
   bool storingTexCoords = false;
+  bool coloursPerFace = false;
 
 public:
   std::vector<int> indices;
@@ -38,6 +39,7 @@ public:
   void calculateMinMax();
   bool gotTexCoords() const { return storingTexCoords; }
   uint getID() const { return id; }
+  void setColoursPerFace(bool perFace) { coloursPerFace = perFace; }
 
 protected:
   bool initVAOWithTexCoords(std::vector<int>* indicesPtr);
