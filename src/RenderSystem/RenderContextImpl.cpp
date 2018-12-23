@@ -56,6 +56,10 @@ void RenderContextImpl::reset()
     {
     texture->cleanUp();
     });
+  resourceCache.forEachVoxelStorage([](VoxelStoragePtr voxelStorage)
+    {
+    voxelStorage->cleanUp();
+    });
   resourceCache.clearAll();
   texIDsToBoundLocals.clear();
   fboStack.clear();
@@ -277,6 +281,28 @@ MeshStorageInstancedPtr RenderContextImpl::createInstancedMeshStorage(const stri
     return nullptr;
     }
   return meshStorage;
+  }
+
+
+VoxelStoragePtr RenderContextImpl::getSharedVoxelStorage(const string& mgvFilePath)
+  {
+  if (VoxelStoragePtr cachedVoxelStorage = resourceCache.getVoxelStorage(mgvFilePath))
+    return cachedVoxelStorage;
+
+  VoxelStoragePtr voxelStorage(new VoxelStorage(nextVoxelStorageID++));
+  loadVoxelMGVFile(mgvFilePath, &voxelStorage->colours, &voxelStorage->voxels, false);
+
+  if(voxelStorage->initialiseVAO())
+    {
+    resourceCache.addVoxelStorage(voxelStorage, mgvFilePath);
+    logInfo("Created voxel storage: " + std::to_string(voxelStorage->getID()) + ", '" + mgvFilePath + "'");
+    return voxelStorage;
+    }
+  else
+    {
+    logWarning("Failed to create voxel storage!: " + std::to_string(voxelStorage->getID()) + ", '" + mgvFilePath + "'");
+    return nullptr;
+    }
   }
 
 void RenderContextImpl::pushTransform(const mathernogl::Transform* transform)
@@ -577,6 +603,7 @@ void RenderContextImpl::setShadowMapDrawStage(int drawStage)
   {
   shadowMapDrawStage = drawStage;
   }
+
 
 
 

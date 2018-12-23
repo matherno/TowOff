@@ -91,11 +91,30 @@ void ResourceCache::forEachTexture(std::function<void(TexturePtr texture)> func)
     func(pair.second);
   }
 
+VoxelStoragePtr ResourceCache::getVoxelStorage(const string& mgvFilePath)
+  {
+  if (voxelStorages.count(mgvFilePath) > 0)
+    return voxelStorages[mgvFilePath];
+  return nullptr;
+  }
+
+void ResourceCache::addVoxelStorage(VoxelStoragePtr voxelStorage, const string& mgvFilePath)
+  {
+  voxelStorages[mgvFilePath] = voxelStorage;
+  }
+
+void ResourceCache::forEachVoxelStorage(std::function<void(VoxelStoragePtr voxelStorage)> func)
+  {
+  for (auto pair : voxelStorages)
+    func(pair.second);
+  }
+
 void ResourceCache::clearAll()
   {
   shaderPrograms.clear();
   meshStorages.clear();
   textures.clear();
   fontDefinitions.clear();
+  voxelStorages.clear();
   }
 
