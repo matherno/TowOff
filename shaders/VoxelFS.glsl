@@ -51,10 +51,18 @@ vec3 colourAt(int index)
 
 void main()
   {
+  vec3 colour = colourAt(colourIdxFS);
+
   float lightFactor = dot(normalFS, normalize(inLightDir * -1));
+
+  colour.r = pow(colour.r, 2.2);
+  colour.g = pow(colour.g, 2.2);
+  colour.b = pow(colour.b, 2.2);
+
   lightFactor *= 0.5;
   lightFactor += 0.5;
-  vec3 diffuseCol = colourAt(colourIdxFS) * clamp(lightFactor, 0, 1);
 
-  outputColour = vec4(diffuseCol, 1);
+  colour *= clamp(lightFactor, 0, 1);
+
+  outputColour = vec4(colour, 1);
   }
