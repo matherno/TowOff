@@ -51,6 +51,11 @@ bool InputManagerImpl::isKeyDown(uint key) const
   return inputSource.isKeyAction(key, mathernogl::INPUT_HELD);
   }
 
+bool InputManagerImpl::isMouseDown(uint button) const
+  {
+  return inputSource.isMouseButtonAction(button, mathernogl::INPUT_HELD);
+  }
+
 void InputManagerImpl::processInput(GameContext* gameContext)
   {
   inputSource.checkHeldButtons();
@@ -254,3 +259,4 @@ Vector2D InputManagerImpl::getMousePos() const
   {
   return inputSource.getMousePos();
   }
+

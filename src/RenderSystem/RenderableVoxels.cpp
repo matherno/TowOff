@@ -33,9 +33,13 @@ void RenderableVoxels::render(RenderContext* renderContext)
   shaderProgram->setVarFloat("inVoxelSize", voxelSize);
 
   storage->getVAO().bind();
-  glPointSize(10);
   glDrawArrays(GL_POINTS, 0, storage->getNumVoxels());
   ASSERT_NO_GL_ERROR();
+  }
+
+void RenderableVoxels::renderShadowMap(RenderContext* renderContext)
+  {
+  render(renderContext);
   }
 
 void RenderableVoxels::setVoxelStorage(VoxelStoragePtr storage)
@@ -47,3 +51,4 @@ void RenderableVoxels::setVoxelSize(double size)
   {
   voxelSize = size;
   }
+

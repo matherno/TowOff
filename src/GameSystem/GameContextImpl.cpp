@@ -172,7 +172,11 @@ Vector3D GameContextImpl::getViewDirectionAtCursor(uint cursorX, uint cursorY) c
   uint screenWidth = getRenderContext()->getWindow()->getWidth();
   uint screenHeight = getRenderContext()->getWindow()->getHeight();
   Vector3D clipSpacePos = Vector3D((float)cursorX / (float)screenWidth * 2.0f - 1.0f, (1.0f - (float)cursorY / (float)screenHeight) * 2.0f - 1.0f, 0);
-  return (clipToWorldTransform(clipSpacePos + Vector3D(0, 0, 1)) - clipToWorldTransform(clipSpacePos)).getUniform();
+  const bool isOrthoCam = getRenderContext()->getCameraToClip()->getAt(3, 3) > 0.0;
+  if (isOrthoCam)
+    return (clipToWorldTransform(clipSpacePos - Vector3D(0, 0, 1)) - clipToWorldTransform(clipSpacePos)).getUniform();
+  else
+    return (clipToWorldTransform(clipSpacePos + Vector3D(0, 0, 1)) - clipToWorldTransform(clipSpacePos)).getUniform();
   }
 
 Vector3D GameContextImpl::clipToWorldTransform(const Vector3D& clipSpacePos) const
