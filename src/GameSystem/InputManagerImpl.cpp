@@ -74,8 +74,8 @@ void InputManagerImpl::processInput(GameContext* gameContext)
     }
 
   Vector2D mouse = inputSource.getMousePos();
-  uint mouseX = (uint) mouse.x;
-  uint mouseY = (uint) mouse.y;
+  uint mouseX = (uint) std::max(mouse.x, 0.0f);
+  uint mouseY = (uint) std::max(mouse.y, 0.0f);
 
   //  fire mouse move events if the mouse has moved
   //  mouse move events should be fired before other mouse events
