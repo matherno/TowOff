@@ -290,7 +290,7 @@ VoxelStoragePtr RenderContextImpl::getSharedVoxelStorage(const string& mgvFilePa
     return cachedVoxelStorage;
 
   VoxelStoragePtr voxelStorage(new VoxelStorage(nextVoxelStorageID++));
-  loadVoxelMGVFile(mgvFilePath, &voxelStorage->colours, &voxelStorage->voxels, false);
+  loadVoxelMGVFile(mgvFilePath, &voxelStorage->colours, &voxelStorage->voxels, true);
 
   if(voxelStorage->initialiseVAO())
     {
