@@ -531,7 +531,11 @@ void TOGameContext::setFogOfWarState(bool isOn)
 
 BotPortalPtr TOGameContext::createBotPortal(const Vector3D& position)
   {
-  return botManager->createBotPortal(this, position);
+//  return botManager->createBotPortal(this, position);
+
+  getRenderContext()->getVoxelBatchManager()->setVoxelSize(2);
+  getRenderContext()->getVoxelBatchManager()->createVoxelModelInstance(getRenderContext(), "resources/Woodcutter.mgv", position);
+
   }
 
 void TOGameContext::removeBotPortal(uint id)

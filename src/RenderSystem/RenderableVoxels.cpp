@@ -3,6 +3,7 @@
 //
 
 #include "RenderableVoxels.h"
+#include "RenderUtils.h"
 
 RenderableVoxels::RenderableVoxels(uint id, int drawStage) : Renderable(id, drawStage)
   {
@@ -12,7 +13,7 @@ RenderableVoxels::RenderableVoxels(uint id, int drawStage) : Renderable(id, draw
 void RenderableVoxels::initialise(RenderContext* renderContext)
   {
   using namespace mathernogl;
-  std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/VoxelVS.glsl"), Shader(GL_GEOMETRY_SHADER, "shaders/VoxelGS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/VoxelFS.glsl") };
+  std::vector<Shader> shaders = { Shader(GL_VERTEX_SHADER, "shaders/VoxelVS.glsl"), Shader(GL_FRAGMENT_SHADER, "shaders/VoxelFS.glsl") };
   shaderProgram = renderContext->getSharedShaderProgram(&shaders);
   }
 
@@ -25,7 +26,7 @@ void RenderableVoxels::render(RenderContext* renderContext)
   {
   mathernogl::clearGLErrors();
   renderContext->activateShaderProgram(shaderProgram);
-  mathernogl::setFaceCulling(false);
+  mathernogl::setFaceCulling(true);
 
   int colIdx = 0;
   for (Vector3D col : storage->colours)
@@ -33,7 +34,7 @@ void RenderableVoxels::render(RenderContext* renderContext)
   shaderProgram->setVarFloat("inVoxelSize", voxelSize);
 
   storage->getVAO().bind();
-  glDrawArrays(GL_POINTS, 0, storage->getNumVoxels());
+  glDrawArraysInstanced(GL_TRIANGLES, 0, 36, storage->getNumVoxels());
   ASSERT_NO_GL_ERROR();
   }
 
@@ -52,3 +53,28 @@ void RenderableVoxels::setVoxelSize(double size)
   voxelSize = size;
   }
 
+BoundingBoxPtr RenderableVoxels::getBounds()
+  {
+  if (!objSpaceBounds && storage)
+    {
+    Vector3D worldMin = storage->getMin() * voxelSize;
+    Vector3D worldMax = storage->getMax() * voxelSize;
+    worldMax.x += voxelSize;
+    worldMax.y += voxelSize;
+    worldMax.z += voxelSize;
+    objSpaceBounds = std::make_shared<BoundingBox>(worldMin, worldMax);
+    }
+
+  if (boundingBoxTransform.getTransformMatrix() != getTransform()->getTransformMatrix())
+    {
+    worldSpaceBounds = nullptr;
+    boundingBoxTransform = *getTransform();
+    }
+
+  if (objSpaceBounds && !worldSpaceBounds)
+    {
+    worldSpaceBounds = std::make_shared<BoundingBox>(*objSpaceBounds);
+    RenderUtils::transformBoundingBox(worldSpaceBounds.get(), getTransform());
+    }
+  return worldSpaceBounds;
+  }

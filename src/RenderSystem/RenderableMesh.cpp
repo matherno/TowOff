@@ -3,6 +3,7 @@
 //
 
 #include "RenderableMesh.h"
+#include "RenderUtils.h"
 
 using namespace mathernogl;
 
@@ -122,4 +123,23 @@ void RenderableMesh::setDrawStyleVertColours()
   {
   drawStyle = MESH_DRAW_STYLE_VERT_COLOUR;
   texture.reset();
+  }
+
+BoundingBoxPtr RenderableMesh::getBounds()
+  {
+  if (!objSpaceBounds && meshStorage)
+    objSpaceBounds = std::make_shared<BoundingBox>(meshStorage->getMin(), meshStorage->getMax());
+
+  if (boundingBoxTransform.getTransformMatrix() != getTransform()->getTransformMatrix())
+    {
+    worldSpaceBounds = nullptr;
+    boundingBoxTransform = *getTransform();
+    }
+
+  if (objSpaceBounds && !worldSpaceBounds)
+    {
+    worldSpaceBounds = std::make_shared<BoundingBox>(*objSpaceBounds);
+    RenderUtils::transformBoundingBox(worldSpaceBounds.get(), getTransform());
+    }
+  return worldSpaceBounds;
   }

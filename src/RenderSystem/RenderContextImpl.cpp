@@ -66,6 +66,7 @@ void RenderContextImpl::reset()
   drawStages.clear();
   registerStandardDrawStages();
   postProcessingSteps.clear();
+  voxelBatchManager.cleanUp(this);
   }
 
 uint RenderContextImpl::getNextRenderableID()
@@ -76,6 +77,7 @@ uint RenderContextImpl::getNextRenderableID()
 void RenderContextImpl::setWorldToCamera(const Matrix4& transform)
   {
   worldToCameraTransform = transform;
+  worldToClipTransform = worldToCameraTransform * cameraToClipTransform;
 
   viewDirection = Vector3D(0, 0, 1) * matrixInverse(worldToCameraTransform);
   viewDirection.makeUniform();
@@ -84,6 +86,7 @@ void RenderContextImpl::setWorldToCamera(const Matrix4& transform)
 void RenderContextImpl::setCameraToClip(const Matrix4& transform)
   {
   cameraToClipTransform = transform;
+  worldToClipTransform = worldToCameraTransform * cameraToClipTransform;
 
   Matrix4 clipToCamera = mathernogl::matrixInverse(cameraToClipTransform);
   viewZNearPlane = (Vector3D(0, 0, -1) * clipToCamera).z;
@@ -250,8 +253,8 @@ MeshStoragePtr RenderContextImpl::getSharedMeshStorage(const std::string& objFil
 
   MeshStoragePtr meshStorage(new MeshStorage(nextMeshStorageID++));
   loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords, &meshStorage->colours, false);
-  meshStorage->calculateMinMax();
   meshStorage->setColoursPerFace(true);
+  meshStorage->invalidateMinMax();
   if(meshStorage->initialiseVAO())
     {
     resourceCache.addMeshStorage(meshStorage, objFilePath);
@@ -274,7 +277,7 @@ MeshStorageInstancedPtr RenderContextImpl::createInstancedMeshStorage(const stri
   {
   MeshStorageInstancedPtr meshStorage(new MeshStorageInstanced(nextMeshStorageID++, maxNumInstances));
   loadObj(objFilePath, &meshStorage->indices, &meshStorage->vertices, &meshStorage->normals, &meshStorage->texCoords);
-  meshStorage->calculateMinMax();
+  meshStorage->invalidateMinMax();
   if(!meshStorage->initialiseVAO())
     {
     logWarning("Failed to create mesh storage!: " + std::to_string(meshStorage->getID()) + ", '" + objFilePath + "'");
@@ -291,6 +294,7 @@ VoxelStoragePtr RenderContextImpl::getSharedVoxelStorage(const string& mgvFilePa
 
   VoxelStoragePtr voxelStorage(new VoxelStorage(nextVoxelStorageID++));
   loadVoxelMGVFile(mgvFilePath, &voxelStorage->colours, &voxelStorage->voxels, true);
+  voxelStorage->invalidateMinMax();
 
   if(voxelStorage->initialiseVAO())
     {
@@ -338,6 +342,11 @@ const Matrix4* RenderContextImpl::getWorldToCamera() const
 const Matrix4* RenderContextImpl::getCameraToClip() const
   {
   return &cameraToClipTransform;
+  }
+
+const Matrix4* RenderContextImpl::getWorldToClip() const
+  {
+  return &worldToClipTransform;
   }
 
 TexturePtr RenderContextImpl::getSharedTexture(const string& imageFilePath, TextureOptions options)
@@ -603,6 +612,7 @@ void RenderContextImpl::setShadowMapDrawStage(int drawStage)
   {
   shadowMapDrawStage = drawStage;
   }
+
 
 
 

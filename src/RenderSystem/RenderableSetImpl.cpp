@@ -3,6 +3,7 @@
 //
 
 #include "RenderableSetImpl.h"
+#include "RenderUtils.h"
 
 RenderableSetImpl::RenderableSetImpl(uint id) : RenderableSet(id)
   {
@@ -65,6 +66,15 @@ void RenderableSetImpl::render(RenderContext* renderContext, bool shadowMap)
     {
     if (renderable->getDrawStage() == DRAW_STAGE_ALL || renderable->getDrawStage() == activeDrawStage)
       {
+      BoundingBoxPtr childBounds = renderable->getBounds();
+      if (childBounds)
+        {
+        BoundingBoxPtr transformedBounds = std::make_shared<BoundingBox>(*childBounds);
+        RenderUtils::transformBoundingBox(transformedBounds.get(), getTransform());
+        if (RenderUtils::isBoundingBoxClipped(transformedBounds.get(), renderContext->getWorldToClip()))
+          continue;
+        }
+
       if (!usingParentClipPlane)
         renderContext->setClippingPlane(*renderable->getClippingPlane());
 
@@ -79,4 +89,21 @@ void RenderableSetImpl::render(RenderContext* renderContext, bool shadowMap)
         renderContext->disableClippingPlane();
       }
     }
+  }
+
+BoundingBoxPtr RenderableSetImpl::getBounds()
+  {
+  if (renderables.count() == 0)
+    return nullptr;
+
+  BoundingBoxPtr bounds(new BoundingBox());
+  for (RenderablePtr renderable : *renderables.getList())
+    {
+    BoundingBoxPtr childBounds = renderable->getBounds();
+    if (!childBounds)
+      return nullptr;
+    bounds->addBoundingBox(childBounds);
+    }
+  RenderUtils::transformBoundingBox(bounds.get(), getTransform());
+  return bounds;
   }

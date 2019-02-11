@@ -132,17 +132,21 @@ bool MeshStorage::initVAOWithColours(std::vector<int>* indicesPtr)
   return glGetError() == GL_NO_ERROR;
   }
 
-mathernogl::Vector3D MeshStorage::getMin() const
+mathernogl::Vector3D MeshStorage::getMin()
   {
+  if (!minMaxValid)
+    recalculateMinMax();
   return min;
   }
 
-mathernogl::Vector3D MeshStorage::getMax() const
+mathernogl::Vector3D MeshStorage::getMax()
   {
+  if (!minMaxValid)
+    recalculateMinMax();
   return max;
   }
 
-void MeshStorage::calculateMinMax()
+void MeshStorage::recalculateMinMax()
   {
   bool firstVert = true;
   for (Vector3D& vert : vertices)
@@ -163,6 +167,12 @@ void MeshStorage::calculateMinMax()
       max.z = std::max(max.z, vert.z);
       }
     }
+  minMaxValid = true;
+  }
+
+void MeshStorage::invalidateMinMax()
+  {
+  minMaxValid = false;
   }
 
 
