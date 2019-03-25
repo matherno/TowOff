@@ -1,3 +1,14 @@
 cmake-build-debug
 cmake-build-release
 .idea
+.vscode
+obj
+bin_*
+Makefile
+TowOff.code-workspace
+TowOff.make
+saves
+gmon.out
+profile_results.png
+*.ini
+Log.txt

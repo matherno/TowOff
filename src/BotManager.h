@@ -4,6 +4,7 @@
 #include "BotPortal.h"
 #include "Bot.h"
 #include "BotQTNode.h"
+#include "RenderSystem/RenderableMesh.h"
 
 struct BotType
   {

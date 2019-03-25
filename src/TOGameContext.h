@@ -2,6 +2,7 @@
 
 class TOGameContext;
 
+#include <RenderSystem/BoundingBox.h>
 #include <GameSystem/GameSystem.h>
 #include <GameSystem/GameContextImpl.h>
 #include <ParticleSystem/ParticleSystem.h>

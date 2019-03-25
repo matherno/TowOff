@@ -1,7 +1,6 @@
 #pragma once
 
 #include <GameSystem/GameSystem.h>
-#include <BoundingBox.h>
 #include "TOGameSaveLoad.h"
 #include "TowerTarget.h"
 
